@@ -6,11 +6,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './components/app/app.component';
 import { CineworldService } from './services/cineworld.service';
 import { CinemaListComponent } from './components/cinema-list/cinema-list.component';
+import { CinemaComponent } from './components/cinema/cinema.component';
 
 @NgModule({
     declarations: [
         AppComponent,
-        CinemaListComponent
+        CinemaListComponent,
+        CinemaComponent
     ],
     imports: [
         BrowserModule,

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CineworldService, ICinema } from '../../services/cineworld.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'cinema-list',
@@ -8,7 +9,10 @@ import { CineworldService, ICinema } from '../../services/cineworld.service';
 })
 export class CinemaListComponent {
 
-    constructor(private cineworldService: CineworldService) {
+    constructor(
+        private cineworldService: CineworldService,
+        private router: Router,
+        ) {
         this.loadCinemaList();
     }
 
@@ -16,10 +20,10 @@ export class CinemaListComponent {
         return this._cinemaList;
     }
 
-    private _cinemaList: ICinema[];
+    private _cinemaList: ICinema[] | undefined;
 
-    public selectCinema(cinema: ICinema){
-        console.log(`cinema selected: ${cinema.name}`);
+    public selectCinema(cinema: ICinema) {
+        this.router.navigate(['/cinema/', cinema.externalCode]);
     }
 
     private loadCinemaList() {
