@@ -1,0 +1,13 @@
+<h2>Select Cinema</h2>
+
+<ul class="cinema-list">
+
+    <li 
+        *ngFor="let cinema of cinemaList" 
+        class="cinema"
+        (click)="selectCinema(cinema)"
+        >
+        {{cinema.name}}
+    </li>
+
+</ul>
