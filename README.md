@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Roaders/cineworld-planner.svg?branch=master)](https://travis-ci.org/Roaders/cineworld-planner)
+
 # CineworldPlanner
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.12.
