@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { CineworldService, ICinema } from '../../services/cineworld.service';
+import { CineworldService } from '../../services/cineworld.service';
 import { Router } from '@angular/router';
 import { TouchSequence } from 'selenium-webdriver';
+import { ICinema } from 'src/app/contracts/contracts';
 
 @Component({
   selector: 'cinema-list',

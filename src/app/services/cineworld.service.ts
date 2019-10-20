@@ -2,29 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { filter } from 'minimatch';
+import { ICinema } from '../contracts/contracts';
 
 const HOMEPAGE_URL = `https://www.cineworld.co.uk`;
-
-export interface ICinemaAddress {
-    address1: string;
-    address2?: string;
-    address3?: string;
-    address4?: string;
-    city: string;
-    postalCode: string;
-    state?: string;
-}
-
-export interface ICinema {
-    address: ICinemaAddress;
-    externalCode: string;
-    filename: string;
-    latitude: number;
-    longitude: number;
-    name: string;
-    uri: string;
-}
 
 const apiSitesListRegExp = /apiSitesList *= *(\[[^]+\])/;
 

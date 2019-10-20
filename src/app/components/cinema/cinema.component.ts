@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { CineworldService, ICinema } from 'src/app/services/cineworld.service';
+import { Component } from '@angular/core';
+import { CineworldService } from 'src/app/services/cineworld.service';
 import { ActivatedRoute } from '@angular/router';
-import { map, filter, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { Observer } from 'rxjs';
+import { ICinema, IDay as IDate } from 'src/app/contracts/contracts';
 
 @Component({
     selector: 'cinema',
@@ -17,6 +18,12 @@ export class CinemaComponent {
         this.loadCinemaTimes();
     }
 
+    private _selectedDate: undefined | IDate;
+
+    public get selectedDate() {
+        return this._selectedDate;
+    }
+
     private _errorMessage: undefined | string;
 
     public get errorMessage() {
@@ -27,6 +34,10 @@ export class CinemaComponent {
 
     public get cinema(): ICinema | undefined {
         return this._cinema;
+    }
+
+    public selectDate(date: IDate) {
+        this._selectedDate = date;
     }
 
     private loadCinemaTimes() {

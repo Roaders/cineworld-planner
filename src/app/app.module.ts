@@ -7,12 +7,14 @@ import { AppComponent } from './components/app/app.component';
 import { CineworldService } from './services/cineworld.service';
 import { CinemaListComponent } from './components/cinema-list/cinema-list.component';
 import { CinemaComponent } from './components/cinema/cinema.component';
+import { DateSelectorComponent } from './components/date-selector/date-selector.component';
 
 @NgModule({
     declarations: [
         AppComponent,
         CinemaListComponent,
-        CinemaComponent
+        CinemaComponent,
+        DateSelectorComponent
     ],
     imports: [
         BrowserModule,

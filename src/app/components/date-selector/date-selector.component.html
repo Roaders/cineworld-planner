@@ -1,0 +1,14 @@
+
+<div class="date-selector">
+
+    <div class="btn-group btn-group-lg" role="group" aria-label="Select Day">
+        <button 
+            *ngFor="let day of days"
+            type="button" 
+            class="btn btn-primary"
+            [ngClass]="{active: isActive(day)}"
+            (click)="selectDate(day)"
+            >{{day.description}}</button>
+    </div>
+
+</div>

@@ -1,25 +1,32 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { CinemaComponent } from './cinema.component';
+import { DateSelectorComponent } from '../date-selector/date-selector.component';
+import { CineworldService } from 'src/app/services/cineworld.service';
+import { HttpClientModule } from '@angular/common/http';
+import { AppRoutingModule } from 'src/app/app-routing.module';
+import { CinemaListComponent } from '../cinema-list/cinema-list.component';
+import { FormsModule } from '@angular/forms';
 
 describe('CinemaComponent', () => {
-  let component: CinemaComponent;
-  let fixture: ComponentFixture<CinemaComponent>;
+    let component: CinemaComponent;
+    let fixture: ComponentFixture<CinemaComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ CinemaComponent ]
-    })
-    .compileComponents();
-  }));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [CinemaComponent, DateSelectorComponent, CinemaListComponent ],
+            providers: [ CineworldService ],
+            imports: [ HttpClientModule, AppRoutingModule, FormsModule ]
+        })
+        .compileComponents();
+    }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(CinemaComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(CinemaComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

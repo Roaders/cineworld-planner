@@ -1,7 +1,8 @@
 
 import { HttpClient } from '@angular/common/http';
-import { CineworldService, ICinema } from './cineworld.service';
+import { CineworldService } from './cineworld.service';
 import { Subject } from 'rxjs';
+import { ICinema } from '../contracts/contracts';
 
 // tslint:disable: max-line-length
 describe('cineworld.service', () => {
@@ -29,7 +30,7 @@ describe('cineworld.service', () => {
         it('should return a formatted cinema list', () => {
             const instance = getInstance();
 
-            let result: ICinema[];
+            let result: ICinema[] | undefined;
 
             instance.getCinemaListAsync().subscribe(value => result = value);
 
@@ -38,7 +39,8 @@ describe('cineworld.service', () => {
 
             expect(result).toBeDefined();
             expect(Array.isArray(result)).toBeTruthy();
-            expect(result.length).toBeGreaterThan(10);
+            // tslint:disable-next-line: no-non-null-assertion
+            expect(result!.length).toBeGreaterThan(10);
         });
 
     });
