@@ -6,6 +6,11 @@ import { ICinema } from '../contracts/contracts';
 
 const HOMEPAGE_URL = `https://www.cineworld.co.uk`;
 
+function getListingsUrl(externalCode: string, date: string) {
+    // tslint:disable-next-line: max-line-length
+    return `https://www.cineworld.co.uk/uk/data-api-service/v1/quickbook/10108/film-events/in-cinema/${externalCode}/at-date/${date}`;
+}
+
 const apiSitesListRegExp = /apiSitesList *= *(\[[^]+\])/;
 
 @Injectable()
@@ -39,6 +44,10 @@ export class CineworldService {
                 throw new Error(`Could not find cinema with externalCode ${externalCode}`);
             }),
         );
+    }
+
+    public getCinemaListings(externalCode: string, date: string) {
+        return this.http.get(getListingsUrl(externalCode, date));
     }
 }
 

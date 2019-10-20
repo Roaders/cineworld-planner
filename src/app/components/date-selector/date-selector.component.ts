@@ -58,7 +58,7 @@ export class DateSelectorComponent implements OnInit {
 
                 return {
                     description,
-                    date: date.format('DD-MM-YYYY')
+                    date: date.format('YYYY-MM-DD')
                 };
             });
     }

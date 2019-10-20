@@ -30,13 +30,13 @@ describe('DateSelectorComponent', () => {
         const instance = getInstance();
 
         const expectedDays = [
-            {description: 'Today', date: '27-01-2019'},
-            {description: 'Tomorrow', date: '28-01-2019'},
-            {description: 'Tue', date: '29-01-2019'},
-            {description: 'Wed', date: '30-01-2019'},
-            {description: 'Thu', date: '31-01-2019'},
-            {description: 'Fri', date: '01-02-2019'},
-            {description: 'Sat', date: '02-02-2019'},
+            {description: 'Today', date: '2019-01-27'},
+            {description: 'Tomorrow', date: '2019-01-28'},
+            {description: 'Tue', date: '2019-01-29'},
+            {description: 'Wed', date: '2019-01-30'},
+            {description: 'Thu', date: '2019-01-31'},
+            {description: 'Fri', date: '2019-02-01'},
+            {description: 'Sat', date: '2019-02-02'},
         ];
 
         expect(instance.days).toEqual(expectedDays);

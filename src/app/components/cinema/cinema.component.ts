@@ -15,7 +15,7 @@ export class CinemaComponent {
         private cineworldService: CineworldService,
         private activatedRoute: ActivatedRoute
     ) {
-        this.loadCinemaTimes();
+        this.loadCinema();
     }
 
     private _selectedDate: undefined | IDate;
@@ -37,20 +37,35 @@ export class CinemaComponent {
     }
 
     public selectDate(date: IDate) {
+        if (this._selectedDate != null && this._selectedDate.date === date.date) {
+            return;
+        }
+
         this._selectedDate = date;
+        this.loadCinemaTimes(date);
     }
 
-    private loadCinemaTimes() {
+    private loadCinemaTimes(date: IDate) {
+        const externalCode = this.activatedRoute.snapshot.params.externalCode;
+
+        const observer: Observer<any> = {
+            error: error => this._errorMessage = error,
+            next: cinema => this._cinema = cinema,
+            complete: () => null,
+        };
+
+        this.cineworldService.getCinemaListings(externalCode, date.date).subscribe(observer);
+    }
+
+    private loadCinema() {
         const externalCode = this.activatedRoute.snapshot.params.externalCode;
 
         const observer: Observer<ICinema> = {
             error: error => this._errorMessage = error,
-            next: () => null,
+            next: cinema => this._cinema = cinema,
             complete: () => null,
         };
 
-        this.cineworldService.getCinemaAsync(externalCode).pipe(
-            tap(cinema => this._cinema = cinema)
-        ).subscribe(observer);
+        this.cineworldService.getCinemaAsync(externalCode).subscribe(observer);
     }
 }
