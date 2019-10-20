@@ -1,6 +1,32 @@
 import express from 'express';
+import { Express } from 'express';
+import { setupRoutes } from './routes';
+import cors from 'cors';
 
-const app = express();
+const app: Express = express();
+
+const allowedOrigins = [
+    'http://localhost:4200',
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // allow requests with no origin
+        // (like mobile apps or curl requests)
+        if (!origin) {
+            return callback(null, true);
+        }
+
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = `The CORS policy for this site does not allow access from ${origin}.`;
+            return callback(new Error(msg), false);
+        }
+
+        return callback(null, true);
+    }
+}));
+
+setupRoutes(app);
 
 const port = process.env.PORT || 3000;
 

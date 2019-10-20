@@ -2,13 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { ICinema } from '../../contracts/contracts';
+import { ICinema, IListingsResponse } from '../../contracts/contracts';
 
 const HOMEPAGE_URL = `https://www.cineworld.co.uk`;
 
 function getListingsUrl(externalCode: string, date: string) {
-    // tslint:disable-next-line: max-line-length
-    return `https://www.cineworld.co.uk/uk/data-api-service/v1/quickbook/10108/film-events/in-cinema/${externalCode}/at-date/${date}`;
+    return `http://localhost:3000/listings/${externalCode}/${date}`;
 }
 
 const apiSitesListRegExp = /apiSitesList *= *(\[[^]+\])/;
@@ -46,8 +45,8 @@ export class CineworldService {
         );
     }
 
-    public getCinemaListings(externalCode: string, date: string) {
-        return this.http.get(getListingsUrl(externalCode, date));
+    public getCinemaListings(externalCode: string, date: string): Observable<IListingsResponse> {
+        return this.http.get<IListingsResponse>(getListingsUrl(externalCode, date));
     }
 }
 

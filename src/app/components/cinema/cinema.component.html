@@ -3,3 +3,12 @@
 <date-selector (selectedDate)="selectDate($event)"></date-selector>
 
 <div>SelectedDate: {{selectedDate?.date}}</div>
+
+<div class="film-container">
+
+    <div 
+        class="film"
+        *ngFor="let film of filmList" 
+        >{{film.name}}</div>
+
+</div>
