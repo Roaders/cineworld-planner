@@ -8,6 +8,7 @@
         "start": "ng serve --open",
         "prebuild-node": "npm run clean",
         "build-node": "tsc -p src/node/tsconfig.json",
+        "heroku-postbuild": "npm run build-node",
         "watch-build-node": "tsc -p src/node/tsconfig.json --watch",
         "start-ts-node": "ts-node --project src/node/tsconfig.json src/node/index.ts",
         "start-node": "node dist/node",
