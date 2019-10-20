@@ -34,7 +34,7 @@ describe('DateSelectorComponent', () => {
             {description: 'Tomorrow', date: '2019-01-28'},
             {description: 'Tue', date: '2019-01-29'},
             {description: 'Wed', date: '2019-01-30'},
-            {description: 'Thu', date: '219-01-31'},
+            {description: 'Thu', date: '2019-01-31'},
             {description: 'Fri', date: '2019-02-01'},
             {description: 'Sat', date: '2019-02-02'},
         ];
