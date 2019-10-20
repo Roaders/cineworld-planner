@@ -3,7 +3,6 @@ import { Express } from 'express';
 import { setupRoutes } from './routes';
 import cors from 'cors';
 
-
 const app: Express = express();
 
 const allowedOrigins = [

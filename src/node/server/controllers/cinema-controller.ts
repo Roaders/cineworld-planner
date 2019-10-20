@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { map, shareReplay } from 'rxjs/operators';
 import axios from 'axios-observable';
 import { AxiosError } from 'axios';
-import { ICinema } from '../../contracts/contracts';
+import { ICinema } from '../../../contracts/contracts';
 import { defer, Observable } from 'rxjs';
 
 const CINEWORLD_HOMEPAGE_URL = `https://www.cineworld.co.uk`;
