@@ -1,10 +1,10 @@
 import Client from 'ftp';
 import { readdirSync } from 'fs';
-import { join, basename } from 'path';
+import { join } from 'path';
 import { from, bindNodeCallback } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
-console.log(`RELEASE ${process.env.FTP_HOST}  ${process.env.FTP_USER} ${process.env.FTP_PASSWORD}`);
+console.log(`RELEASE ${process.env.NODE_ENV} ${process.env.FTP_USER}@${process.env.FTP_HOST}`);
 
 const DIST_PATH = `dist/cineworld-planner`;
 const filesList = readdirSync(join(process.cwd(), DIST_PATH));
@@ -23,12 +23,6 @@ function pushFiles() {
     ).subscribe({
         complete: () => client.end()
     });
-
-    // client.put(
-    //     join(process.cwd(), DIST_PATH, filesList[0]),
-    //     filesList[0],
-    //     () => client.end()
-    //     );
 }
 
 client.on('ready', () => {
