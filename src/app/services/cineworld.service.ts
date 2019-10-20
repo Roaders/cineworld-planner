@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { shareReplay, map } from 'rxjs/operators';
 import { ICinema, IListingsResponse } from '../../contracts/contracts';
 
-const HOMEPAGE_URL = `https://www.cineworld.co.uk`;
-
-function getListingsUrl(externalCode: string, date: string) {
-    return `http://localhost:3000/listings/${externalCode}/${date}`;
+function getCinemasUrl() {
+    return `http://localhost:3000/cinema`;
 }
 
-const apiSitesListRegExp = /apiSitesList *= *(\[[^]+\])/;
+function getListingsUrl(externalCode: string, date: string) {
+    return `http://localhost:3000/cinema/${externalCode}/listings/${date}`;
+}
+
 
 @Injectable()
 export class CineworldService {
@@ -23,8 +24,7 @@ export class CineworldService {
     public getCinemaListAsync(): Observable<ICinema[]> {
 
         if (this._cinemaListStream == null) {
-            this._cinemaListStream = this.http.get(HOMEPAGE_URL, {responseType: 'text'}).pipe(
-                map(processRawHtml),
+            this._cinemaListStream = this.http.get<ICinema[]>(getCinemasUrl()).pipe(
                 shareReplay(),
             );
         }
@@ -48,15 +48,4 @@ export class CineworldService {
     public getCinemaListings(externalCode: string, date: string): Observable<IListingsResponse> {
         return this.http.get<IListingsResponse>(getListingsUrl(externalCode, date));
     }
-}
-
-function processRawHtml(rawHtml: string): ICinema[] {
-    const regExpResult = apiSitesListRegExp.exec(rawHtml);
-    const sitesListString = regExpResult != null ? regExpResult[1] : undefined;
-
-    if (sitesListString) {
-        return JSON.parse(sitesListString);
-    }
-
-    throw new Error('Could not retrieve sites list from html');
 }

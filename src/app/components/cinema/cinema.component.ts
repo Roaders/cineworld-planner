@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CineworldService } from 'src/app/services/cineworld.service';
 import { ActivatedRoute } from '@angular/router';
-import { tap } from 'rxjs/operators';
 import { Observer } from 'rxjs';
 import { ICinema, IDay as IDate, IFilm, IListingsResponse } from 'src/contracts/contracts';
 
@@ -52,18 +51,20 @@ export class CinemaComponent {
     }
 
     private loadCinemaTimes(date: IDate) {
+        this._filmList = undefined;
         const externalCode = this.activatedRoute.snapshot.params.externalCode;
 
         const observer: Observer<IListingsResponse> = {
             error: error => this._errorMessage = error,
-            next: response => {
-                console.log(`listings loaded: ${response.body.films.length}`);
-                this._filmList = response.body.films;
-            },
+            next: response => this.onListingLoaded(response),
             complete: () => null,
         };
 
         this.cineworldService.getCinemaListings(externalCode, date.date).subscribe(observer);
+    }
+
+    private onListingLoaded(response: IListingsResponse) {
+        this._filmList = response.body.films;
     }
 
     private loadCinema() {

@@ -2,9 +2,10 @@
 
 <date-selector (selectedDate)="selectDate($event)"></date-selector>
 
-<div>SelectedDate: {{selectedDate?.date}}</div>
-
-<div class="film-container">
+<div 
+    *ngIf="filmList != null && filmList.length > 0"
+    class="film-container pt-2"
+    >
 
     <div 
         class="film"
@@ -12,3 +13,13 @@
         >{{film.name}}</div>
 
 </div>
+
+<div *ngIf="filmList != null && filmList.length === 0">No Listings</div>
+
+<div 
+    *ngIf="filmList == null" 
+    class="d-flex align-items-center pt-2">
+        <span class="spinner-border text-primary mr-2"></span>
+        <span>Loading...</span>
+</div>
+
