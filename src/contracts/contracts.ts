@@ -1,4 +1,9 @@
 
+export interface IEnvironment {
+    production: boolean;
+    baseUrl: string;
+}
+
 export interface IDay {
     description: string;
     date: string;

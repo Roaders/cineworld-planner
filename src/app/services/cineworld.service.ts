@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { shareReplay, map } from 'rxjs/operators';
 import { ICinema, IListingsResponse } from '../../contracts/contracts';
+import { environment } from '../environments/environment';
 
 function getCinemasUrl() {
-    return `http://localhost:3000/cinema`;
+    return `${environment.baseUrl}/cinema`;
 }
 
 function getListingsUrl(externalCode: string, date: string) {
-    return `http://localhost:3000/cinema/${externalCode}/listings/${date}`;
+    return `${environment.baseUrl}/cinema/${externalCode}/listings/${date}`;
 }
 
 

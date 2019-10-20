@@ -3,11 +3,17 @@ import { Express } from 'express';
 import { setupRoutes } from './routes';
 import cors from 'cors';
 
+
 const app: Express = express();
 
 const allowedOrigins = [
-    'http://localhost:4200',
+    'https://www.cineworld-planner.co.uk',
+    'http://www.cineworld-planner.co.uk'
 ];
+
+if (process.env.NODE_ENV !== 'production') {
+    allowedOrigins.push('http://localhost:4200');
+}
 
 app.use(cors({
     origin: (origin, callback) => {

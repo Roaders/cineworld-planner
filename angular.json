@@ -36,8 +36,8 @@
                         "production": {
                             "fileReplacements": [
                                 {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.prod.ts"
+                                    "replace": "src/app/environments/environment.ts",
+                                    "with": "src/app/environments/environment.prod.ts"
                                 }
                             ],
                             "optimization": true,
@@ -61,6 +61,14 @@
                                     "maximumError": "10kb"
                                 }
                             ]
+                        },
+                        "local": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/app/environments/environment.ts",
+                                    "with": "src/app/environments/environment.local.ts"
+                                }
+                            ]
                         }
                     }
                 },
@@ -72,6 +80,9 @@
                     "configurations": {
                         "production": {
                             "browserTarget": "cineworld-planner:build:production"
+                        },
+                        "local": {
+                            "browserTarget": "cineworld-planner:build:local"
                         }
                     }
                 },
