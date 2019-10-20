@@ -23,6 +23,7 @@
         "preverify-release": "npm install && npm run clean",
         "verify-release": "concurrently npm:build-node npm:test npm:build",
         "run-release": "node dist/node/release",
+        "push": "npm version patch && git push origin --follow-tags",
         "test": "ng test --watch=false --browsers=ChromeHeadless",
         "lint": "ng lint"
     },
