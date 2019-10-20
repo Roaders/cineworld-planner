@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import moment from 'moment';
-import { IDay } from 'src/app/contracts/contracts';
+import { IDay } from 'src/contracts/contracts';
 
 @Component({
     selector: 'date-selector',

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { ICinema } from '../contracts/contracts';
+import { ICinema } from '../../contracts/contracts';
 
 const HOMEPAGE_URL = `https://www.cineworld.co.uk`;
 

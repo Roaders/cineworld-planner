@@ -2,7 +2,7 @@
 import { HttpClient } from '@angular/common/http';
 import { CineworldService } from './cineworld.service';
 import { Subject } from 'rxjs';
-import { ICinema } from '../contracts/contracts';
+import { ICinema } from '../../contracts/contracts';
 
 // tslint:disable: max-line-length
 describe('cineworld.service', () => {

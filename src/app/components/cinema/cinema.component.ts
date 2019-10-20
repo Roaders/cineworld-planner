@@ -3,7 +3,7 @@ import { CineworldService } from 'src/app/services/cineworld.service';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { Observer } from 'rxjs';
-import { ICinema, IDay as IDate } from 'src/app/contracts/contracts';
+import { ICinema, IDay as IDate } from 'src/contracts/contracts';
 
 @Component({
     selector: 'cinema',
