@@ -13,8 +13,8 @@
         "predebug-node": "npm run clean && npm run build-node",
         "debug-node": "node --inspect dist/node",
         "build": "ng build",
-        "test": "ng test",
-        "watch-test": "ng test --watch",
+        "watch-test": "ng test",
+        "test": "ng test --watch=false --browsers=ChromeHeadless",
         "lint": "ng lint"
     },
     "private": true,
