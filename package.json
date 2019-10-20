@@ -1,7 +1,7 @@
 {
     "name": "cineworld-planner",
     "description": "An Application to help plan multi-film visits to cineworld",
-    "version": "0.0.0",
+    "version": "1.0.1",
     "scripts": {
         "ng": "ng",
         "clean": "rimraf dist",
@@ -9,6 +9,7 @@
         "start-app-local": "ng serve --open --configuration=local",
         "start-app-production": "ng serve --open --configuration=production",
         "prebuild-node": "npm run clean",
+        "prebuild-prod": "npm run clean",
         "build-node": "tsc -p src/node/tsconfig.json",
         "heroku-postbuild": "npm run build-node",
         "watch-build-node": "tsc -p src/node/tsconfig.json --watch",
