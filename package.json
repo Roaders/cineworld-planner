@@ -6,9 +6,11 @@
         "ng": "ng",
         "clean": "rimraf dist",
         "start": "ng serve --open",
+        "prebuild-node": "npm run clean",
         "build-node": "tsc -p src/node/tsconfig.json",
         "watch-build-node": "tsc -p src/node/tsconfig.json --watch",
-        "start-node": "ts-node --project src/node/tsconfig.json src/node/index.ts",
+        "start-ts-node": "ts-node --project src/node/tsconfig.json src/node/index.ts",
+        "start-node": "node dist/node",
         "watch-node": "nodemon",
         "predebug-node": "npm run clean && npm run build-node",
         "debug-node": "node --inspect dist/node",
@@ -68,5 +70,8 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/Roaders/cineworld-planner.git"
+    },
+    "engines": {
+        "node": "10.x"
     }
 }
