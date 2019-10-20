@@ -7,7 +7,6 @@ import { Observer } from 'rxjs';
 @Component({
     selector: 'cinema',
     templateUrl: './cinema.component.html',
-    styleUrls: ['./cinema.component.scss']
 })
 export class CinemaComponent {
 

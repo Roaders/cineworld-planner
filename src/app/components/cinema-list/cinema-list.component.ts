@@ -6,7 +6,6 @@ import { TouchSequence } from 'selenium-webdriver';
 @Component({
   selector: 'cinema-list',
   templateUrl: './cinema-list.component.html',
-  styleUrls: ['./cinema-list.component.scss']
 })
 export class CinemaListComponent {
 

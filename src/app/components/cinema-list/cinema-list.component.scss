@@ -1,12 +1,12 @@
 
 .cinema-list{
-
+    .cinema{
+        cursor: pointer;
+    }
+    
+    .cinema:hover{
+        background-color: $primary;
+    }
 }
 
-.cinema{
-    cursor: pointer;
-}
 
-.cinema:hover{
-    background-color: red;
-}

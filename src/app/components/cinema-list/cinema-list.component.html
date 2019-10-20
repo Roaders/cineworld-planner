@@ -1,18 +1,22 @@
-<h2>Select Cinema</h2>
 
-<div>
-    <span>Search:</span>
-    <input [(ngModel)]="searchString" type="text">
+<div class="cinema-list">
+    <h2>Select Cinema</h2>
+
+    <div>
+        <span>Search:</span>
+        <input [(ngModel)]="searchString" type="text">
+    </div>
+    
+    <div>
+    
+        <div 
+            *ngFor="let cinema of cinemaList" 
+            class="cinema"
+            (click)="selectCinema(cinema)"
+            >
+            {{cinema.name}}
+        </div>
+    
+    </div>
 </div>
 
-<ul class="cinema-list">
-
-    <li 
-        *ngFor="let cinema of cinemaList" 
-        class="cinema"
-        (click)="selectCinema(cinema)"
-        >
-        {{cinema.name}}
-    </li>
-
-</ul>
