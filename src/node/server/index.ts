@@ -12,6 +12,7 @@ const allowedOrigins = [
 
 if (process.env.NODE_ENV !== 'production') {
     allowedOrigins.push('http://localhost:4200');
+    allowedOrigins.push('http://staging.cineworld-planner.co.uk');
 }
 
 app.use(cors({
