@@ -14,6 +14,8 @@
         "debug-node": "node --inspect dist/node",
         "build": "ng build",
         "watch-test": "ng test",
+        "preverify-release": "npm install && npm run clean",
+        "verify-release": "concurrently npm:build-node npm:test npm:build",
         "test": "ng test --watch=false --browsers=ChromeHeadless",
         "lint": "ng lint"
     },
@@ -45,6 +47,7 @@
         "@types/node": "~8.9.4",
         "bootstrap": "^4.3.1",
         "codelyzer": "^5.0.0",
+        "concurrently": "^5.0.0",
         "jasmine-core": "~3.4.0",
         "jasmine-spec-reporter": "~4.2.1",
         "karma": "~4.1.0",
