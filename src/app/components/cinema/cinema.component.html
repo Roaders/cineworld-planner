@@ -1,28 +1,38 @@
-<h2>
-    <span>{{cinema?.name}}</span>
-    <span class="pl-1" (click)="toggleFavorite(cinema)">heart</span>
-    <span class="pl-1">{{isFavoriteCinema(cinema)}}</span>
-</h2>
+<div class="cinema">
+    <h2>
+        <span>{{cinema?.name}}</span>
+        <i 
+            class="fa pl-1 heart-toggle"
+            [ngClass]="{
+                'fa-heart': isFavoriteCinema(cinema), 
+                'heart': isFavoriteCinema(cinema), 
+                'fa-heart-o': !isFavoriteCinema(cinema)
+            }"
+            aria-hidden="true"
+            (click)="toggleFavorite(cinema)"
+            ></i>
+    </h2>
 
-<date-selector (selectedDate)="selectDate($event)"></date-selector>
-
-<div 
-    *ngIf="filmList != null && filmList.length > 0"
-    class="film-container pt-2"
-    >
+    <date-selector (selectedDate)="selectDate($event)"></date-selector>
 
     <div 
-        class="film"
-        *ngFor="let film of filmList" 
-        >{{film.name}}</div>
+        *ngIf="filmList != null && filmList.length > 0"
+        class="film-container pt-2"
+        >
+
+        <div 
+            class="film"
+            *ngFor="let film of filmList" 
+            >{{film.name}}</div>
+    </div>
+
+    <div *ngIf="filmList != null && filmList.length === 0">No Listings</div>
+
+    <div 
+        *ngIf="filmList == null" 
+        class="d-flex align-items-center pt-2">
+            <span class="spinner-border text-primary mr-2"></span>
+            <span>Loading...</span>
+    </div>
+
 </div>
-
-<div *ngIf="filmList != null && filmList.length === 0">No Listings</div>
-
-<div 
-    *ngIf="filmList == null" 
-    class="d-flex align-items-center pt-2">
-        <span class="spinner-border text-primary mr-2"></span>
-        <span>Loading...</span>
-</div>
-

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CineworldService } from '../../services/cineworld.service';
 import { Router } from '@angular/router';
-import { TouchSequence } from 'selenium-webdriver';
 import { ICinema } from 'src/contracts/contracts';
 import { CinemaHelper } from 'src/app/helper/cinema-helper';
 

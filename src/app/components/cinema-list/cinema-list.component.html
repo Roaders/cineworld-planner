@@ -20,8 +20,10 @@
             (click)="selectCinema(cinema)"
             >
             <span>{{cinema.name}}</span>
-            <span class="pl-1" >heart</span>
-            <span class="pl-1">{{isFavoriteCinema(cinema)}}</span>
+            <i 
+                *ngIf="isFavoriteCinema(cinema)"
+                class="fa fa-heart pl-1 heart" 
+                aria-hidden="true"></i>
         </div>
     
     </div>
