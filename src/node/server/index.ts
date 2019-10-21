@@ -2,12 +2,14 @@ import express from 'express';
 import { Express } from 'express';
 import { setupRoutes } from './routes';
 import cors from 'cors';
-import { urlLookup } from '../../constants/constants';
-import { IUrlLookup } from '../../contracts/contracts';
 
 const app: Express = express();
 
-const allowedOrigins = Object.keys(urlLookup).map(key => urlLookup[key as keyof IUrlLookup]) as string[];
+const allowedOrigins = [
+    'https://www.cineworld-planner.co.uk',
+    'http://staging.cineworld-planner.co.uk',
+    'http://localhost:4200',
+];
 
 app.use(cors({
     origin: (origin, callback) => {
