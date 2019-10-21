@@ -6,6 +6,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from 'src/app/app-routing.module';
 import { CinemaListComponent } from '../cinema-list/cinema-list.component';
 import { FormsModule } from '@angular/forms';
+import { CinemaHelper } from 'src/app/helper/cinema-helper';
+import { PreferencesService } from 'src/app/services/preferences.service';
 
 describe('CinemaComponent', () => {
     let component: CinemaComponent;
@@ -14,7 +16,7 @@ describe('CinemaComponent', () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [CinemaComponent, DateSelectorComponent, CinemaListComponent ],
-            providers: [ CineworldService ],
+            providers: [ CineworldService, CinemaHelper, PreferencesService ],
             imports: [ HttpClientModule, AppRoutingModule, FormsModule ]
         })
         .compileComponents();
