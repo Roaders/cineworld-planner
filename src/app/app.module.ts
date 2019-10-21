@@ -9,6 +9,7 @@ import { CinemaListComponent } from './components/cinema-list/cinema-list.compon
 import { CinemaComponent } from './components/cinema/cinema.component';
 import { DateSelectorComponent } from './components/date-selector/date-selector.component';
 import { PreferencesService } from './services/preferences.service';
+import { CinemaHelper } from './helper/cinema-helper';
 
 @NgModule({
     declarations: [
@@ -25,7 +26,8 @@ import { PreferencesService } from './services/preferences.service';
     ],
     providers: [
         CineworldService,
-        PreferencesService
+        PreferencesService,
+        CinemaHelper,
     ],
     bootstrap: [AppComponent]
 })

@@ -2,21 +2,35 @@
 <div class="cinema-list">
     <h2>Select Cinema</h2>
 
-    <div>
-        <span>Search:</span>
-        <input [(ngModel)]="searchString" type="text">
+    <div class="form-group">
+        <label for="cinemaSearchInput">Search</label>
+        <input 
+            type="text" 
+            class="form-control" 
+            id="cinemaSearchInput" 
+            placeholder="Cinema name..."
+            [(ngModel)]="searchString"
+            >
     </div>
     
-    <div>
-    
+    <div *ngIf="cinemaList != null">
         <div 
             *ngFor="let cinema of cinemaList" 
             class="cinema"
             (click)="selectCinema(cinema)"
             >
-            {{cinema.name}}
+            <span>{{cinema.name}}</span>
+            <span class="pl-1" >heart</span>
+            <span class="pl-1">{{isFavoriteCinema(cinema)}}</span>
         </div>
     
+    </div>
+
+    <div 
+        *ngIf="cinemaList == null" 
+        class="d-flex align-items-center pt-2">
+            <span class="spinner-border text-primary mr-2"></span>
+            <span>Loading...</span>
     </div>
 </div>
 

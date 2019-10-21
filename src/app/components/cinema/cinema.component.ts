@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observer } from 'rxjs';
 import { ICinema, IDay as IDate, IFilm, IListingsResponse, ICinemaAddress } from 'src/contracts/contracts';
 import { PreferencesService } from 'src/app/services/preferences.service';
+import { CinemaHelper } from 'src/app/helper/cinema-helper';
 
 @Component({
     selector: 'cinema',
@@ -13,7 +14,7 @@ export class CinemaComponent {
 
     constructor(
         private cineworldService: CineworldService,
-        private preferencesService: PreferencesService,
+        private cinemaHelper: CinemaHelper,
         private activatedRoute: ActivatedRoute
     ) {
         this.loadCinema();
@@ -44,17 +45,11 @@ export class CinemaComponent {
     }
 
     public isFavoriteCinema(cinema?: ICinema): boolean {
-        return cinema != null && this.preferencesService.getFavoriteCinemaIds().indexOf(cinema.externalCode) >= 0;
+        return this.cinemaHelper.isFavoriteCinema(cinema);
     }
 
     public toggleFavorite(cinema?: ICinema) {
-        if (cinema != null) {
-            if (this.preferencesService.getFavoriteCinemaIds().indexOf(cinema.externalCode) < 0) {
-                this.preferencesService.addFavoriteCinema(cinema.externalCode);
-            } else {
-                this.preferencesService.removeFavoriteCinema(cinema.externalCode);
-            }
-        }
+        this.cinemaHelper.toggleFavorite(cinema);
     }
 
     public selectDate(date: IDate) {
