@@ -2,17 +2,36 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { shareReplay, map } from 'rxjs/operators';
-import { ICinema, IListingsResponse } from '../../contracts/contracts';
+import { ICinema, IListingsResponse, IUrlLookup } from '../../contracts/contracts';
 import { environment } from '../environments/environment';
+import { urlLookup } from 'src/constants/constants';
+
+function getUrlParams() {
+    const hash = window.location.hash;
+    const urlParams = hash.substr(hash.indexOf('?'));
+
+    return new URLSearchParams(urlParams);
+}
+
+function getBaseUrl() {
+    const environmentKey = environment.baseUrl;
+
+    const urlEnv = getUrlParams().get('env');
+
+    if (urlEnv != null && urlLookup[urlEnv as keyof IUrlLookup] != null) {
+        return urlLookup[urlEnv as keyof IUrlLookup] as string;
+    }
+
+    return urlLookup[environmentKey];
+}
 
 function getCinemasUrl() {
-    return `${environment.baseUrl}/cinema`;
+    return `${getBaseUrl()}/cinema`;
 }
 
 function getListingsUrl(externalCode: string, date: string) {
-    return `${environment.baseUrl}/cinema/${externalCode}/listings/${date}`;
+    return `${getBaseUrl()}/cinema/${externalCode}/listings/${date}`;
 }
-
 
 @Injectable()
 export class CineworldService {

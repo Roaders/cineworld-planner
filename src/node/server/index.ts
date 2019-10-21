@@ -2,18 +2,12 @@ import express from 'express';
 import { Express } from 'express';
 import { setupRoutes } from './routes';
 import cors from 'cors';
+import { urlLookup } from '../../constants/constants';
+import { IUrlLookup } from '../../contracts/contracts';
 
 const app: Express = express();
 
-const allowedOrigins = [
-    'https://www.cineworld-planner.co.uk',
-    'http://www.cineworld-planner.co.uk'
-];
-
-if (process.env.NODE_ENV !== 'production') {
-    allowedOrigins.push('http://localhost:4200');
-    allowedOrigins.push('http://staging.cineworld-planner.co.uk');
-}
+const allowedOrigins = Object.keys(urlLookup).map(key => urlLookup[key as keyof IUrlLookup]) as string[];
 
 app.use(cors({
     origin: (origin, callback) => {

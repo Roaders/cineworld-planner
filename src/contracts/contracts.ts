@@ -1,7 +1,7 @@
 
 export interface IEnvironment {
     production: boolean;
-    baseUrl: string;
+    baseUrl: keyof IUrlLookup;
 }
 
 export interface IDay {
@@ -62,3 +62,8 @@ export interface IListingsResponse {
     };
 }
 
+export interface IUrlLookup {
+    local: string;
+    staging: string;
+    prod: string;
+}
