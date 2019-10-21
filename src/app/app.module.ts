@@ -8,6 +8,7 @@ import { CineworldService } from './services/cineworld.service';
 import { CinemaListComponent } from './components/cinema-list/cinema-list.component';
 import { CinemaComponent } from './components/cinema/cinema.component';
 import { DateSelectorComponent } from './components/date-selector/date-selector.component';
+import { PreferencesService } from './services/preferences.service';
 
 @NgModule({
     declarations: [
@@ -22,7 +23,10 @@ import { DateSelectorComponent } from './components/date-selector/date-selector.
         HttpClientModule,
         FormsModule,
     ],
-    providers: [CineworldService],
+    providers: [
+        CineworldService,
+        PreferencesService
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

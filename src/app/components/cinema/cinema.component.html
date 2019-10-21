@@ -1,4 +1,8 @@
-<h2>{{cinema?.name}}</h2>
+<h2>
+    <span>{{cinema?.name}}</span>
+    <span class="pl-1" (click)="toggleFavorite(cinema)">heart</span>
+    <span class="pl-1">{{isFavoriteCinema(cinema)}}</span>
+</h2>
 
 <date-selector (selectedDate)="selectDate($event)"></date-selector>
 
