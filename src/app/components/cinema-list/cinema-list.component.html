@@ -5,6 +5,8 @@
 
     <h2>Select Cinema</h2>
 
+    <div *ngIf="errorMessage != null" class="alert alert-danger" role="alert">{{errorMessage}}</div>
+
     <div class="form-group">
         <label for="cinemaSearchInput">Search</label>
         <input 

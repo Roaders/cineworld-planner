@@ -20,6 +20,12 @@ export class CinemaListComponent {
         this.loadCinemaList();
     }
 
+    private _errorMessage: undefined | string;
+
+    public get errorMessage() {
+        return this._errorMessage;
+    }
+
     private coordinates: Coordinates | undefined;
 
     public get alhpabeticalSearch() {
@@ -129,7 +135,7 @@ export class CinemaListComponent {
     private onGeolocationError(positionError: PositionError) {
         console.log(`GEO LOCATION ERROR: ${positionError.message}`);
 
-        alert(`GEO LOCATION ERROR: ${positionError.message}`);
+        this._errorMessage = `Could not get location: ${positionError.message}`;
 
         this._alhpabeticalSearch = true;
     }
