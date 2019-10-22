@@ -27,15 +27,10 @@
 <div class="mt-2 event-list d-inline" *ngIf="itinerary.length > 0">
 
     <h3>Itinerary</h3>
-    
-    <div class="container p-0">
 
-        <div class="row w-100 m-0" *ngFor="let event of itinerary">
-            <div class="col-1"><span>{{event.start}}</span><span *ngIf="event.startEstimated">*</span></div>
-            <div class="col"><span class="ml-1">{{event.message}}</span></div>
-            <div class="col-1"><span class="ml-1">{{event.end}}</span><span *ngIf="event.endEstimated">*</span></div>
-        </div>
-
+    <div class="w-100 d-flex" *ngFor="let event of itinerary">
+        <div class="grid-time"><span>{{event.start}}</span><span *ngIf="event.startEstimated">*</span></div>
+        <div class="flex-grow-1"><span class="ml-1">{{event.message}}</span></div>
+        <div class="grid-time text-right"><span class="ml-1">{{event.end}}</span><span *ngIf="event.endEstimated">*</span></div>
     </div>
-
 </div>

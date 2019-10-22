@@ -24,11 +24,32 @@ export class EventListComponent {
 
     public trailerTime = 30;
 
-    @Input()
-    public events: IEvent[] | undefined;
+    private _events: IEvent[] | undefined;
 
     @Input()
-    public selectedFilms: IFilm[] = [];
+    public set events(value: IEvent[] | undefined) {
+        this._events = value || [];
+
+        this._selectedEvents = [];
+    }
+
+    public get events(): IEvent[] | undefined {
+        return this._events;
+    }
+
+    private _selectedFilms: IFilm[] = [];
+
+    public get selectedFilms(): IFilm[] {
+        return this._selectedFilms;
+    }
+
+    @Input()
+    public set selectedFilms(value: IFilm[]) {
+        this._selectedFilms = value;
+
+        this._selectedEvents = this._selectedEvents
+            .filter(event => this._selectedFilms.some(film => film.id === event.filmId));
+    }
 
     public get itinerary(): ITineraryItem[] {
         return this._selectedEvents
