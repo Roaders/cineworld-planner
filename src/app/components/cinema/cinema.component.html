@@ -1,40 +1,8 @@
 <div class="cinema container">
     
-    <h1><i class="fa fa-home" aria-hidden="true" [routerLink]="'/cinemaList'"></i> Cineworld Planner</h1>
+    <cinema-header [cinema]="cinema"></cinema-header>
 
-    <div class="d-flex">
-        <h2 class="flex-grow-1">
-            <span>{{cinema?.name}}</span>
-            <i 
-                class="fa pl-1 heart-toggle"
-                [ngClass]="{
-                    'fa-heart': isFavoriteCinema(cinema), 
-                    'heart': isFavoriteCinema(cinema), 
-                    'fa-heart-o': !isFavoriteCinema(cinema)
-                }"
-                aria-hidden="true"
-                (click)="toggleFavorite(cinema)"
-                ></i>
-        </h2>
-
-        <h2 class="mr-2">
-            <a href="https://www.cineworld.co.uk{{cinema?.uri}}" target="_blank">
-                <i 
-                    class="fa fa-film" 
-                    aria-hidden="true"
-                    ></i>
-            </a>
-        </h2>
-
-        <h2>
-            <a href="{{cinemaUrl}}" target="_blank">
-                <i 
-                    class="fa fa-map-marker" 
-                    aria-hidden="true"
-                    ></i>
-            </a>
-        </h2>
-    </div>
+    <div *ngIf="errorMessage != null" class="alert alert-danger" role="alert">{{errorMessage}}</div>
 
     <date-selector (selectedDate)="selectDate($event)"></date-selector>
 
@@ -68,11 +36,9 @@
         </div>
     </div>
 
-
-    <div class="mt-2" *ngIf="selectedFilms.length > 0">
-        <h3>Listings</h3>
-
-        <div *ngFor="let film of selectedFilms" >{{film.name}}</div>
-    </div>
+    <event-list
+        [events]="events"
+        [selectedFilms]="selectedFilms"
+        ></event-list>
 
 </div>

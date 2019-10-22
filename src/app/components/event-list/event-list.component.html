@@ -1,0 +1,21 @@
+
+<div class="mt-2 event-list" *ngIf="eventsList.length > 0">
+    <h3>Listings</h3>
+    
+    <button 
+        *ngFor="let event of eventsList"
+        type="button"
+        class="btn btn-primary btn-block d-flex"
+        >
+        <div class="d-inline">{{getStartTime(event)}} - {{getEndTime(event)}} {{getEventFilmName(event)}}</div>
+        
+        <div class="d-inline flex-grow-1 text-right">
+            <span 
+                class="ml-1" 
+                *ngFor="let attribute of eventAttributes(event)"
+                title="{{attribute.description}}"
+                >{{attribute.icon}}</span>
+        </div>
+
+    </button>
+</div>

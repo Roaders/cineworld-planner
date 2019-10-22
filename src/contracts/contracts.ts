@@ -40,12 +40,39 @@ export interface IFilm {
     weight: number;
 }
 
-export enum FilmAttributes {
-    '2d' = '2d'
-}
+export type FilmAttribute =
+    '2d' |
+    'pg' |
+    'screenx' |
+    'u' |
+    '15' |
+    '4dx' |
+    '12a' |
+    'superscreen' |
+    '3d' |
+    'alternative-content' |
+    'audio-described' |
+    'subbed';
+
+const FilmAttributeObject: {[key in FilmAttribute ]: any; } = {
+    '2d' : null,
+    pg : null,
+    screenx : null,
+    u : null,
+    15 : null,
+    '4dx' : null,
+    '12a' : null,
+    superscreen : null,
+    '3d' : null,
+    'alternative-content' : null,
+    'audio-described' : null,
+    subbed: null,
+};
+
+export const FilmAttributeValues = Object.keys(FilmAttributeObject) as FilmAttribute[];
 
 export interface IEvent {
-    attributeIds: FilmAttributes[];
+    attributeIds: FilmAttribute[];
     bookingLink: string;
     businessDay: string;
     cinemaId: string;

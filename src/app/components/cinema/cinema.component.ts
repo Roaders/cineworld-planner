@@ -2,8 +2,7 @@ import { Component } from '@angular/core';
 import { CineworldService } from 'src/app/services/cineworld.service';
 import { ActivatedRoute } from '@angular/router';
 import { Observer } from 'rxjs';
-import { ICinema, IDay as IDate, IFilm, IListingsResponse, ICinemaAddress } from 'src/contracts/contracts';
-import { PreferencesService } from 'src/app/services/preferences.service';
+import { ICinema, IDay as IDate, IFilm, IListingsResponse, ICinemaAddress, IEvent, FilmAttribute, FilmAttributeValues } from 'src/contracts/contracts';
 import { CinemaHelper } from 'src/app/helper/cinema-helper';
 
 @Component({
@@ -14,57 +13,42 @@ export class CinemaComponent {
 
     constructor(
         private cineworldService: CineworldService,
-        private cinemaHelper: CinemaHelper,
         private activatedRoute: ActivatedRoute
     ) {
         this.loadCinema();
     }
 
-    private _selectedFilms: IFilm[] = [];
+    private _events: IEvent[] | undefined;
+
+    public get events() {
+        return this._events;
+    }
 
     public get selectedFilms(): IFilm[] {
         return this._selectedFilms;
     }
 
-    private _filmList: IFilm[] | undefined;
-
     public get filmList() {
         return this._filmList;
     }
-
-    private _selectedDate: undefined | IDate;
-
-    public get selectedDate() {
-        return this._selectedDate;
-    }
-
-    private _errorMessage: undefined | string;
 
     public get errorMessage() {
         return this._errorMessage;
     }
 
-    private _cinema: ICinema | undefined;
-
     public get cinema(): ICinema | undefined {
         return this._cinema;
     }
 
-    public get cinemaUrl(): string | undefined {
-        if (this.cinema == null) {
-            return;
-        }
+    private _selectedFilms: IFilm[] = [];
 
-        return `https://www.google.com/maps/search/?api=1&query=${this.cinema.latitude},${this.cinema.longitude}`;
-    }
+    private _filmList: IFilm[] | undefined;
 
-    public isFavoriteCinema(cinema?: ICinema): boolean {
-        return this.cinemaHelper.isFavoriteCinema(cinema);
-    }
+    private _selectedDate: undefined | IDate;
 
-    public toggleFavorite(cinema?: ICinema) {
-        this.cinemaHelper.toggleFavorite(cinema);
-    }
+    private _errorMessage: undefined | string;
+
+    private _cinema: ICinema | undefined;
 
     public selectDate(date: IDate) {
         if (this._selectedDate != null && this._selectedDate.date === date.date) {
@@ -89,6 +73,7 @@ export class CinemaComponent {
 
     private loadCinemaTimes(date: IDate) {
         this._filmList = undefined;
+        this._selectedFilms = [];
         const externalCode = this.activatedRoute.snapshot.params.externalCode;
 
         const observer: Observer<IListingsResponse> = {
@@ -102,6 +87,19 @@ export class CinemaComponent {
 
     private onListingLoaded(response: IListingsResponse) {
         this._filmList = response.body.films;
+        this._events = response.body.events;
+
+        console.log(`Listings loaded`);
+
+        const allAttributes = new Array<FilmAttribute>();
+
+        this._events
+            .reduce((attributes, event) => [...attributes, ...event.attributeIds], allAttributes)
+            .forEach(attribute => {
+                if (FilmAttributeValues.indexOf(attribute) < 0) {
+                    console.warn(`WARNING: unknown attribute: ${attribute}`);
+                }
+            });
     }
 
     private loadCinema() {

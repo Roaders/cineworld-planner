@@ -1,20 +1,11 @@
 
 .cinema{
-    .fa-home{
-        cursor: pointer;
-    }
 
-    .fa-map-marker{
-        color: #FE7569;
+    .btn-primary:hover{
+        background-color: $primary;
+        border-color: $primary;
     }
-
-    .fa-film{
-        color: black;
-    }
-
-    .heart-toggle{
-        cursor: pointer;
-    }
+    
 }
 
 

@@ -10,13 +10,17 @@ import { CinemaComponent } from './components/cinema/cinema.component';
 import { DateSelectorComponent } from './components/date-selector/date-selector.component';
 import { PreferencesService } from './services/preferences.service';
 import { CinemaHelper } from './helper/cinema-helper';
+import { CinemaHeaderComponent } from './components/cinema-header/cinema-header.component';
+import { EventListComponent } from './components/event-list/event-list.component';
 
 @NgModule({
     declarations: [
         AppComponent,
         CinemaListComponent,
         CinemaComponent,
-        DateSelectorComponent
+        DateSelectorComponent,
+        CinemaHeaderComponent,
+        EventListComponent
     ],
     imports: [
         BrowserModule,
