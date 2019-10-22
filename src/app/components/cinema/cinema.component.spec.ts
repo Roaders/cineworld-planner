@@ -8,6 +8,8 @@ import { CinemaListComponent } from '../cinema-list/cinema-list.component';
 import { FormsModule } from '@angular/forms';
 import { CinemaHelper } from 'src/app/helper/cinema-helper';
 import { PreferencesService } from 'src/app/services/preferences.service';
+import { CinemaHeaderComponent } from '../cinema-header/cinema-header.component';
+import { EventListComponent } from '../event-list/event-list.component';
 
 describe('CinemaComponent', () => {
     let component: CinemaComponent;
@@ -15,7 +17,7 @@ describe('CinemaComponent', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [CinemaComponent, DateSelectorComponent, CinemaListComponent ],
+            declarations: [CinemaComponent, DateSelectorComponent, CinemaListComponent, CinemaHeaderComponent, EventListComponent ],
             providers: [ CineworldService, CinemaHelper, PreferencesService ],
             imports: [ HttpClientModule, AppRoutingModule, FormsModule ]
         })
