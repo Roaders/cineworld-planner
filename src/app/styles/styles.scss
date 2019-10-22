@@ -18,3 +18,22 @@ body{
 .container {
     max-width: 700px;
 }
+
+
+@media only screen and (min-width: 700px) {
+
+    .btn-group-responsive > .btn {
+        padding: 0.5rem 1rem;
+        font-size: 1.25rem;
+        line-height: 1.5;
+    }
+}
+
+@media only screen and (max-width: 450px) {
+
+    .btn-group-responsive > .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+}

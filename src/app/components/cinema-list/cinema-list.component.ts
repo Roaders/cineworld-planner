@@ -3,6 +3,8 @@ import { CineworldService } from '../../services/cineworld.service';
 import { Router } from '@angular/router';
 import { ICinema } from 'src/contracts/contracts';
 import { CinemaHelper } from 'src/app/helper/cinema-helper';
+import { getDistance } from 'geolib';
+import { GeolibInputCoordinates } from 'geolib/es/types';
 
 @Component({
   selector: 'cinema-list',
@@ -18,7 +20,15 @@ export class CinemaListComponent {
         this.loadCinemaList();
     }
 
-    private _searchString = '';
+    private coordinates: Coordinates | undefined;
+
+    public get alhpabeticalSearch() {
+        return this._alhpabeticalSearch;
+    }
+
+    public get geolocationAvailable(): boolean {
+        return navigator.geolocation != null;
+    }
 
     public get searchString() {
         return this._searchString;
@@ -30,28 +40,18 @@ export class CinemaListComponent {
         this._filteredCinemaList = undefined;
     }
 
-    private _cinemaList: ICinema[] | undefined;
-    private _sortedCinemaList: ICinema[] | undefined;
-    private _filteredCinemaList: ICinema[] | undefined;
-
-    public isFavoriteCinema(cinema?: ICinema): boolean {
-        return this.cinemaHelper.isFavoriteCinema(cinema);
-    }
-
     public get cinemaList(): ICinema[] | undefined {
         if (this._cinemaList == null) {
             return undefined;
         }
 
         if (this._sortedCinemaList == null) {
-            this._sortedCinemaList = this._cinemaList.sort((one, two) => this.compareCinemas(one, two));
+            this._sortedCinemaList = this.sortCinemaList(this._cinemaList);
         }
 
         if (this._searchString !== '') {
-            const compareString = this.searchString.toLowerCase();
             if (this._filteredCinemaList == null) {
-                this._filteredCinemaList = this._sortedCinemaList
-                    .filter(cinema => cinema.name.toLowerCase().indexOf(compareString) >= 0);
+                this._filteredCinemaList = this.filterCinemaList(this._sortedCinemaList);
             }
 
             return this._filteredCinemaList;
@@ -60,8 +60,75 @@ export class CinemaListComponent {
         return this._sortedCinemaList;
     }
 
+    private _cinemaList: ICinema[] | undefined;
+    private _sortedCinemaList: ICinema[] | undefined;
+    private _filteredCinemaList: ICinema[] | undefined;
+
+    private _alhpabeticalSearch = true;
+
+    private _searchString = '';
+
+    public isFavoriteCinema(cinema?: ICinema): boolean {
+        return this.cinemaHelper.isFavoriteCinema(cinema);
+    }
+
     public selectCinema(cinema: ICinema) {
         this.router.navigate(['/cinema/', cinema.externalCode]);
+    }
+
+    public applySort(alphabetical: boolean) {
+        if (navigator.geolocation == null) {
+            this._alhpabeticalSearch = true;
+            return;
+        }
+
+        this._alhpabeticalSearch = alphabetical;
+
+        if (!alphabetical) {
+            navigator.geolocation.getCurrentPosition(
+                position => this.onGeolocation(position),
+                positionError => this.onGeolocationError(positionError),
+                {
+                    maximumAge: 1000 * 60,
+                    timeout: 1000 * 30
+                }
+            );
+        }
+
+        this.clearSortAndFilter();
+    }
+
+    public getDistance(cinema: ICinema): number | undefined {
+
+        if (this.coordinates == null) {
+            return undefined;
+        }
+
+        const cinemaCoords: GeolibInputCoordinates = {latitude: cinema.latitude, longitude: cinema.longitude};
+        const locationCoords: GeolibInputCoordinates = {latitude: this.coordinates.latitude, longitude: this.coordinates.longitude};
+
+        const distance = getDistance(cinemaCoords, locationCoords);
+
+        return distance;
+    }
+
+    private sortCinemaList(list: ICinema[]) {
+        return list.sort((one, two) => this.compareCinemas(one, two));
+    }
+
+    private filterCinemaList(list: ICinema[]) {
+        const compareString = this.searchString.toLowerCase();
+        return list.filter(cinema => cinema.name.toLowerCase().indexOf(compareString) >= 0);
+    }
+
+    private onGeolocation(position: Position) {
+        this.coordinates = position.coords;
+        this.clearSortAndFilter();
+    }
+
+    private onGeolocationError(positionError: PositionError) {
+        console.log(`GEO LOCATION ERROR: ${positionError.message}`);
+        this._alhpabeticalSearch = true;
     }
 
     private loadCinemaList() {
@@ -75,6 +142,20 @@ export class CinemaListComponent {
             return favoriteCompare;
         }
 
+        if (!this.alhpabeticalSearch && this.coordinates != null) {
+            const distanceOne = this.getDistance(one);
+            const distanceTwo = this.getDistance(two);
+
+            if (distanceOne && distanceTwo) {
+                return distanceOne - distanceTwo;
+            }
+        }
+
         return one.name.localeCompare(two.name);
+    }
+
+    private clearSortAndFilter() {
+        this._filteredCinemaList = undefined;
+        this._sortedCinemaList = undefined;
     }
 }

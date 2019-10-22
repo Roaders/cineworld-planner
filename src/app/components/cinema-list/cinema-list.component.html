@@ -16,6 +16,28 @@
             >
     </div>
     
+    <div 
+        *ngIf="geolocationAvailable"
+        class="btn-group btn-group w-100 mb-2" 
+        role="group" 
+        aria-label="Cinema List Sort"
+        >
+
+        <button
+            type="button" 
+            class="btn btn-primary"
+            [ngClass]="{active: alhpabeticalSearch}"
+            (click)="applySort(true)"
+            >Alphabetical</button>
+
+        <button
+            type="button" 
+            class="btn btn-primary"
+            [ngClass]="{active: !alhpabeticalSearch}"
+            (click)="applySort(false)"
+            >Location</button>
+    </div>
+
     <div *ngIf="cinemaList != null">
 
         <button 
