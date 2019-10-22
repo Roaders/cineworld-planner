@@ -3,6 +3,10 @@
 
     <h3>Listings</h3>
     
+    <div>
+        <span *ngFor="let attribute of allAttributes">{{attribute}}</span>
+    </div>
+
     <button 
         *ngFor="let event of eventsList"
         type="button"

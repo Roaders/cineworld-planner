@@ -51,6 +51,17 @@ export class EventListComponent {
             .filter(event => this._selectedFilms.some(film => film.id === event.filmId));
     }
 
+    public get allAttributes(): FilmAttribute[] {
+        if (this.events == null) {
+            return [];
+        }
+
+        return this.events.map(event => event.attributeIds)
+            .reduce((all, ids) => [...all, ...ids.filter(id => all.indexOf(id) < 0)], new Array<FilmAttribute>())
+            .filter(attribute => displayedAttributes.some(displayed => displayed === attribute))
+            .sort();
+    }
+
     public get itinerary(): ITineraryItem[] {
         return this._selectedEvents
             .sort(sortEvents)
