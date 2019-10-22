@@ -4,6 +4,14 @@ import moment from 'moment';
 
 const displayedAttributes: FilmAttribute[] = ['2d', 'screenx', '4dx', 'superscreen', '3d', 'audio-described', 'subbed'];
 
+interface ITineraryItem {
+    startEstimated?: boolean;
+    endEstimated?: boolean;
+    start: string;
+    message: string;
+    end: string;
+}
+
 @Component({
     selector: 'event-list',
     templateUrl: './event-list.component.html'
@@ -12,6 +20,8 @@ export class EventListComponent {
 
     constructor() { }
 
+    private _selectedEvents: IEvent[] = [];
+
     public trailerTime = 30;
 
     @Input()
@@ -19,6 +29,27 @@ export class EventListComponent {
 
     @Input()
     public selectedFilms: IFilm[] = [];
+
+    public get itinerary(): ITineraryItem[] {
+        return this._selectedEvents
+            .sort(sortEvents)
+            .map(event => {
+                const start = this.getStartTime(event);
+                const message = this.getEventFilmName(event);
+                const end = this.getEndTime(event);
+
+                if (start == null || end == null || message == null) {
+                    throw Error(`Could not generate itinerary. start: ${start}, end: ${end} message: ${message}`);
+                }
+
+                return {
+                    start,
+                    message,
+                    end,
+                    endEstimated: true
+                };
+            });
+    }
 
     public get eventsList(): IEvent[] {
         if (this.events == null) {
@@ -93,8 +124,27 @@ export class EventListComponent {
 
         }
     }
+
+    public isEventSelected(film: IEvent): boolean {
+        return this._selectedEvents.some(selectedEvent => selectedEvent.id === film.id);
+    }
+
+    public toggleEvent(event: IEvent) {
+        if (this.isEventSelected(event)) {
+            this._selectedEvents = this._selectedEvents.filter(selectedEvent => selectedEvent.id !== event.id);
+        } else {
+            this._selectedEvents.push(event);
+        }
+    }
 }
 
 function handleUnknownAttribute(attribute: never) {
     console.warn(`Unknown Attribute: ${attribute}`);
+}
+
+function sortEvents(one: IEvent, two: IEvent): number {
+    const oneTime = moment(one.eventDateTime).toDate().getTime();
+    const twoTime = moment(two.eventDateTime).toDate().getTime();
+
+    return oneTime - twoTime;
 }
