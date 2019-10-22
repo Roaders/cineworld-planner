@@ -2,40 +2,77 @@
     
     <h1><i class="fa fa-home" aria-hidden="true" [routerLink]="'/cinemaList'"></i> Cineworld Planner</h1>
 
-    <h2>
-        <span>{{cinema?.name}}</span>
-        <i 
-            class="fa pl-1 heart-toggle"
-            [ngClass]="{
-                'fa-heart': isFavoriteCinema(cinema), 
-                'heart': isFavoriteCinema(cinema), 
-                'fa-heart-o': !isFavoriteCinema(cinema)
-            }"
-            aria-hidden="true"
-            (click)="toggleFavorite(cinema)"
-            ></i>
-    </h2>
+    <div class="d-flex">
+        <h2 class="flex-grow-1">
+            <span>{{cinema?.name}}</span>
+            <i 
+                class="fa pl-1 heart-toggle"
+                [ngClass]="{
+                    'fa-heart': isFavoriteCinema(cinema), 
+                    'heart': isFavoriteCinema(cinema), 
+                    'fa-heart-o': !isFavoriteCinema(cinema)
+                }"
+                aria-hidden="true"
+                (click)="toggleFavorite(cinema)"
+                ></i>
+        </h2>
+
+        <h2 class="mr-2">
+            <a href="https://www.cineworld.co.uk{{cinema?.uri}}" target="_blank">
+                <i 
+                    class="fa fa-film" 
+                    aria-hidden="true"
+                    ></i>
+            </a>
+        </h2>
+
+        <h2>
+            <a href="{{cinemaUrl}}" target="_blank">
+                <i 
+                    class="fa fa-map-marker" 
+                    aria-hidden="true"
+                    ></i>
+            </a>
+        </h2>
+    </div>
 
     <date-selector (selectedDate)="selectDate($event)"></date-selector>
 
-    <div 
-        *ngIf="filmList != null && filmList.length > 0"
-        class="film-container pt-2"
-        >
+    <div class="mt-2">
+        <h3>Films:</h3>
 
         <div 
-            class="film"
-            *ngFor="let film of filmList" 
-            >{{film.name}}</div>
+            *ngIf="filmList != null && filmList.length > 0"
+            class="film-container pt-2"
+            >
+    
+            <button 
+                *ngFor="let film of filmList" 
+                type="button"
+                class="btn btn-primary btn-block"
+                (click)="toggleFilm(film)"
+                [ngClass]="{'active': isFilmSelected(film)}"
+                >
+                {{film.name}}
+            </button>
+    
+        </div>
+    
+        <div *ngIf="filmList != null && filmList.length === 0">No Listings</div>
+    
+        <div 
+            *ngIf="filmList == null" 
+            class="d-flex align-items-center pt-2">
+                <span class="spinner-border text-primary mr-2"></span>
+                <span>Loading...</span>
+        </div>
     </div>
 
-    <div *ngIf="filmList != null && filmList.length === 0">No Listings</div>
 
-    <div 
-        *ngIf="filmList == null" 
-        class="d-flex align-items-center pt-2">
-            <span class="spinner-border text-primary mr-2"></span>
-            <span>Loading...</span>
+    <div class="mt-2" *ngIf="selectedFilms.length > 0">
+        <h3>Listings</h3>
+
+        <div *ngFor="let film of selectedFilms" >{{film.name}}</div>
     </div>
 
 </div>

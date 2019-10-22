@@ -20,6 +20,12 @@ export class CinemaComponent {
         this.loadCinema();
     }
 
+    private _selectedFilms: IFilm[] = [];
+
+    public get selectedFilms(): IFilm[] {
+        return this._selectedFilms;
+    }
+
     private _filmList: IFilm[] | undefined;
 
     public get filmList() {
@@ -44,6 +50,14 @@ export class CinemaComponent {
         return this._cinema;
     }
 
+    public get cinemaUrl(): string | undefined {
+        if (this.cinema == null) {
+            return;
+        }
+
+        return `https://www.google.com/maps/search/?api=1&query=${this.cinema.latitude},${this.cinema.longitude}`;
+    }
+
     public isFavoriteCinema(cinema?: ICinema): boolean {
         return this.cinemaHelper.isFavoriteCinema(cinema);
     }
@@ -59,6 +73,18 @@ export class CinemaComponent {
 
         this._selectedDate = date;
         this.loadCinemaTimes(date);
+    }
+
+    public isFilmSelected(film: IFilm): boolean {
+        return this._selectedFilms.some(selectedFilm => selectedFilm.id === film.id);
+    }
+
+    public toggleFilm(film: IFilm) {
+        if (this.isFilmSelected(film)) {
+            this._selectedFilms = this._selectedFilms.filter(selectedFilm => selectedFilm.id !== film.id);
+        } else {
+            this._selectedFilms.push(film);
+        }
     }
 
     private loadCinemaTimes(date: IDate) {
