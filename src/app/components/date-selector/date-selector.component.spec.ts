@@ -31,7 +31,7 @@ describe('DateSelectorComponent', () => {
 
         const expectedDays = [
             {description: 'Today', date: '2019-01-27'},
-            {description: 'Tomorrow', date: '2019-01-28'},
+            {description: 'Mon', date: '2019-01-28'},
             {description: 'Tue', date: '2019-01-29'},
             {description: 'Wed', date: '2019-01-30'},
             {description: 'Thu', date: '2019-01-31'},

@@ -49,9 +49,6 @@ export class DateSelectorComponent implements OnInit {
                     case 0:
                         description = 'Today';
                         break;
-                    case 1:
-                        description = 'Tomorrow';
-                        break;
                     default:
                         description = date.format('ddd');
                 }
