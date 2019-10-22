@@ -45,14 +45,28 @@
         <button 
             *ngFor="let cinema of cinemaList" 
             type="button"
-            class="btn btn-primary cinema-button btn-block"
+            class="btn btn-primary cinema-button btn-block position-relative"
             (click)="selectCinema(cinema)"
             >
-            <span>{{cinema.name}}</span>
-            <i 
-                *ngIf="isFavoriteCinema(cinema)"
-                class="fa fa-heart pl-1 heart" 
-                aria-hidden="true"></i>
+            <div class="d-inline">
+                <span>{{cinema.name}}</span>
+                <i 
+                    *ngIf="isFavoriteCinema(cinema)"
+                    class="fa fa-heart pl-1 heart" 
+                    aria-hidden="true"></i>
+            </div>
+
+            <div 
+                class="d-inline button-right"
+                *ngIf="!alhpabeticalSearch"
+                >
+                <span class="mr-1">{{displayDistance(cinema)}}</span>
+                <i 
+                    class="fa fa-arrow-circle-up"
+                    [ngStyle]="{'transform': getBearingStyle(cinema)}"
+                    aria-hidden="true">
+                </i>
+            </div>
         </button>
     
     </div>

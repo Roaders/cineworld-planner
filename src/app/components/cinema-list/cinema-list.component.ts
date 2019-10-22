@@ -3,7 +3,7 @@ import { CineworldService } from '../../services/cineworld.service';
 import { Router } from '@angular/router';
 import { ICinema } from 'src/contracts/contracts';
 import { CinemaHelper } from 'src/app/helper/cinema-helper';
-import { getDistance } from 'geolib';
+import { getDistance, convertDistance, getRhumbLineBearing } from 'geolib';
 import { GeolibInputCoordinates } from 'geolib/es/types';
 
 @Component({
@@ -104,18 +104,35 @@ export class CinemaListComponent {
         this.clearSortAndFilter();
     }
 
-    public getDistance(cinema: ICinema): number | undefined {
+    public displayDistance(cinema: ICinema): string | undefined {
+        const distance = this.getDistance(cinema);
+        return distance != null ? `${convertDistance(distance, 'mi').toFixed(1)}mi` : undefined;
+    }
 
+    public getBearing(cinema: ICinema): number | undefined {
         if (this.coordinates == null) {
             return undefined;
         }
 
-        const cinemaCoords: GeolibInputCoordinates = {latitude: cinema.latitude, longitude: cinema.longitude};
-        const locationCoords: GeolibInputCoordinates = {latitude: this.coordinates.latitude, longitude: this.coordinates.longitude};
+        return getRhumbLineBearing(getCoords(this.coordinates), getCoords(cinema));
+    }
 
-        const distance = getDistance(cinemaCoords, locationCoords);
+    public getBearingStyle(cinema: ICinema): string | undefined {
+        const bearing = this.getBearing(cinema);
 
-        return distance;
+        if (bearing == null) {
+            return undefined;
+        }
+
+        return `rotate(${bearing.toFixed(0)}deg)`;
+    }
+
+    private getDistance(cinema: ICinema): number | undefined {
+        if (this.coordinates == null) {
+            return undefined;
+        }
+
+        return getDistance(getCoords(cinema), getCoords(this.coordinates));
     }
 
     private sortCinemaList(list: ICinema[]) {
@@ -167,4 +184,10 @@ export class CinemaListComponent {
         this._filteredCinemaList = undefined;
         this._sortedCinemaList = undefined;
     }
+}
+
+function getCoords(coords: Pick<Coordinates, 'longitude' | 'latitude'>) {
+    const {longitude, latitude} = coords;
+
+    return {longitude, latitude};
 }

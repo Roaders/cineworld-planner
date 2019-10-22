@@ -1,10 +1,5 @@
 
-.cinema-list{
-    .cinema-button{
-        display: block;
-    }
-    
-    .cinema:hover{
-        background-color: $primary;
-    }
+.button-right{  
+    position: absolute;
+    right: 1rem;
 }
