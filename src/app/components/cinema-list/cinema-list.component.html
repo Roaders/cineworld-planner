@@ -45,7 +45,8 @@
         <button 
             *ngFor="let cinema of cinemaList" 
             type="button"
-            class="btn btn-primary cinema-button btn-block position-relative"
+            class="btn btn-primary btn-block position-relative"
+            [ngClass]="{locationButton: !alhpabeticalSearch}"
             (click)="selectCinema(cinema)"
             >
             <div class="d-inline">
@@ -57,7 +58,7 @@
             </div>
 
             <div 
-                class="d-inline button-right"
+                class="button-right location-info"
                 *ngIf="!alhpabeticalSearch"
                 >
                 <span class="mr-1">{{displayDistance(cinema)}}</span>
