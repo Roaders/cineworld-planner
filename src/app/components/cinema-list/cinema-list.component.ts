@@ -128,6 +128,9 @@ export class CinemaListComponent {
 
     private onGeolocationError(positionError: PositionError) {
         console.log(`GEO LOCATION ERROR: ${positionError.message}`);
+
+        alert(`GEO LOCATION ERROR: ${positionError.message}`);
+
         this._alhpabeticalSearch = true;
     }
 
