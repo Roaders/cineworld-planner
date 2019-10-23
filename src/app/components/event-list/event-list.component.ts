@@ -4,6 +4,8 @@ import moment from 'moment';
 
 const displayedAttributes: FilmAttribute[] = ['2d', 'screenx', '4dx', 'superscreen', '3d', 'audio-described', 'subbed'];
 
+type FilterMode = 'exclude' | 'include';
+
 interface ITineraryItem {
     startEstimated?: boolean;
     endEstimated?: boolean;
@@ -37,6 +39,8 @@ export class EventListComponent {
         return this._events;
     }
 
+    private _filters: {attribute: FilmAttribute, mode: FilterMode}[] = [];
+
     private _selectedFilms: IFilm[] = [];
 
     public get selectedFilms(): IFilm[] {
@@ -56,7 +60,9 @@ export class EventListComponent {
             return [];
         }
 
-        return this.events.map(event => event.attributeIds)
+        return this.events
+            .filter(event => this.selectedFilms.some(film => film.id === event.filmId))
+            .map(event => event.attributeIds)
             .reduce((all, ids) => [...all, ...ids.filter(id => all.indexOf(id) < 0)], new Array<FilmAttribute>())
             .filter(attribute => displayedAttributes.some(displayed => displayed === attribute))
             .sort();
@@ -166,6 +172,41 @@ export class EventListComponent {
             this._selectedEvents = this._selectedEvents.filter(selectedEvent => selectedEvent.id !== event.id);
         } else {
             this._selectedEvents.push(event);
+        }
+    }
+
+    public attributeFilterClass(attribute: FilmAttribute): string {
+        const attributeFilter = this._filters.filter(filter => filter.attribute === attribute)[0];
+        const existingMode = attributeFilter != null ? attributeFilter.mode : undefined;
+
+        switch (existingMode) {
+            case 'include':
+                return 'fa-check';
+
+            case 'exclude':
+                return 'fa-times';
+
+            default:
+                return 'fa-square-o';
+        }
+    }
+
+    public toggleFilter(attribute: FilmAttribute) {
+        const attributeFilter = this._filters.filter(filter => filter.attribute === attribute)[0];
+        const existingMode = attributeFilter != null ? attributeFilter.mode : undefined;
+
+        this._filters = this._filters.filter(filter => filter.attribute !== attribute);
+
+        switch (existingMode) {
+            case 'include':
+                this._filters.push({attribute, mode: 'exclude'});
+                break;
+
+            case 'exclude':
+                break;
+
+            default:
+                this._filters.push({attribute, mode: 'include'});
         }
     }
 }
