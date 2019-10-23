@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { IEvent, IFilm, FilmAttribute } from 'src/contracts/contracts';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
 type FilterMode = 'exclude' | 'include';
 
@@ -103,23 +103,45 @@ export class EventListComponent {
         return eventFilm ? eventFilm.name : undefined;
     }
 
-    public getStartTime(event: IEvent): string | undefined {
-        return moment(event.eventDateTime).format('HH:MM');
-    }
+    public getEventTimespanStyle(event: IEvent): object | undefined {
+        const displayedEvents = this.eventsList;
 
-    public getEndTime(event: IEvent): string | undefined {
-        const eventFilm = this.selectedFilms.filter(film => film.id === event.filmId)[0];
+        const spanStartMoment = this.getStartMoment(displayedEvents[0]);
+        const spanEndMoment = this.getEndMoment(displayedEvents[displayedEvents.length - 1]);
 
-        if (eventFilm == null) {
+        if (spanStartMoment == null || spanEndMoment == null) {
             return undefined;
         }
 
-        const time = moment(event.eventDateTime);
+        const spanStartTime = spanStartMoment.toDate().getTime();
+        const spanEndTime = spanEndMoment.toDate().getTime();
 
-        time.add(this.trailerTime, 'minutes');
-        time.add(eventFilm.length, 'minutes');
+        const spanElapsed = spanEndTime - spanStartTime;
 
-        return time.format('HH:MM');
+        const eventStart = this.getStartMoment(event);
+        const eventEnd = this.getEndMoment(event);
+
+        if (eventStart == null || eventEnd == null) {
+            return undefined;
+        }
+
+        const startSpan = eventStart.toDate().getTime() - spanStartTime;
+        const endSpan = spanEndTime - eventEnd.toDate().getTime();
+
+        const startFraction = startSpan / spanElapsed;
+        const endFraction = endSpan / spanElapsed;
+
+        return {left: `${startFraction * 100}%`, right: `${endFraction * 100}%` };
+    }
+
+    private getStartMoment(event: IEvent): Moment | undefined {
+        return moment(event.eventDateTime);
+    }
+
+    public getEndTime(event: IEvent): string | undefined {
+        const endMoment = this.getEndMoment(event);
+
+        return endMoment != null ? endMoment.format('HH:MM') : undefined;
     }
 
     public eventAttributes(event: IEvent) {
@@ -233,6 +255,27 @@ export class EventListComponent {
             return this._filters.filter(filter => filter.mode === 'include')
                 .every(filter => event.attributeIds.some(id => id === filter.attribute));
         });
+    }
+
+    private getEndMoment(event: IEvent): Moment | undefined {
+        const eventFilm = this.selectedFilms.filter(film => film.id === event.filmId)[0];
+
+        if (eventFilm == null) {
+            return undefined;
+        }
+
+        const time = moment(event.eventDateTime);
+
+        time.add(this.trailerTime, 'minutes');
+        time.add(eventFilm.length, 'minutes');
+
+        return time;
+    }
+
+    private getStartTime(event: IEvent): string | undefined {
+        const startMoment = this.getStartMoment(event);
+
+        return startMoment != null ? startMoment.format('HH:MM') : undefined;
     }
 }
 

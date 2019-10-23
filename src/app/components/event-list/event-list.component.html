@@ -19,24 +19,32 @@
         </button>
     </div>
 
-    <button 
-        *ngFor="let event of eventsList"
-        type="button"
-        class="btn btn-primary btn-block d-flex"
-        (click)="toggleEvent(event)"
-        [ngClass]="{'active': isEventSelected(event)}"
-        >
-        <div class="d-inline">{{getStartTime(event)}} - {{getEndTime(event)}}* {{getEventFilmName(event)}}</div>
-        
-        <div class="d-inline flex-grow-1 text-right">
-            <span 
-                class="ml-1" 
-                *ngFor="let attribute of eventAttributes(event)"
-                title="{{attribute.description}}"
-                >{{attribute.icon}}</span>
-        </div>
+    <div id="listingsContainer">
+        <button 
+            *ngFor="let event of eventsList"
+            type="button"
+            class="btn btn-sm btn-outline-primary event-button btn-block d-flex position-relative"
+            (click)="toggleEvent(event)"
+            [ngClass]="{'active': isEventSelected(event)}"
+            >
 
-    </button>
+            <div class="position-absolute event-timespan" 
+                [ngStyle]="getEventTimespanStyle(event)">
+            </div>
+
+            <div class="d-inline">{{getStartTime(event)}} - {{getEndTime(event)}}* {{getEventFilmName(event)}}</div>
+            
+            <div class="d-inline flex-grow-1 text-right">
+                <span 
+                    class="ml-1" 
+                    *ngFor="let attribute of eventAttributes(event)"
+                    title="{{attribute.description}}"
+                    >{{attribute.icon}}</span>
+            </div>
+    
+        </button>
+    </div>
+
     <div class="text-muted small">* end time estimated</div>
 </div>
 

@@ -13,6 +13,10 @@ export class CinemaHeaderComponent {
     @Input()
     public cinema: ICinema | undefined;
 
+    public get cinemaName(): string {
+        return this.cinema != null ? this.cinema.name : 'Loading...';
+    }
+
     public get cinemaUrl(): string | undefined {
         if (this.cinema == null) {
             return;

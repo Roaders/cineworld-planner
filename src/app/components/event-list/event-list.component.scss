@@ -9,4 +9,19 @@
         width: 3rem;
     }
 
+    .event-button{
+        color: $body-color;
+    }
+
+    .event-timespan{
+        background-color: $primary;
+        top: 0;
+        bottom: 0;
+        z-index: -1;
+    }
+
+    .event-button:hover{
+        color: $white
+    }
+
 }
