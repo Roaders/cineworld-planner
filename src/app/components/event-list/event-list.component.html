@@ -25,14 +25,21 @@
             type="button"
             class="btn btn-sm btn-outline-primary event-button btn-block d-flex position-relative"
             (click)="toggleEvent(event)"
-            [ngClass]="{'active': isEventSelected(event)}"
             >
 
             <div class="position-absolute event-timespan" 
                 [ngStyle]="getEventTimespanStyle(event)">
             </div>
 
-            <div class="d-inline">{{getStartTime(event)}} - {{getEndTime(event)}}* {{getEventFilmName(event)}}</div>
+            <div class="d-inline">
+                <i 
+                    class="fa"
+                    [ngClass]="{'fa-check': isEventSelected(event), 'fa-square-o': !isEventSelected(event)}"
+                    aria-hidden="true"
+                    >
+                </i>
+                {{getStartTime(event)}} - {{getEndTime(event)}}* {{getEventFilmName(event)}}
+            </div>
             
             <div class="d-inline flex-grow-1 text-right">
                 <span 

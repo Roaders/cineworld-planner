@@ -92,7 +92,12 @@ export class EventListComponent {
             return [];
         }
 
-        const filmEvents = this.events.filter(event => this.selectedFilms.some(selectedFilm => selectedFilm.id === event.filmId));
+        const filmsToDisplay = this.selectedFilms
+            .filter(film => this._selectedEvents.every(event => event.filmId !== film.id));
+
+        const filmEvents = this.events
+            .filter(event => this._selectedEvents.some(selectedEvent => selectedEvent === event) ||
+                filmsToDisplay.some(selectedFilm => selectedFilm.id === event.filmId));
 
         return this.filterEvents(filmEvents);
     }
