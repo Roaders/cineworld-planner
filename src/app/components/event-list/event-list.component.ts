@@ -2,8 +2,6 @@ import { Component, Input } from '@angular/core';
 import { IEvent, IFilm, FilmAttribute } from 'src/contracts/contracts';
 import moment from 'moment';
 
-const displayedAttributes: FilmAttribute[] = ['2d', 'screenx', '4dx', 'superscreen', '3d', 'audio-described', 'subbed'];
-
 type FilterMode = 'exclude' | 'include';
 
 interface ITineraryItem {
@@ -56,15 +54,15 @@ export class EventListComponent {
     }
 
     public get allAttributes(): FilmAttribute[] {
-        if (this.events == null) {
+        if (this._events == null) {
             return [];
         }
 
-        return this.events
+        return this._events
             .filter(event => this.selectedFilms.some(film => film.id === event.filmId))
             .map(event => event.attributeIds)
             .reduce((all, ids) => [...all, ...ids.filter(id => all.indexOf(id) < 0)], new Array<FilmAttribute>())
-            .filter(attribute => displayedAttributes.some(displayed => displayed === attribute))
+            .filter(attribute => this.displayAttribute(attribute) != null)
             .sort();
     }
 
@@ -94,7 +92,9 @@ export class EventListComponent {
             return [];
         }
 
-        return this.events.filter(event => this.selectedFilms.some(selectedFilm => selectedFilm.id === event.filmId));
+        const filmEvents = this.events.filter(event => this.selectedFilms.some(selectedFilm => selectedFilm.id === event.filmId));
+
+        return this.filterEvents(filmEvents);
     }
 
     public getEventFilmName(event: IEvent): string | undefined {
@@ -124,7 +124,6 @@ export class EventListComponent {
 
     public eventAttributes(event: IEvent) {
         return event.attributeIds
-            .filter(id => displayedAttributes.some(displayed => displayed === id))
             .map(attributeId => this.displayAttribute(attributeId))
             .filter(display => display != null);
     }
@@ -151,10 +150,18 @@ export class EventListComponent {
             case 'subbed':
                 return { icon: 'SU', description: attribute };
 
+            case 'movies-for-juniors':
+                return { icon: 'J', description: 'Juniors' };
+
+            case 'qa':
+                return { icon: attribute.toUpperCase(), description: attribute.toUpperCase() };
+
             case '12a':
             case '15':
             case 'u':
             case 'pg':
+            case 'tbc':
+            case 'ch':
                 return undefined;
 
             default:
@@ -208,6 +215,24 @@ export class EventListComponent {
             default:
                 this._filters.push({attribute, mode: 'include'});
         }
+
+        this._selectedEvents = this.filterEvents(this._selectedEvents);
+    }
+
+    private filterEvents(events: IEvent[]) {
+        return events.filter(event => {
+            const excludeFilters = this._filters.filter(filter => {
+                return filter.mode === 'exclude' &&
+                    event.attributeIds.some(id => filter.attribute === id);
+            });
+
+            if (excludeFilters.length > 0) {
+                return false;
+            }
+
+            return this._filters.filter(filter => filter.mode === 'include')
+                .every(filter => event.attributeIds.some(id => id === filter.attribute));
+        });
     }
 }
 

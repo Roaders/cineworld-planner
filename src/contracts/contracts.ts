@@ -52,7 +52,11 @@ export type FilmAttribute =
     '3d' |
     'alternative-content' |
     'audio-described' |
-    'subbed';
+    'subbed' |
+    'qa' | // Q&A
+    'ch' | // charity
+    'tbc' |
+    'movies-for-juniors';
 
 const FilmAttributeObject: {[key in FilmAttribute ]: any; } = {
     '2d' : null,
@@ -67,6 +71,10 @@ const FilmAttributeObject: {[key in FilmAttribute ]: any; } = {
     'alternative-content' : null,
     'audio-described' : null,
     subbed: null,
+    qa: null,
+    ch: null,
+    tbc: null,
+    'movies-for-juniors': null,
 };
 
 export const FilmAttributeValues = Object.keys(FilmAttributeObject) as FilmAttribute[];
