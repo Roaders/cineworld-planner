@@ -1,7 +1,7 @@
 {
     "name": "cineworld-planner",
     "description": "An Application to help plan multi-film visits to cineworld",
-    "version": "1.0.24",
+    "version": "1.0.25",
     "scripts": {
         "ng": "ng",
         "clean": "rimraf dist",
