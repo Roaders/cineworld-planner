@@ -139,8 +139,10 @@ export class EventListComponent {
         return {left: `${startFraction * 100}%`, right: `${endFraction * 100}%` };
     }
 
-    private getStartMoment(event: IEvent): Moment | undefined {
-        return moment(event.eventDateTime);
+    public getStartTime(event: IEvent): string | undefined {
+        const startMoment = this.getStartMoment(event);
+
+        return startMoment != null ? startMoment.format('HH:MM') : undefined;
     }
 
     public getEndTime(event: IEvent): string | undefined {
@@ -277,10 +279,8 @@ export class EventListComponent {
         return time;
     }
 
-    private getStartTime(event: IEvent): string | undefined {
-        const startMoment = this.getStartMoment(event);
-
-        return startMoment != null ? startMoment.format('HH:MM') : undefined;
+    private getStartMoment(event: IEvent): Moment | undefined {
+        return moment(event.eventDateTime);
     }
 }
 
