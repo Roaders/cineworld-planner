@@ -9,7 +9,7 @@
             class="mr-2 btn btn-sm btn-secondary"
             (click)="toggleFilter(attribute)"
             >
-            <span class="mr-1">{{displayAttribute(attribute).icon}}</span>
+            <span class="mr-1">{{displayAttribute(attribute)?.icon}}</span>
             <i 
                 class="fa"
                 [ngClass]="attributeFilterClass(attribute)"
