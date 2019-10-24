@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
-import { IEvent, IFilm, FilmAttribute } from 'src/contracts/contracts';
+import { IEvent, IFilm } from 'src/contracts/contracts';
 import { getStartMoment, formatTime, getEndMoment, getEventFilmName } from 'src/app/helper/event-helper';
-
-type FilterMode = 'exclude' | 'include';
+import { displayAttribute } from 'src/app/helper/attribute-helper';
+import { IFilter } from '../attribute-selector/attribute-selector.component';
 
 @Component({
     selector: 'event-list',
@@ -10,9 +10,11 @@ type FilterMode = 'exclude' | 'include';
 })
 export class EventListComponent {
 
+    private _filters: IFilter[] = [];
+
     private _selectedEvents: IEvent[] = [];
 
-    public get selectedEvents(): IEvent[]{
+    public get selectedEvents(): IEvent[] {
         return this._selectedEvents;
     }
 
@@ -31,8 +33,6 @@ export class EventListComponent {
         return this._events;
     }
 
-    private _filters: {attribute: FilmAttribute, mode: FilterMode}[] = [];
-
     private _selectedFilms: IFilm[] = [];
 
     public get selectedFilms(): IFilm[] {
@@ -45,19 +45,6 @@ export class EventListComponent {
 
         this._selectedEvents = this._selectedEvents
             .filter(event => this._selectedFilms.some(film => film.id === event.filmId));
-    }
-
-    public get allAttributes(): FilmAttribute[] {
-        if (this._events == null) {
-            return [];
-        }
-
-        return this._events
-            .filter(event => this.selectedFilms.some(film => film.id === event.filmId))
-            .map(event => event.attributeIds)
-            .reduce((all, ids) => [...all, ...ids.filter(id => all.indexOf(id) < 0)], new Array<FilmAttribute>())
-            .filter(attribute => this.displayAttribute(attribute) != null)
-            .sort();
     }
 
     public get eventsList(): IEvent[] {
@@ -73,6 +60,12 @@ export class EventListComponent {
                 filmsToDisplay.some(selectedFilm => selectedFilm.id === event.filmId));
 
         return this.filterEvents(filmEvents);
+    }
+
+    public onAttributeFiltersChanged(filters: IFilter[]) {
+        this._filters = filters || [];
+
+        this._selectedEvents = this.filterEvents(this._selectedEvents);
     }
 
     public getEventFilmName(event: IEvent): string | undefined {
@@ -124,50 +117,8 @@ export class EventListComponent {
 
     public eventAttributes(event: IEvent) {
         return event.attributeIds
-            .map(attributeId => this.displayAttribute(attributeId))
+            .map(attributeId => displayAttribute(attributeId))
             .filter(display => display != null);
-    }
-
-    public displayAttribute(attribute: FilmAttribute): { icon: string, description: string } | undefined {
-        switch (attribute) {
-            case '4dx':
-            case '2d':
-            case '3d':
-                return { icon: attribute.toUpperCase(), description: attribute.toUpperCase() };
-
-            case 'screenx':
-                return { icon: 'X', description: 'ScreenX' };
-
-            case 'superscreen':
-                return { icon: 'S', description: 'SuperScreen' };
-
-            case 'alternative-content':
-                return { icon: 'AC', description: attribute };
-
-            case 'audio-described':
-                return { icon: 'AD', description: attribute };
-
-            case 'subbed':
-                return { icon: 'SU', description: attribute };
-
-            case 'movies-for-juniors':
-                return { icon: 'J', description: 'Juniors' };
-
-            case 'qa':
-                return { icon: attribute.toUpperCase(), description: attribute.toUpperCase() };
-
-            case '12a':
-            case '15':
-            case 'u':
-            case 'pg':
-            case 'tbc':
-            case 'ch':
-                return undefined;
-
-            default:
-                handleUnknownAttribute(attribute);
-
-        }
     }
 
     public isEventSelected(film: IEvent): boolean {
@@ -180,43 +131,6 @@ export class EventListComponent {
         } else {
             this._selectedEvents.push(event);
         }
-    }
-
-    public attributeFilterClass(attribute: FilmAttribute): string {
-        const attributeFilter = this._filters.filter(filter => filter.attribute === attribute)[0];
-        const existingMode = attributeFilter != null ? attributeFilter.mode : undefined;
-
-        switch (existingMode) {
-            case 'include':
-                return 'fa-check';
-
-            case 'exclude':
-                return 'fa-times';
-
-            default:
-                return 'fa-square-o';
-        }
-    }
-
-    public toggleFilter(attribute: FilmAttribute) {
-        const attributeFilter = this._filters.filter(filter => filter.attribute === attribute)[0];
-        const existingMode = attributeFilter != null ? attributeFilter.mode : undefined;
-
-        this._filters = this._filters.filter(filter => filter.attribute !== attribute);
-
-        switch (existingMode) {
-            case 'include':
-                this._filters.push({attribute, mode: 'exclude'});
-                break;
-
-            case 'exclude':
-                break;
-
-            default:
-                this._filters.push({attribute, mode: 'include'});
-        }
-
-        this._selectedEvents = this.filterEvents(this._selectedEvents);
     }
 
     private filterEvents(events: IEvent[]) {
@@ -235,8 +149,4 @@ export class EventListComponent {
         });
     }
 
-}
-
-function handleUnknownAttribute(attribute: never) {
-    console.warn(`Unknown Attribute: ${attribute}`);
 }

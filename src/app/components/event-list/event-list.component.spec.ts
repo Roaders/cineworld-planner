@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { EventListComponent } from './event-list.component';
 import { ItineraryComponent } from '../itinerary/itinerary.component';
+import { AttributeSelectorComponent } from '../attribute-selector/attribute-selector.component';
 
 describe('EventListComponent', () => {
   let component: EventListComponent;
@@ -9,7 +9,7 @@ describe('EventListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EventListComponent, ItineraryComponent ]
+      declarations: [ EventListComponent, ItineraryComponent, AttributeSelectorComponent ]
     })
     .compileComponents();
   }));

@@ -1,23 +1,13 @@
 
-<div class="mt-2 event-list" *ngIf="allAttributes.length > 0">
+<div class="mt-2 event-list" *ngIf="selectedFilms.length > 0">
 
     <h3>Listings</h3>
     
-    <div class="mb-2">
-        <button 
-            *ngFor="let attribute of allAttributes"
-            class="mr-2 btn btn-sm btn-secondary"
-            (click)="toggleFilter(attribute)"
-            >
-            <span class="mr-1">{{displayAttribute(attribute)?.icon}}</span>
-            <i 
-                class="fa"
-                [ngClass]="attributeFilterClass(attribute)"
-                aria-hidden="true"
-                >
-            </i>
-        </button>
-    </div>
+    <attribute-selector
+        [events]="events"
+        [selectedFilms]="selectedFilms"
+        (filters)="onAttributeFiltersChanged($event)"
+        ></attribute-selector>
 
     <div id="listingsContainer">
         <button 

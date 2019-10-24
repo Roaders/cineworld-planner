@@ -13,6 +13,7 @@ import { CinemaHelper } from './helper/cinema-helper';
 import { CinemaHeaderComponent } from './components/cinema-header/cinema-header.component';
 import { EventListComponent } from './components/event-list/event-list.component';
 import { ItineraryComponent } from './components/itinerary/itinerary.component';
+import { AttributeSelectorComponent } from './components/attribute-selector/attribute-selector.component';
 
 @NgModule({
     declarations: [
@@ -22,7 +23,8 @@ import { ItineraryComponent } from './components/itinerary/itinerary.component';
         DateSelectorComponent,
         CinemaHeaderComponent,
         EventListComponent,
-        ItineraryComponent
+        ItineraryComponent,
+        AttributeSelectorComponent
     ],
     imports: [
         BrowserModule,

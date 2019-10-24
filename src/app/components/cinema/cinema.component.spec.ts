@@ -11,6 +11,7 @@ import { PreferencesService } from 'src/app/services/preferences.service';
 import { CinemaHeaderComponent } from '../cinema-header/cinema-header.component';
 import { EventListComponent } from '../event-list/event-list.component';
 import { ItineraryComponent } from '../itinerary/itinerary.component';
+import { AttributeSelectorComponent } from '../attribute-selector/attribute-selector.component';
 
 describe('CinemaComponent', () => {
     let component: CinemaComponent;
@@ -24,7 +25,9 @@ describe('CinemaComponent', () => {
                 ItineraryComponent,
                 CinemaListComponent,
                 CinemaHeaderComponent,
-                EventListComponent ],
+                EventListComponent,
+                AttributeSelectorComponent,
+            ],
             providers: [ CineworldService, CinemaHelper, PreferencesService ],
             imports: [ HttpClientModule, AppRoutingModule, FormsModule ]
         })

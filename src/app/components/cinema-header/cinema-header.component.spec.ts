@@ -12,6 +12,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from 'src/app/app-routing.module';
 import { FormsModule } from '@angular/forms';
 import { ItineraryComponent } from '../itinerary/itinerary.component';
+import { AttributeSelectorComponent } from '../attribute-selector/attribute-selector.component';
 
 describe('CinemaHeaderComponent', () => {
     let component: CinemaHeaderComponent;
@@ -25,7 +26,8 @@ describe('CinemaHeaderComponent', () => {
                 CinemaListComponent,
                 ItineraryComponent,
                 CinemaHeaderComponent,
-                EventListComponent
+                EventListComponent,
+                AttributeSelectorComponent,
             ],
             providers: [CineworldService, CinemaHelper, PreferencesService],
             imports: [HttpClientModule, AppRoutingModule, FormsModule]

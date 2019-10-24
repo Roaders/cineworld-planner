@@ -1,0 +1,16 @@
+
+<div *ngIf="allAttributes.length > 0" class="mb-2">
+    <button 
+        *ngFor="let attribute of allAttributes"
+        class="mr-2 btn btn-sm btn-secondary"
+        (click)="toggleFilter(attribute)"
+        >
+        <span class="mr-1">{{getIcon(attribute)}}</span>
+        <i 
+            class="fa"
+            [ngClass]="attributeFilterClass(attribute)"
+            aria-hidden="true"
+            >
+        </i>
+    </button>
+</div>

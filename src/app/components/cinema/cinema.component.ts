@@ -2,8 +2,7 @@ import { Component } from '@angular/core';
 import { CineworldService } from 'src/app/services/cineworld.service';
 import { ActivatedRoute } from '@angular/router';
 import { Observer } from 'rxjs';
-import { ICinema, IDay as IDate, IFilm, IListingsResponse, ICinemaAddress, IEvent, FilmAttribute, FilmAttributeValues } from 'src/contracts/contracts';
-import { CinemaHelper } from 'src/app/helper/cinema-helper';
+import { ICinema, IDay as IDate, IFilm, IListingsResponse, IEvent, FilmAttribute, FilmAttributeValues } from 'src/contracts/contracts';
 
 @Component({
     selector: 'cinema',
@@ -88,8 +87,6 @@ export class CinemaComponent {
     private onListingLoaded(response: IListingsResponse) {
         this._filmList = response.body.films;
         this._events = response.body.events;
-
-        console.log(`Listings loaded`);
 
         const allAttributes = new Array<FilmAttribute>();
 
