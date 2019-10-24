@@ -10,6 +10,7 @@ import { CinemaHelper } from 'src/app/helper/cinema-helper';
 import { PreferencesService } from 'src/app/services/preferences.service';
 import { CinemaHeaderComponent } from '../cinema-header/cinema-header.component';
 import { EventListComponent } from '../event-list/event-list.component';
+import { ItineraryComponent } from '../itinerary/itinerary.component';
 
 describe('CinemaComponent', () => {
     let component: CinemaComponent;
@@ -17,7 +18,13 @@ describe('CinemaComponent', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [CinemaComponent, DateSelectorComponent, CinemaListComponent, CinemaHeaderComponent, EventListComponent ],
+            declarations: [
+                CinemaComponent,
+                DateSelectorComponent,
+                ItineraryComponent,
+                CinemaListComponent,
+                CinemaHeaderComponent,
+                EventListComponent ],
             providers: [ CineworldService, CinemaHelper, PreferencesService ],
             imports: [ HttpClientModule, AppRoutingModule, FormsModule ]
         })

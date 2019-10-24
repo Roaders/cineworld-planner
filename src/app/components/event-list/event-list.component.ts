@@ -1,16 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { IEvent, IFilm, FilmAttribute } from 'src/contracts/contracts';
-import moment, { Moment } from 'moment';
+import { getStartMoment, formatTime, getEndMoment, getEventFilmName } from 'src/app/helper/event-helper';
 
 type FilterMode = 'exclude' | 'include';
-
-interface ITineraryItem {
-    startEstimated?: boolean;
-    endEstimated?: boolean;
-    start: string;
-    message: string;
-    end: string;
-}
 
 @Component({
     selector: 'event-list',
@@ -18,11 +10,13 @@ interface ITineraryItem {
 })
 export class EventListComponent {
 
-    constructor() { }
-
     private _selectedEvents: IEvent[] = [];
 
-    public trailerTime = 30;
+    public get selectedEvents(): IEvent[]{
+        return this._selectedEvents;
+    }
+
+    public trailerAllowance = 30;
 
     private _events: IEvent[] | undefined;
 
@@ -66,27 +60,6 @@ export class EventListComponent {
             .sort();
     }
 
-    public get itinerary(): ITineraryItem[] {
-        return this._selectedEvents
-            .sort(sortEvents)
-            .map(event => {
-                const start = this.getStartTime(event);
-                const message = this.getEventFilmName(event);
-                const end = this.getEndTime(event);
-
-                if (start == null || end == null || message == null) {
-                    throw Error(`Could not generate itinerary. start: ${start}, end: ${end} message: ${message}`);
-                }
-
-                return {
-                    start,
-                    message,
-                    end,
-                    endEstimated: true
-                };
-            });
-    }
-
     public get eventsList(): IEvent[] {
         if (this.events == null) {
             return [];
@@ -103,16 +76,14 @@ export class EventListComponent {
     }
 
     public getEventFilmName(event: IEvent): string | undefined {
-        const eventFilm = this.selectedFilms.filter(film => film.id === event.filmId)[0];
-
-        return eventFilm ? eventFilm.name : undefined;
+        return getEventFilmName(event, this.selectedFilms);
     }
 
     public getEventTimespanStyle(event: IEvent): object | undefined {
         const displayedEvents = this.eventsList;
 
-        const spanStartMoment = this.getStartMoment(displayedEvents[0]);
-        const spanEndMoment = this.getEndMoment(displayedEvents[displayedEvents.length - 1]);
+        const spanStartMoment = getStartMoment(displayedEvents[0]);
+        const spanEndMoment = getEndMoment(displayedEvents[displayedEvents.length - 1], this.trailerAllowance, this.selectedFilms);
 
         if (spanStartMoment == null || spanEndMoment == null) {
             return undefined;
@@ -123,8 +94,8 @@ export class EventListComponent {
 
         const spanElapsed = spanEndTime - spanStartTime;
 
-        const eventStart = this.getStartMoment(event);
-        const eventEnd = this.getEndMoment(event);
+        const eventStart = getStartMoment(event);
+        const eventEnd = getEndMoment(event, this.trailerAllowance, this.selectedFilms);
 
         if (eventStart == null || eventEnd == null) {
             return undefined;
@@ -140,15 +111,15 @@ export class EventListComponent {
     }
 
     public getStartTime(event: IEvent): string | undefined {
-        const startMoment = this.getStartMoment(event);
+        const startMoment = getStartMoment(event);
 
-        return startMoment != null ? this.formatTime(startMoment) : undefined;
+        return startMoment != null ? formatTime(startMoment) : undefined;
     }
 
     public getEndTime(event: IEvent): string | undefined {
-        const endMoment = this.getEndMoment(event);
+        const endMoment = getEndMoment(event, this.trailerAllowance, this.selectedFilms);
 
-        return endMoment != null ? this.formatTime(endMoment) : undefined;
+        return endMoment != null ? formatTime(endMoment) : undefined;
     }
 
     public eventAttributes(event: IEvent) {
@@ -264,40 +235,8 @@ export class EventListComponent {
         });
     }
 
-    private formatTime(value: Moment): string {
-        return value.format('HH:mm');
-    }
-
-    private getEndMoment(event: IEvent): Moment | undefined {
-        const eventFilm = this.selectedFilms.filter(film => film.id === event.filmId)[0];
-
-        if (eventFilm == null) {
-            return undefined;
-        }
-
-        const time = moment(event.eventDateTime);
-
-        time.add(this.trailerTime, 'minutes');
-        time.add(eventFilm.length, 'minutes');
-
-        return time;
-    }
-
-    private getStartMoment(event: IEvent): Moment | undefined {
-        console.log(`get start moment (toTimeString): ${event.eventDateTime} => ${moment(event.eventDateTime).toDate().toTimeString()}`);
-        console.log(`get start moment (format): ${event.eventDateTime} => ${moment(event.eventDateTime).format('HH:MM')}`);
-
-        return moment(event.eventDateTime);
-    }
 }
 
 function handleUnknownAttribute(attribute: never) {
     console.warn(`Unknown Attribute: ${attribute}`);
-}
-
-function sortEvents(one: IEvent, two: IEvent): number {
-    const oneTime = moment(one.eventDateTime).toDate().getTime();
-    const twoTime = moment(two.eventDateTime).toDate().getTime();
-
-    return oneTime - twoTime;
 }

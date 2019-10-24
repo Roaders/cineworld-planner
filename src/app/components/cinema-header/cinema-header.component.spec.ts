@@ -11,6 +11,7 @@ import { PreferencesService } from 'src/app/services/preferences.service';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from 'src/app/app-routing.module';
 import { FormsModule } from '@angular/forms';
+import { ItineraryComponent } from '../itinerary/itinerary.component';
 
 describe('CinemaHeaderComponent', () => {
     let component: CinemaHeaderComponent;
@@ -18,7 +19,14 @@ describe('CinemaHeaderComponent', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [CinemaComponent, DateSelectorComponent, CinemaListComponent, CinemaHeaderComponent, EventListComponent],
+            declarations: [
+                CinemaComponent,
+                DateSelectorComponent,
+                CinemaListComponent,
+                ItineraryComponent,
+                CinemaHeaderComponent,
+                EventListComponent
+            ],
             providers: [CineworldService, CinemaHelper, PreferencesService],
             imports: [HttpClientModule, AppRoutingModule, FormsModule]
         })

@@ -12,6 +12,7 @@ import { PreferencesService } from './services/preferences.service';
 import { CinemaHelper } from './helper/cinema-helper';
 import { CinemaHeaderComponent } from './components/cinema-header/cinema-header.component';
 import { EventListComponent } from './components/event-list/event-list.component';
+import { ItineraryComponent } from './components/itinerary/itinerary.component';
 
 @NgModule({
     declarations: [
@@ -20,7 +21,8 @@ import { EventListComponent } from './components/event-list/event-list.component
         CinemaComponent,
         DateSelectorComponent,
         CinemaHeaderComponent,
-        EventListComponent
+        EventListComponent,
+        ItineraryComponent
     ],
     imports: [
         BrowserModule,
