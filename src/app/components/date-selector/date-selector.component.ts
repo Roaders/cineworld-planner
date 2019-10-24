@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import moment from 'moment';
 import { IDay } from 'src/contracts/contracts';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'date-selector',
@@ -8,7 +9,10 @@ import { IDay } from 'src/contracts/contracts';
 })
 export class DateSelectorComponent implements OnInit {
 
-    constructor() {
+    constructor(
+        private activatedRoute: ActivatedRoute,
+        private router: Router,
+        ) {
         this._days = this.generateDates();
     }
 
@@ -27,6 +31,14 @@ export class DateSelectorComponent implements OnInit {
         this._selectedDate = day;
 
         this.selectedDate.emit(day);
+
+        const cinema = this.activatedRoute.snapshot.params.externalCode;
+
+        if (cinema == null) {
+            return;
+        }
+
+        this.router.navigate(['/cinema/', cinema, day.date]);
     }
 
     public isActive(day: IDay) {
@@ -34,7 +46,14 @@ export class DateSelectorComponent implements OnInit {
     }
 
     public ngOnInit(): void {
-        this.selectDate(this.days[0]);
+        const dateFromRoute: string | undefined = this.activatedRoute.snapshot.params.selectedDate;
+        let selectedDay = this.days.filter(day => day.date === dateFromRoute)[0];
+
+        if (selectedDay == null) {
+            selectedDay = this._days[0];
+        }
+
+        this.selectDate(selectedDay);
     }
 
     private generateDates(): IDay[] {

@@ -6,6 +6,7 @@ import { CinemaListComponent } from './components/cinema-list/cinema-list.compon
 const routes: Routes = [
     { path: 'cinemaList', component: CinemaListComponent },
     { path: 'cinema/:externalCode', component: CinemaComponent },
+    { path: 'cinema/:externalCode/:selectedDate', component: CinemaComponent },
     { path: '',   redirectTo: '/cinemaList', pathMatch: 'full' },
 ];
 
