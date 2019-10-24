@@ -142,13 +142,13 @@ export class EventListComponent {
     public getStartTime(event: IEvent): string | undefined {
         const startMoment = this.getStartMoment(event);
 
-        return startMoment != null ? startMoment.format('HH:MM') : undefined;
+        return startMoment != null ? this.formatTime(startMoment) : undefined;
     }
 
     public getEndTime(event: IEvent): string | undefined {
         const endMoment = this.getEndMoment(event);
 
-        return endMoment != null ? endMoment.format('HH:MM') : undefined;
+        return endMoment != null ? this.formatTime(endMoment) : undefined;
     }
 
     public eventAttributes(event: IEvent) {
@@ -264,6 +264,10 @@ export class EventListComponent {
         });
     }
 
+    private formatTime(value: Moment): string {
+        return value.format('HH:mm');
+    }
+
     private getEndMoment(event: IEvent): Moment | undefined {
         const eventFilm = this.selectedFilms.filter(film => film.id === event.filmId)[0];
 
@@ -280,6 +284,9 @@ export class EventListComponent {
     }
 
     private getStartMoment(event: IEvent): Moment | undefined {
+        console.log(`get start moment (toTimeString): ${event.eventDateTime} => ${moment(event.eventDateTime).toDate().toTimeString()}`);
+        console.log(`get start moment (format): ${event.eventDateTime} => ${moment(event.eventDateTime).format('HH:MM')}`);
+
         return moment(event.eventDateTime);
     }
 }
