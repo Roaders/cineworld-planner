@@ -28,7 +28,7 @@
     }
 
     .trailers-timespan{
-        background-color: $secondary;
+        background-color: rgba($primary, 0.5)
     }
 
     .btn-primary{
@@ -44,6 +44,10 @@
     }
 
     .event-button:hover{
+        color: $white
+    }
+
+    .event-button.active{
         color: $white
     }
 

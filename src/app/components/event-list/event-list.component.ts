@@ -106,8 +106,6 @@ export class EventListComponent {
         const earliestFilmEnd = moment(eventStart).add(eventFilm.length, 'minutes');
         const latestFilmEnd = moment(trailersEnd).add(eventFilm.length, 'minutes');
 
-        console.log(`${eventStart.toString()} ${trailersEnd.toString()} ${earliestFilmEnd.toString()} ${latestFilmEnd.toString()}`);
-
         return [
             this.createTimeSpan(eventStart, trailersEnd, 'trailers-timespan'),
             this.createTimeSpan(trailersEnd, earliestFilmEnd, 'film-timespan'),
@@ -127,8 +125,8 @@ export class EventListComponent {
         const startPercentage = (startDuration / spanElapsed) * 100;
         const endPercentage = (endDuration / spanElapsed) * 100;
 
-        const left = `${startPercentage.toFixed(0)}%`;
-        const right = `${endPercentage.toFixed(0)}%`;
+        const left = `${startPercentage}%`;
+        const right = `${endPercentage}%`;
 
         return {
             start: left,
@@ -188,11 +186,25 @@ export class EventListComponent {
         const displayedEvents = this.eventsList;
 
         const spanStartMoment = getStartMoment(displayedEvents[0]);
-        const spanEndMoment = getEndMoment(displayedEvents[displayedEvents.length - 1], this.trailerAllowance, this.selectedFilms);
 
-        if (spanStartMoment == null || spanEndMoment == null) {
+        if (spanStartMoment == null) {
             let errorMessage = `could not calculate timespan: `;
             errorMessage = errorMessage + `spanStartMoment:${spanStartMoment ? 'defined' : 'notDefined'} `;
+            this.showError(errorMessage);
+            throw new Error(errorMessage);
+        }
+
+        const spanEndMoment = displayedEvents
+            .map(event => getEndMoment(event, this.trailerAllowance, this.selectedFilms))
+            .reduce((latest, current) => {
+                if (latest != null && current != null && current.isAfter(latest)) {
+                    return current;
+                }
+                return latest;
+            }, spanStartMoment);
+
+        if ( spanEndMoment == null) {
+            let errorMessage = `could not calculate timespan: `;
             errorMessage = errorMessage + `spanEndMoment:${spanEndMoment ? 'defined' : 'notDefined'}`;
             this.showError(errorMessage);
             throw new Error(errorMessage);
