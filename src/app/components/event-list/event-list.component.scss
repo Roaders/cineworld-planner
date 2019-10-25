@@ -1,6 +1,36 @@
 
 .event-list{
 
+    .film-end-timespan, .film-timespan, .trailers-timespan{
+        top: 0;
+        bottom: 0;
+        z-index: -1;
+    }
+
+    $boundaryOne: 35%;
+    $boundaryTwo: 50%;
+    $boundaryThree: 85%;
+
+    .film-end-timespan {
+        background-image: linear-gradient(45deg, 
+            $primary $boundaryOne, 
+            transparent $boundaryOne, 
+            transparent $boundaryTwo, 
+            $primary $boundaryTwo, 
+            $primary $boundaryThree, 
+            transparent $boundaryThree, 
+            #fff);
+        background-size: 15px 15px;
+    }
+
+    .film-timespan{
+        background-color: $primary;
+    }
+
+    .trailers-timespan{
+        background-color: $secondary;
+    }
+
     .btn-primary{
         text-align: left;
     }
@@ -11,13 +41,6 @@
 
     .event-button{
         color: $body-color;
-    }
-
-    .event-timespan{
-        background-color: $primary;
-        top: 0;
-        bottom: 0;
-        z-index: -1;
     }
 
     .event-button:hover{

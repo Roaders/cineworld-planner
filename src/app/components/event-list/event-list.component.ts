@@ -3,12 +3,26 @@ import { IEvent, IFilm } from 'src/contracts/contracts';
 import { getStartMoment, formatTime, getEndMoment, getEventFilmName } from 'src/app/helper/event-helper';
 import { displayAttribute } from 'src/app/helper/attribute-helper';
 import { IFilter } from '../attribute-selector/attribute-selector.component';
+import moment, { Moment } from 'moment';
+
+interface ITimespan {
+    start: string;
+    end: string;
+    style: object;
+    spanClass: string;
+}
 
 @Component({
     selector: 'event-list',
     templateUrl: './event-list.component.html'
 })
 export class EventListComponent {
+
+    private _errors: string[] = [];
+
+    public get errors() {
+        return this._errors;
+    }
 
     private _filters: IFilter[] = [];
 
@@ -72,35 +86,56 @@ export class EventListComponent {
         return getEventFilmName(event, this.selectedFilms);
     }
 
-    public getEventTimespanStyle(event: IEvent): object | undefined {
-        const displayedEvents = this.eventsList;
+    public getTimeSpans(event: IEvent): ITimespan[] {
 
-        const spanStartMoment = getStartMoment(displayedEvents[0]);
-        const spanEndMoment = getEndMoment(displayedEvents[displayedEvents.length - 1], this.trailerAllowance, this.selectedFilms);
+        const eventFilm = this.selectedFilms.filter(film => film.id === event.filmId)[0];
 
-        if (spanStartMoment == null || spanEndMoment == null) {
-            return undefined;
+        if (eventFilm == null) {
+            const error = `Could not get film for event ${event.id} ${event.eventDateTime}`;
+            this.showError(error);
+            throw new Error(error);
         }
-
-        const spanStartTime = spanStartMoment.toDate().getTime();
-        const spanEndTime = spanEndMoment.toDate().getTime();
-
-        const spanElapsed = spanEndTime - spanStartTime;
 
         const eventStart = getStartMoment(event);
-        const eventEnd = getEndMoment(event, this.trailerAllowance, this.selectedFilms);
 
-        if (eventStart == null || eventEnd == null) {
-            return undefined;
+        if (eventStart == null) {
+            return [];
         }
 
-        const startSpan = eventStart.toDate().getTime() - spanStartTime;
-        const endSpan = spanEndTime - eventEnd.toDate().getTime();
+        const trailersEnd = moment(eventStart).add(this.trailerAllowance, 'minutes');
+        const earliestFilmEnd = moment(eventStart).add(eventFilm.length, 'minutes');
+        const latestFilmEnd = moment(trailersEnd).add(eventFilm.length, 'minutes');
 
-        const startFraction = startSpan / spanElapsed;
-        const endFraction = endSpan / spanElapsed;
+        console.log(`${eventStart.toString()} ${trailersEnd.toString()} ${earliestFilmEnd.toString()} ${latestFilmEnd.toString()}`);
 
-        return {left: `${startFraction * 100}%`, right: `${endFraction * 100}%` };
+        return [
+            this.createTimeSpan(eventStart, trailersEnd, 'trailers-timespan'),
+            this.createTimeSpan(trailersEnd, earliestFilmEnd, 'film-timespan'),
+            this.createTimeSpan(earliestFilmEnd, latestFilmEnd, 'film-end-timespan'),
+        ];
+    }
+
+    private createTimeSpan(startMoment: Moment, endMoment: Moment, spanClass: string): ITimespan {
+        const {spanStartTime, spanEndTime, spanElapsed} = this.getOverallTimespan();
+
+        const start = startMoment.toDate().getTime();
+        const end = endMoment.toDate().getTime();
+
+        const startDuration = start - spanStartTime;
+        const endDuration = spanEndTime - end;
+
+        const startPercentage = (startDuration / spanElapsed) * 100;
+        const endPercentage = (endDuration / spanElapsed) * 100;
+
+        const left = `${startPercentage.toFixed(0)}%`;
+        const right = `${endPercentage.toFixed(0)}%`;
+
+        return {
+            start: left,
+            end: right,
+            style: {left, right},
+            spanClass
+        };
     }
 
     public getStartTime(event: IEvent): string | undefined {
@@ -147,6 +182,34 @@ export class EventListComponent {
             return this._filters.filter(filter => filter.mode === 'include')
                 .every(filter => event.attributeIds.some(id => id === filter.attribute));
         });
+    }
+
+    private getOverallTimespan() {
+        const displayedEvents = this.eventsList;
+
+        const spanStartMoment = getStartMoment(displayedEvents[0]);
+        const spanEndMoment = getEndMoment(displayedEvents[displayedEvents.length - 1], this.trailerAllowance, this.selectedFilms);
+
+        if (spanStartMoment == null || spanEndMoment == null) {
+            let errorMessage = `could not calculate timespan: `;
+            errorMessage = errorMessage + `spanStartMoment:${spanStartMoment ? 'defined' : 'notDefined'} `;
+            errorMessage = errorMessage + `spanEndMoment:${spanEndMoment ? 'defined' : 'notDefined'}`;
+            this.showError(errorMessage);
+            throw new Error(errorMessage);
+        }
+
+        const spanStartTime = spanStartMoment.toDate().getTime();
+        const spanEndTime = spanEndMoment.toDate().getTime();
+
+        const spanElapsed = spanEndTime - spanStartTime;
+
+        return {spanStartTime, spanEndTime, spanElapsed};
+    }
+
+    private showError(error: string) {
+        if (this.errors.indexOf(error) < 0) {
+            this.errors.push(error);
+        }
     }
 
 }

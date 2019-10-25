@@ -2,7 +2,9 @@
 <div class="mt-2 event-list" *ngIf="selectedFilms.length > 0">
 
     <h3>Listings</h3>
-    
+
+    <div *ngFor="let error of errors" class="alert alert-danger" role="alert">{{error}}</div>
+
     <attribute-selector
         [events]="events"
         [selectedFilms]="selectedFilms"
@@ -17,8 +19,11 @@
             (click)="toggleEvent(event)"
             >
 
-            <div class="position-absolute event-timespan" 
-                [ngStyle]="getEventTimespanStyle(event)">
+            <div
+                *ngFor="let span of getTimeSpans(event)" 
+                class="position-absolute" 
+                [ngClass]="span.spanClass"
+                [ngStyle]="span.style">
             </div>
 
             <div class="d-inline">
