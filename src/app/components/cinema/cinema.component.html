@@ -14,7 +14,7 @@
             class="film-container pt-2"
             >
     
-            <div *ngFor="let film of filmList" class="mb-2 d-flex" >
+            <div *ngFor="let film of filmList" class="mb-2 d-flex align-items-center" >
 
                     <button 
                         type="button"
@@ -25,23 +25,23 @@
                         {{film.name}}
                     </button>
 
-                    <h2 class="mr-2">
+                    <div class="mr-2 icon-link">
                         <a href="{{film.videoLink}}" target="_blank">
                             <i 
                                 class="fa fa-youtube-play" 
                                 aria-hidden="true"
                                 ></i>
                         </a>
-                    </h2>
+                    </div>
 
-                    <h2 class="mr-2">
+                    <div class="icon-link">
                         <a href="{{film.link}}" target="_blank">
                             <i 
                                 class="fa fa-film" 
                                 aria-hidden="true"
                                 ></i>
                         </a>
-                    </h2>
+                    </div>
             </div>
     
         </div>
