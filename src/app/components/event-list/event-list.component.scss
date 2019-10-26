@@ -28,27 +28,23 @@
     }
 
     .trailers-timespan{
-        background-color: rgba($primary, 0.5)
+        background-color: rgba($primary, 0.5);
     }
-
-    .btn-primary{
+    
+    .event-button{
+        color: $body-color;
+        background-color: rgba($primary, 0.25);
         text-align: left;
     }
 
-    .grid-time {
-        width: 3rem;
-    }
-
-    .event-button{
-        color: $body-color;
-    }
-
     .event-button:hover{
-        color: $white
+        color: $white;
+        background-color: rgba($primary, 0.75);
     }
 
     .event-button.active{
-        color: $white
+        color: $white;
+        background-color: rgba($primary, 0.75);
     }
 
 }
