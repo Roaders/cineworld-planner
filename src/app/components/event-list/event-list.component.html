@@ -15,7 +15,8 @@
         <button 
             *ngFor="let event of eventsList"
             type="button"
-            class="btn btn-sm btn-outline-primary event-button btn-block d-flex position-relative"
+            class="btn btn-sm event-button btn-block d-flex position-relative"
+            [ngClass]="getEventButtonClass(event)"
             (click)="toggleEvent(event)"
             >
 

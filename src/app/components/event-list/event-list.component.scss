@@ -11,40 +11,43 @@
     $boundaryTwo: 50%;
     $boundaryThree: 85%;
 
-    .film-end-timespan {
-        background-image: linear-gradient(45deg, 
-            $primary $boundaryOne, 
-            transparent $boundaryOne, 
-            transparent $boundaryTwo, 
-            $primary $boundaryTwo, 
-            $primary $boundaryThree, 
-            transparent $boundaryThree, 
-            #fff);
-        background-size: 15px 15px;
-    }
+    @each $color, $value in $theme-colors {
+        .event-button-#{$color} {
+            color: $body-color;
+            background-color: rgba($value, 0.25);
+            text-align: left;
 
-    .film-timespan{
-        background-color: $primary;
-    }
-
-    .trailers-timespan{
-        background-color: rgba($primary, 0.5);
-    }
+            .film-end-timespan {
+                background-image: linear-gradient(45deg, 
+                    $value $boundaryOne, 
+                    transparent $boundaryOne, 
+                    transparent $boundaryTwo, 
+                    $value $boundaryTwo, 
+                    $value $boundaryThree, 
+                    transparent $boundaryThree, 
+                    #fff);
+                background-size: 15px 15px;
+            }
     
-    .event-button{
-        color: $body-color;
-        background-color: rgba($primary, 0.25);
-        text-align: left;
-    }
+            .film-timespan{
+                background-color: $value;
+            }
+        
+            .trailers-timespan{
+                background-color: rgba($value, 0.5);
+            }
 
-    .event-button:hover{
-        color: $white;
-        background-color: rgba($primary, 0.75);
-    }
+            &:hover{
+                color: $white;
+                background-color: rgba($value, 0.75);
+            }
 
-    .event-button.active{
-        color: $white;
-        background-color: rgba($primary, 0.75);
+            &.active{
+                color: $white;
+                background-color: rgba($value, 0.75);
+            }
+
+        }
     }
 
 }

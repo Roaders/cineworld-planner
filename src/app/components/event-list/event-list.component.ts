@@ -86,15 +86,28 @@ export class EventListComponent {
         return getEventFilmName(event, this.selectedFilms);
     }
 
+    public getEventButtonClass(event: IEvent) {
+
+        const styles = [
+            'primary',
+            'success',
+            'warning',
+            'danger',
+            'info',
+            'secondary',
+        ];
+
+        const eventFilm = this.getEventFilm(event);
+        const index = this.selectedFilms.indexOf(eventFilm);
+
+        const style = styles[index % styles.length];
+
+        return [`btn-outline-${style}`, `event-button-${style}`];
+    }
+
     public getTimeSpans(event: IEvent): ITimespan[] {
 
-        const eventFilm = this.selectedFilms.filter(film => film.id === event.filmId)[0];
-
-        if (eventFilm == null) {
-            const error = `Could not get film for event ${event.id} ${event.eventDateTime}`;
-            this.showError(error);
-            throw new Error(error);
-        }
+        const eventFilm = this.getEventFilm(event);
 
         const eventStart = getStartMoment(event);
 
@@ -111,6 +124,18 @@ export class EventListComponent {
             this.createTimeSpan(trailersEnd, earliestFilmEnd, 'film-timespan'),
             this.createTimeSpan(earliestFilmEnd, latestFilmEnd, 'film-end-timespan'),
         ];
+    }
+
+    private getEventFilm(event: IEvent) {
+        const eventFilm = this.selectedFilms.filter(film => film.id === event.filmId)[0];
+
+        if (eventFilm == null) {
+            const error = `Could not get film for event ${event.id} ${event.eventDateTime}`;
+            this.showError(error);
+            throw new Error(error);
+        }
+
+        return eventFilm;
     }
 
     private createTimeSpan(startMoment: Moment, endMoment: Moment, spanClass: string): ITimespan {
