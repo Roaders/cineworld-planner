@@ -12,6 +12,12 @@ export interface IFilter {attribute: FilmAttribute; mode: FilterMode; }
 })
 export class AttributeSelectorComponent {
 
+    private _expand = false;
+
+    public get expand() {
+        return this._expand;
+    }
+
     private _filters: IFilter[] = [];
 
     @Output()
@@ -48,9 +54,18 @@ export class AttributeSelectorComponent {
             .sort();
     }
 
+    public toggleExpand() {
+        this._expand = !this._expand;
+    }
+
     public getIcon(attribute: FilmAttribute): string | undefined {
         const attributeInfo = displayAttribute(attribute);
         return attributeInfo != null ? attributeInfo.icon : undefined;
+    }
+
+    public getDescription(attribute: FilmAttribute): string | undefined {
+        const attributeInfo = displayAttribute(attribute);
+        return attributeInfo != null ? attributeInfo.description : undefined;
     }
 
     public attributeFilterClass(attribute: FilmAttribute): string {

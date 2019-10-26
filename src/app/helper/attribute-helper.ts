@@ -11,16 +11,16 @@ export function displayAttribute(attribute: FilmAttribute): { icon: string, desc
             return { icon: 'X', description: 'ScreenX' };
 
         case 'superscreen':
-            return { icon: 'S', description: 'SuperScreen' };
+            return { icon: 'S', description: 'Super Screen' };
 
         case 'alternative-content':
-            return { icon: 'AC', description: attribute };
+            return { icon: 'AC', description: 'Alternative Content' };
 
         case 'audio-described':
-            return { icon: 'AD', description: attribute };
+            return { icon: 'AD', description: 'Audio Described' };
 
         case 'subbed':
-            return { icon: 'SU', description: attribute };
+            return { icon: 'SU', description: 'Subtitled' };
 
         case 'movies-for-juniors':
             return { icon: 'J', description: 'Juniors' };

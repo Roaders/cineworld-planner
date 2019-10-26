@@ -1,16 +1,69 @@
 
-<div *ngIf="allAttributes.length > 0" class="mb-2">
-    <button 
-        *ngFor="let attribute of allAttributes"
-        class="mr-2 btn btn-sm btn-secondary"
-        (click)="toggleFilter(attribute)"
-        >
-        <span class="mr-1">{{getIcon(attribute)}}</span>
+<div class="d-flex">
+
+    <div class="flex-grow-1 d-flex">
+        <div *ngIf="allAttributes.length > 0" class="mb-2">
+
+            <div 
+                class="mr-2 " 
+                *ngFor="let attribute of allAttributes"
+                [ngClass]="{
+                    'd-inline': !expand, 
+                    'mb-2': expand,
+                    'expanded-attribute': expand,
+                    'd-flex': expand
+                }"
+                >
+
+                <div 
+                    class="d-inline flex-grow-1"
+                    *ngIf="expand"
+                    >{{getDescription(attribute)}}</div>
+
+                <button 
+                    class="btn btn-sm btn-secondary"
+                    (click)="toggleFilter(attribute)"
+                    >
+                    <span class="mr-1">{{getIcon(attribute)}}</span>
+                    <i 
+                        class="fa"
+                        [ngClass]="attributeFilterClass(attribute)"
+                        aria-hidden="true"
+                        >
+                    </i>
+                </button>
+
+            </div>
+
+            <div
+                *ngIf="expand"
+                class="d-flex mb-2 expanded-attribute"
+                >
+
+                <div 
+                    class="d-inline flex-grow-1"
+                    *ngIf="expand"
+                    >Trailer Allowance</div>
+
+                <input 
+                    class="form-control form-control-sm mr-1" 
+                    type="text"
+                    style="width: 2rem"
+                    >m
+
+            </div>
+
+        </div>
+
+        <div class="flex-grow-1 text-right mr-2">30m</div>
+    </div>
+
+    <div>
         <i 
-            class="fa"
-            [ngClass]="attributeFilterClass(attribute)"
+            class="fa fa-cog icon-link text-secondary" 
             aria-hidden="true"
-            >
-        </i>
-    </button>
+            (click)="toggleExpand()"
+            ></i>
+    </div>
+
 </div>
