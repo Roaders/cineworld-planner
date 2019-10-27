@@ -1,8 +1,10 @@
-import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
 import { FilmAttribute, IEvent, IFilm, FilmAttributeValues } from 'src/contracts/contracts';
 import { displayAttribute } from 'src/app/helper/attribute-helper';
 import { defaultTrailerAllowance } from 'src/app/constants/constants';
 import { PreferencesService } from 'src/app/services/preferences.service';
+import moment, { Moment } from 'moment';
+import { formatTime, getStartMoment, getEndMoment } from 'src/app/helper/event-helper';
 
 export type FilterMode = 'exclude' | 'include';
 
@@ -12,16 +14,11 @@ export interface IFilter {attribute: FilmAttribute; mode: FilterMode; }
     selector: 'attribute-selector',
     templateUrl: './attribute-selector.component.html',
 })
-export class AttributeSelectorComponent {
+export class AttributeSelectorComponent implements OnInit  {
 
     constructor(private preferencesService: PreferencesService) {
         this._filters = preferencesService.getAttributeFilters();
     }
-
-    private _trailerAllowance: number = defaultTrailerAllowance;
-
-    @Output()
-    public readonly trailerAllowanceChange = new EventEmitter<number>();
 
     @Input()
     public get trailerAllowance() {
@@ -39,18 +36,13 @@ export class AttributeSelectorComponent {
         this.preferencesService.setTrailerAllowance(value);
     }
 
-    private _expand = false;
-
     public get expand() {
         return this._expand;
     }
 
-    private _filters: IFilter[];
-
-    @Output()
-    public filters: EventEmitter<IFilter[]> = new EventEmitter<IFilter[]>();
-
-    private _events: IEvent[] = [];
+    public get showFilters() {
+        return this._showFilters;
+    }
 
     @Input()
     public get events(): IEvent[] {
@@ -61,8 +53,6 @@ export class AttributeSelectorComponent {
         this._events = value || [];
     }
 
-    private _selectedFilms: IFilm[] = [];
-
     @Input()
     public get selectedFilms(): IFilm[] {
         return this._selectedFilms;
@@ -70,6 +60,19 @@ export class AttributeSelectorComponent {
 
     public set selectedFilms(value: IFilm[]) {
         this._selectedFilms = value || [];
+    }
+
+    public get hours(): (Moment | undefined)[] {
+        const { spanStartMoment, spanEndMoment } = this.getOverallTimespan();
+
+        const startHour = spanStartMoment.minute(0).toDate().getHours();
+        const endHour = spanEndMoment.toDate().getHours();
+
+        const hours = Array.from({length: endHour + 1 - startHour})
+            .map((_, index) => index + startHour)
+            .map(hour => moment(spanStartMoment).hour(hour));
+
+        return [undefined, ...hours];
     }
 
     public get allAttributes(): FilmAttribute[] {
@@ -88,8 +91,74 @@ export class AttributeSelectorComponent {
             .sort();
     }
 
+    @Output()
+    public startAfter = new EventEmitter<undefined | Moment>();
+
+    @Output()
+    public finishBefore = new EventEmitter<undefined | Moment>();
+
+    private _startAfterMoment: Moment | undefined;
+
+    public get startAfterMoment(): Moment | undefined {
+        return this._startAfterMoment;
+    }
+
+    public set startAfterMoment(value: Moment | undefined) {
+        this._startAfterMoment = value;
+
+        this.startAfter.emit(value);
+    }
+
+    private _finishBeforeMoment: Moment | undefined;
+
+    public get finishBeforeMoment(): Moment | undefined {
+        return this._finishBeforeMoment;
+    }
+
+    public set finishBeforeMoment(value: Moment | undefined) {
+        this._finishBeforeMoment = value;
+
+        this.finishBefore.emit(value);
+    }
+
+    public testMoment: Moment | undefined;
+
+    private _trailerAllowance: number = defaultTrailerAllowance;
+
+    @Output()
+    public readonly trailerAllowanceChange = new EventEmitter<number>();
+
+    private _expand = false;
+
+    private _showFilters = false;
+
+    private _filters: IFilter[];
+
+    @Output()
+    public filters: EventEmitter<IFilter[]> = new EventEmitter<IFilter[]>();
+
+    private _events: IEvent[] = [];
+
+    private _selectedFilms: IFilm[] = [];
+
+    public updateTimeFilter(value: undefined | Moment) {
+        console.log(`update: ${value}`);
+    }
+
+    public formatMoment(value?: Moment): string {
+        return value ? formatTime(value) : 'Select...';
+    }
+
+    public ngOnInit(): void {
+        this.filters.emit(this._filters);
+    }
+
     public toggleExpand() {
         this._expand = !this._expand;
+    }
+
+    public toggleFilters() {
+        this._showFilters = !this._showFilters;
     }
 
     public getIcon(attribute: FilmAttribute): string | undefined {
@@ -141,6 +210,28 @@ export class AttributeSelectorComponent {
         }
 
         this.filters.emit(this._filters);
+    }
+
+    private getOverallTimespan() {
+
+        const spanStartMoment = getStartMoment(this.events[0]);
+
+        const spanEndMoment = this.events
+            .map(event => getEndMoment(event, this.trailerAllowance, this.selectedFilms))
+            .reduce((latest, current) => {
+                if (latest != null && current != null && current.isAfter(latest)) {
+                    return current;
+                }
+                return latest;
+            }, spanStartMoment);
+
+        if ( spanEndMoment == null) {
+            let errorMessage = `could not calculate timespan: `;
+            errorMessage = errorMessage + `spanEndMoment:${spanEndMoment ? 'defined' : 'notDefined'}`;
+            throw new Error(errorMessage);
+        }
+
+        return {spanStartMoment, spanEndMoment};
     }
 
 }
