@@ -7,9 +7,9 @@
         z-index: -1;
     }
 
-    $boundaryOne: 35%;
+    $boundaryOne: 40%;
     $boundaryTwo: 50%;
-    $boundaryThree: 85%;
+    $boundaryThree: 90%;
 
     @each $color, $value in $theme-colors {
         .event-button-#{$color} {
@@ -17,7 +17,7 @@
             background-color: rgba($value, 0.25);
             text-align: left;
 
-            .film-end-timespan {
+            .film-end-timespan, .trailers-timespan {
                 background-image: linear-gradient(45deg, 
                     $value $boundaryOne, 
                     transparent $boundaryOne, 
@@ -26,15 +26,11 @@
                     $value $boundaryThree, 
                     transparent $boundaryThree, 
                     #fff);
-                background-size: 15px 15px;
+                background-size: 10px 10px;
             }
     
             .film-timespan{
                 background-color: $value;
-            }
-        
-            .trailers-timespan{
-                background-color: rgba($value, 0.5);
             }
 
             &:hover{
