@@ -1,14 +1,25 @@
 import { Injectable } from '@angular/core';
+import { IFilter } from '../components/attribute-selector/attribute-selector.component';
 
 const FAVORITE_CINEMA_STORAGE_KEY = 'favoriteCinemaIds';
 const TRAILER_ALLOWANCE_STORAGE_KEY = 'trailerAllowance';
+const ATTRIBUTE_FILTER_STORAGE_KEY = 'attributeFilter';
 
 @Injectable()
 export class PreferencesService {
 
+    public getAttributeFilters(): IFilter[] {
+        const filtersString = localStorage.getItem(ATTRIBUTE_FILTER_STORAGE_KEY);
+        return filtersString ? JSON.parse(filtersString) : [];
+    }
+
+    public setAttributeFilters(value: IFilter[]) {
+        localStorage.setItem(ATTRIBUTE_FILTER_STORAGE_KEY, JSON.stringify(value));
+    }
+
     public getTrailerAllowance(): number {
-        const allowanceString = localStorage.getItem(TRAILER_ALLOWANCE_STORAGE_KEY);
-        return allowanceString ? JSON.parse(allowanceString) : 30;
+        const filtersString = localStorage.getItem(TRAILER_ALLOWANCE_STORAGE_KEY);
+        return filtersString ? JSON.parse(filtersString) : 30;
     }
 
     public setTrailerAllowance(value: number) {

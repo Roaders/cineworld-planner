@@ -1,5 +1,5 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
-import { FilmAttribute, IEvent, IFilm } from 'src/contracts/contracts';
+import { FilmAttribute, IEvent, IFilm, FilmAttributeValues } from 'src/contracts/contracts';
 import { displayAttribute } from 'src/app/helper/attribute-helper';
 import { defaultTrailerAllowance } from 'src/app/constants/constants';
 import { PreferencesService } from 'src/app/services/preferences.service';
@@ -15,6 +15,7 @@ export interface IFilter {attribute: FilmAttribute; mode: FilterMode; }
 export class AttributeSelectorComponent {
 
     constructor(private preferencesService: PreferencesService) {
+        this._filters = preferencesService.getAttributeFilters();
     }
 
     private _trailerAllowance: number = defaultTrailerAllowance;
@@ -44,7 +45,7 @@ export class AttributeSelectorComponent {
         return this._expand;
     }
 
-    private _filters: IFilter[] = [];
+    private _filters: IFilter[];
 
     @Output()
     public filters: EventEmitter<IFilter[]> = new EventEmitter<IFilter[]>();
@@ -72,6 +73,13 @@ export class AttributeSelectorComponent {
     }
 
     public get allAttributes(): FilmAttribute[] {
+        if (this.expand) {
+
+            return FilmAttributeValues
+                .filter(attribute => displayAttribute(attribute) != null)
+                .sort();
+        }
+
         return this._events
             .filter(event => this.selectedFilms.some(film => film.id === event.filmId))
             .map(event => event.attributeIds)
@@ -92,6 +100,10 @@ export class AttributeSelectorComponent {
     public getDescription(attribute: FilmAttribute): string | undefined {
         const attributeInfo = displayAttribute(attribute);
         return attributeInfo != null ? attributeInfo.description : undefined;
+    }
+
+    public saveFilters() {
+        this.preferencesService.setAttributeFilters(this._filters);
     }
 
     public attributeFilterClass(attribute: FilmAttribute): string {
