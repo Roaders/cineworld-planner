@@ -20,7 +20,7 @@ export function getEndMoment(event: IEvent, trailerAllowance: number, films: IFi
     return time;
 }
 
-export function getStartMoment(event: IEvent): Moment | undefined {
+export function getStartMoment(event: IEvent): Moment {
     return moment(event.eventDateTime);
 }
 

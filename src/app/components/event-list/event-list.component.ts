@@ -74,17 +74,14 @@ export class EventListComponent {
         const filmsToDisplay = this.selectedFilms
             .filter(film => this._selectedEvents.every(event => event.filmId !== film.id));
 
-        const filmEvents = this.events
-            .filter(event => this._selectedEvents.some(selectedEvent => selectedEvent === event) ||
-                filmsToDisplay.some(selectedFilm => selectedFilm.id === event.filmId));
-
-        return this.filterEvents(filmEvents);
+        return this.events
+            .filter(event => this.filterEvents(event, filmsToDisplay));
     }
 
     public onAttributeFiltersChanged(filters: IFilter[]) {
         this._filters = filters || [];
 
-        this._selectedEvents = this.filterEvents(this._selectedEvents);
+        this._selectedEvents = this._selectedEvents.filter(event => this.eventMatchesSelectedAttributes(event));
     }
 
     public getEventFilmName(event: IEvent): string | undefined {
@@ -115,11 +112,6 @@ export class EventListComponent {
         const eventFilm = this.getEventFilm(event);
 
         const eventStart = getStartMoment(event);
-
-        if (eventStart == null) {
-            return [];
-        }
-
         const trailersEnd = moment(eventStart).add(this.trailerAllowance, 'minutes');
         const earliestFilmEnd = moment(eventStart).add(eventFilm.length, 'minutes');
         const latestFilmEnd = moment(trailersEnd).add(eventFilm.length, 'minutes');
@@ -196,20 +188,48 @@ export class EventListComponent {
         }
     }
 
-    private filterEvents(events: IEvent[]) {
-        return events.filter(event => {
-            const excludeFilters = this._filters.filter(filter => {
-                return filter.mode === 'exclude' &&
-                    event.attributeIds.some(id => filter.attribute === id);
-            });
+    private filterEvents(event: IEvent, filmsToDisplay: IFilm[]): boolean {
+        if (!this.eventMatchesSelectedAttributes(event)) {
+            return false;
+        }
 
-            if (excludeFilters.length > 0) {
-                return false;
-            }
+        if (this._selectedEvents.some(selectedEvent => selectedEvent === event)) {
+            return true;
+        }
 
-            return this._filters.filter(filter => filter.mode === 'include')
-                .every(filter => event.attributeIds.some(id => id === filter.attribute));
+        if (!filmsToDisplay.some(selectedFilm => selectedFilm.id === event.filmId)) {
+            return false;
+        }
+
+        const eventFilm = this.getEventFilm(event);
+
+        const eventStart = getStartMoment(event);
+        const trailersEnd = moment(eventStart).add(this.trailerAllowance, 'minutes');
+        const earliestFilmEnd = moment(eventStart).add(eventFilm.length, 'minutes');
+
+        return this._selectedEvents.every(selectedEvent => {
+            const selectedEventFilm = this.getEventFilm(selectedEvent);
+
+            const selectedEventStart = getStartMoment(selectedEvent);
+            const selectedTrailersEnd = moment(selectedEventStart).add(this.trailerAllowance, 'minutes');
+            const selectedEarliestFilmEnd = moment(selectedEventStart).add(selectedEventFilm.length, 'minutes');
+
+            return selectedTrailersEnd.isAfter(earliestFilmEnd) || selectedEarliestFilmEnd.isBefore(trailersEnd);
         });
+    }
+
+    private eventMatchesSelectedAttributes(event: IEvent): boolean {
+        const excludeFilters = this._filters.filter(filter => {
+            return filter.mode === 'exclude' &&
+                event.attributeIds.some(id => filter.attribute === id);
+        });
+
+        if (excludeFilters.length > 0) {
+            return false;
+        }
+
+        return this._filters.filter(filter => filter.mode === 'include')
+            .every(filter => event.attributeIds.some(id => id === filter.attribute));
     }
 
     private getOverallTimespan() {
