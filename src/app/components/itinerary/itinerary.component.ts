@@ -1,17 +1,25 @@
 import { Component, Input } from '@angular/core';
 import { IEvent, IFilm } from 'src/contracts/contracts';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import { getStartMoment, formatTime, getEndMoment, getEventFilmName } from 'src/app/helper/event-helper';
 import { defaultTrailerAllowance } from 'src/app/constants/constants';
 
-interface ITineraryItem {
+interface IInteraryBase {
     startEstimated?: boolean;
     endEstimated?: boolean;
-    start: string;
     message: string;
+    alertClass: string;
+}
+
+interface IItineraryItem extends IInteraryBase {
+    start: string;
     end: string;
 }
 
+interface IInteraryMoment extends IInteraryBase {
+    start: Moment;
+    end: Moment;
+}
 
 @Component({
     selector: 'itinerary',
@@ -44,7 +52,7 @@ export class ItineraryComponent {
         this._events = value || [];
     }
 
-    public get itinerary(): ITineraryItem[] {
+    public get itinerary(): IItineraryItem[] {
         return this.events
             .sort(sortEvents)
             .map(event => {
@@ -57,15 +65,52 @@ export class ItineraryComponent {
                 }
 
                 return {
-                    start: formatTime(start),
+                    start,
                     message,
-                    end: formatTime(end),
-                    endEstimated: true
+                    end,
+                    endEstimated: true,
+                    alertClass: 'alert-primary'
                 };
-            });
+            })
+            .reduce((all, item) => {
+                if (all.length < 1) {
+                    return [item];
+                }
+                const previous = all[all.length - 1];
+
+                const interimTime = item.start.diff(previous.end, 'minutes');
+
+                let message: string;
+                let alertClass: string;
+
+                if (interimTime > 0) {
+                    message = `${interimTime.toFixed(0)} minute break`;
+                    alertClass = `alert-success`;
+                } else {
+                    message = `${Math.abs(interimTime).toFixed(0)} minute overlap`;
+                    alertClass = `alert-danger`;
+                }
+
+                const interim = {
+                    start: previous.end,
+                    message,
+                    end: item.start,
+                    endEstimated: true,
+                    startEstimated: true,
+                    alertClass
+                };
+
+                return [...all, interim, item];
+            }, new Array<IInteraryMoment>())
+            .map(({start, message, end, startEstimated, endEstimated, alertClass}) => ({
+                start: formatTime(start),
+                end: formatTime(end),
+                message,
+                endEstimated,
+                startEstimated,
+                alertClass,
+            }));
     }
-
-
 }
 
 function sortEvents(one: IEvent, two: IEvent): number {
