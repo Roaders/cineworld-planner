@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { ICinema } from 'src/contracts/contracts';
 import { CinemaHelper } from 'src/app/helper/cinema-helper';
 import { getDistance, convertDistance, getRhumbLineBearing } from 'geolib';
-import { GeolibInputCoordinates } from 'geolib/es/types';
 
 @Component({
   selector: 'cinema-list',

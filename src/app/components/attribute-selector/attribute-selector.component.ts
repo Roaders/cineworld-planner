@@ -1,6 +1,8 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { FilmAttribute, IEvent, IFilm } from 'src/contracts/contracts';
 import { displayAttribute } from 'src/app/helper/attribute-helper';
+import { defaultTrailerAllowance } from 'src/app/constants/constants';
+import { PreferencesService } from 'src/app/services/preferences.service';
 
 export type FilterMode = 'exclude' | 'include';
 
@@ -11,6 +13,30 @@ export interface IFilter {attribute: FilmAttribute; mode: FilterMode; }
     templateUrl: './attribute-selector.component.html',
 })
 export class AttributeSelectorComponent {
+
+    constructor(private preferencesService: PreferencesService) {
+    }
+
+    private _trailerAllowance: number = defaultTrailerAllowance;
+
+    @Output()
+    public readonly trailerAllowanceChange = new EventEmitter<number>();
+
+    @Input()
+    public get trailerAllowance() {
+        return this._trailerAllowance;
+    }
+
+    public set trailerAllowance(value: number) {
+        if (isNaN(value)) {
+            value = 0;
+        }
+
+        this._trailerAllowance = value;
+
+        this.trailerAllowanceChange.emit(value);
+        this.preferencesService.setTrailerAllowance(value);
+    }
 
     private _expand = false;
 

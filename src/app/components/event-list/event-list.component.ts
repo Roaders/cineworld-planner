@@ -4,6 +4,8 @@ import { getStartMoment, formatTime, getEndMoment, getEventFilmName } from 'src/
 import { displayAttribute } from 'src/app/helper/attribute-helper';
 import { IFilter } from '../attribute-selector/attribute-selector.component';
 import moment, { Moment } from 'moment';
+import { defaultTrailerAllowance } from 'src/app/constants/constants';
+import { PreferencesService } from 'src/app/services/preferences.service';
 
 interface ITimespan {
     start: string;
@@ -17,6 +19,10 @@ interface ITimespan {
     templateUrl: './event-list.component.html'
 })
 export class EventListComponent {
+
+    constructor(preferencesService: PreferencesService) {
+        this.trailerAllowance = preferencesService.getTrailerAllowance();
+    }
 
     private _errors: string[] = [];
 
@@ -32,7 +38,7 @@ export class EventListComponent {
         return this._selectedEvents;
     }
 
-    public trailerAllowance = 30;
+    public trailerAllowance: number;
 
     private _events: IEvent[] | undefined;
 

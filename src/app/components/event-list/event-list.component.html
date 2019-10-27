@@ -9,6 +9,8 @@
         [events]="events"
         [selectedFilms]="selectedFilms"
         (filters)="onAttributeFiltersChanged($event)"
+        [trailerAllowance]="trailerAllowance"
+        (trailerAllowanceChange)="trailerAllowance = $event"
         ></attribute-selector>
 
     <div id="listingsContainer">

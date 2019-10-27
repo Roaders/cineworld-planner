@@ -46,16 +46,18 @@
                     >Trailer Allowance</div>
 
                 <input 
-                    class="form-control form-control-sm mr-1" 
+                    class="form-control form-control-sm mr-1 trailer-alowance-input" 
                     type="text"
-                    style="width: 2rem"
+                    [(ngModel)]="trailerAllowance"
                     >m
 
             </div>
 
         </div>
 
-        <div class="flex-grow-1 text-right mr-2">30m</div>
+        <div 
+            *ngIf="!expand"
+            class="flex-grow-1 text-right mr-2">{{trailerAllowance}}m</div>
     </div>
 
     <div>

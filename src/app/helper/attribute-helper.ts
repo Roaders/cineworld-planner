@@ -37,11 +37,12 @@ export function displayAttribute(attribute: FilmAttribute): { icon: string, desc
             return undefined;
 
         default:
-            handleUnknownAttribute(attribute);
+            return handleUnknownAttribute(attribute);
     }
 }
 
 function handleUnknownAttribute(attribute: never) {
     console.warn(`Unknown Attribute: ${attribute}`);
+    return undefined;
 }
 

@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { IEvent, IFilm } from 'src/contracts/contracts';
 import moment from 'moment';
 import { getStartMoment, formatTime, getEndMoment, getEventFilmName } from 'src/app/helper/event-helper';
+import { defaultTrailerAllowance } from 'src/app/constants/constants';
 
 interface ITineraryItem {
     startEstimated?: boolean;
@@ -30,7 +31,7 @@ export class ItineraryComponent {
     }
 
     @Input()
-    public trailerAllowance = 30;
+    public trailerAllowance = defaultTrailerAllowance;
 
     private _events: IEvent[] = [];
 
