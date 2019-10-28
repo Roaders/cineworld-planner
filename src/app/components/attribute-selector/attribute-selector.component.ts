@@ -51,6 +51,8 @@ export class AttributeSelectorComponent {
         this.preferencesService.setMaxBreakLength(value);
     }
 
+    private _expand = false;
+
     public get expand() {
         return this._expand;
     }
