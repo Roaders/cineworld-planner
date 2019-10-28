@@ -1,22 +1,25 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ItineraryComponent } from './itinerary-list.component';
+import { ItineraryListComponent } from './itinerary-list.component';
 import { PreferencesService } from 'src/app/services/preferences.service';
+import { ItineraryComponent } from '../itinerary/itinerary.component';
 
-describe('ItineraryComponent', () => {
-    let component: ItineraryComponent;
-    let fixture: ComponentFixture<ItineraryComponent>;
+describe('ItineraryListComponent', () => {
+    let component: ItineraryListComponent;
+    let fixture: ComponentFixture<ItineraryListComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             providers: [PreferencesService],
-            declarations: [ItineraryComponent]
+            declarations: [
+                ItineraryListComponent,
+                ItineraryComponent
+            ]
         })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(ItineraryComponent);
+        fixture = TestBed.createComponent(ItineraryListComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

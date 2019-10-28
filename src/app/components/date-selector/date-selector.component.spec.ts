@@ -1,12 +1,11 @@
 import { DateSelectorComponent } from './date-selector.component';
-
 import * as momentImport from 'moment';
 import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 import { CinemaListComponent } from '../cinema-list/cinema-list.component';
 import { CinemaComponent } from '../cinema/cinema.component';
 import { CinemaHeaderComponent } from '../cinema-header/cinema-header.component';
 import { EventListComponent } from '../event-list/event-list.component';
-import { ItineraryComponent } from '../itinerary-list/itinerary-list.component';
+import { ItineraryListComponent } from '../itinerary-list/itinerary-list.component';
 import { AttributeSelectorComponent } from '../attribute-selector/attribute-selector.component';
 import { CineworldService } from 'src/app/services/cineworld.service';
 import { CinemaHelper } from 'src/app/helper/cinema-helper';
@@ -14,6 +13,7 @@ import { PreferencesService } from 'src/app/services/preferences.service';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from 'src/app/app-routing.module';
 import { FormsModule } from '@angular/forms';
+import { ItineraryComponent } from '../itinerary/itinerary.component';
 
 describe('DateSelectorComponent', () => {
     let component: DateSelectorComponent;
@@ -28,6 +28,7 @@ describe('DateSelectorComponent', () => {
                 CinemaHeaderComponent,
                 EventListComponent,
                 ItineraryComponent,
+                ItineraryListComponent,
                 AttributeSelectorComponent,
             ],
             providers: [ CineworldService, CinemaHelper, PreferencesService ],

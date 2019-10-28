@@ -10,8 +10,9 @@ import { CinemaHelper } from 'src/app/helper/cinema-helper';
 import { PreferencesService } from 'src/app/services/preferences.service';
 import { CinemaHeaderComponent } from '../cinema-header/cinema-header.component';
 import { EventListComponent } from '../event-list/event-list.component';
-import { ItineraryComponent } from '../itinerary-list/itinerary-list.component';
+import { ItineraryListComponent } from '../itinerary-list/itinerary-list.component';
 import { AttributeSelectorComponent } from '../attribute-selector/attribute-selector.component';
+import { ItineraryComponent } from '../itinerary/itinerary.component';
 
 describe('CinemaComponent', () => {
     let component: CinemaComponent;
@@ -22,6 +23,7 @@ describe('CinemaComponent', () => {
             declarations: [
                 CinemaComponent,
                 DateSelectorComponent,
+                ItineraryListComponent,
                 ItineraryComponent,
                 CinemaListComponent,
                 CinemaHeaderComponent,
