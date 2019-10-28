@@ -43,7 +43,7 @@
 
             <div
                 *ngIf="expand"
-                class="d-flex mb-2 expanded-attribute"
+                class="d-flex mt-2 mb-2 expanded-attribute"
                 >
 
                 <div 
@@ -56,7 +56,23 @@
                     type="text"
                     [(ngModel)]="trailerAllowance"
                     >m
+            </div>
 
+            <div
+                *ngIf="expand"
+                class="d-flex mb-2 expanded-attribute"
+                >
+
+                <div 
+                    class="d-inline flex-grow-1"
+                    *ngIf="expand"
+                    >Max Break Length</div>
+
+                <input 
+                    class="form-control form-control-sm mr-1 trailer-alowance-input" 
+                    type="text"
+                    [(ngModel)]="maxBreakLength"
+                    >m
             </div>
 
         </div>

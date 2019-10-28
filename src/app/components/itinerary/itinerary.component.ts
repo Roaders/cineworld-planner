@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { IEvent, IFilm } from 'src/contracts/contracts';
 import moment, { Moment } from 'moment';
 import { getStartMoment, formatTime, getEndMoment, getEventFilmName } from 'src/app/helper/event-helper';
-import { defaultTrailerAllowance } from 'src/app/constants/constants';
+import { PreferencesService } from 'src/app/services/preferences.service';
 
 interface IInteraryBase {
     startEstimated?: boolean;
@@ -27,81 +27,63 @@ interface IInteraryMoment extends IInteraryBase {
 })
 export class ItineraryComponent {
 
-    private _films: IFilm[] = [];
-
-    @Input()
-    public get films(): IFilm[] {
-        return this._films;
+    constructor(private preferencesService: PreferencesService) {
     }
 
-    public set films(value: IFilm[]) {
-        this._films = value || [];
-    }
+    private _allEvents: IEvent[] = [];
 
     @Input()
-    public trailerAllowance = defaultTrailerAllowance;
-
-    private _events: IEvent[] = [];
-
-    @Input()
-    public get events(): IEvent[] {
-        return this._events;
+    public get allEvents(): IEvent[] {
+        return this._allEvents;
     }
 
-    public set events(value: IEvent[]) {
-        this._events = value || [];
+    public set allEvents(value: IEvent[]) {
+        this._allEvents = value || [];
+    }
+
+    private _selectedFilms: IFilm[] = [];
+
+    @Input()
+    public get selectedFilms(): IFilm[] {
+        return this._selectedFilms;
+    }
+
+    public set selectedFilms(value: IFilm[]) {
+        this._selectedFilms = value || [];
+    }
+
+    public get trailerAllowance() {
+        return this.preferencesService.getTrailerAllowance();
+    }
+
+    private _selectedEvents: IEvent[] = [];
+
+    @Input()
+    public get selectedEvents(): IEvent[] {
+        return this._selectedEvents;
+    }
+
+    public set selectedEvents(value: IEvent[]) {
+        this._selectedEvents = value || [];
+    }
+
+    public get itineraryList(): IItineraryItem[][] {
+        return this.generateEventLists().map(eventList => this.createItinerary(eventList));
     }
 
     public get itinerary(): IItineraryItem[] {
-        return this.events
+        return this.createItinerary(this.selectedEvents);
+    }
+
+    public getStartTime(itinerary: IItineraryItem[]): string {
+        return itinerary[0].start;
+    }
+
+    private createItinerary(events: IEvent[]): IItineraryItem[] {
+        return events
             .sort(sortEvents)
-            .map(event => {
-                const start = getStartMoment(event);
-                const message = getEventFilmName(event, this.films);
-                const end = getEndMoment(event, this.trailerAllowance, this.films);
-
-                if (start == null || end == null || message == null) {
-                    throw Error(`Could not generate itinerary. start: ${start}, end: ${end} message: ${message}`);
-                }
-
-                return {
-                    start,
-                    message,
-                    end,
-                    endEstimated: true,
-                    alertClass: 'alert-primary'
-                };
-            })
-            .reduce((all, item) => {
-                if (all.length < 1) {
-                    return [item];
-                }
-                const previous = all[all.length - 1];
-
-                const interimTime = item.start.diff(previous.end, 'minutes');
-
-                let message: string;
-                let alertClass: string;
-
-                if (interimTime > 0) {
-                    message = `${interimTime.toFixed(0)} minute break`;
-                    alertClass = `alert-success`;
-                } else {
-                    message = `${Math.abs(interimTime).toFixed(0)} minute overlap`;
-                    alertClass = `alert-danger`;
-                }
-
-                const interim = {
-                    start: previous.end,
-                    message,
-                    end: item.start,
-                    endEstimated: true,
-                    startEstimated: true,
-                    alertClass
-                };
-
-                return [...all, interim, item];
-            }, new Array<IInteraryMoment>())
+            .map(event => this.createMomentItinerary(event))
+            .reduce((all, item) => this.addNextEvent(all, item), new Array<IInteraryMoment>())
             .map(({start, message, end, startEstimated, endEstimated, alertClass}) => ({
                 start: formatTime(start),
                 end: formatTime(end),
@@ -111,7 +93,89 @@ export class ItineraryComponent {
                 alertClass,
             }));
     }
+
+    private addNextEvent(all: IInteraryMoment[], item: IInteraryMoment): IInteraryMoment[] {
+        if (all.length < 1) {
+            return [item];
+        }
+
+        const previous = all[all.length - 1];
+
+        const interimTime = item.start.diff(previous.end, 'minutes');
+
+        let message: string;
+        let alertClass: string;
+
+        if (interimTime > 0) {
+            message = `${interimTime.toFixed(0)} minute break`;
+            alertClass = `alert-success`;
+        } else {
+            message = `${Math.abs(interimTime).toFixed(0)} minute overlap`;
+            alertClass = `alert-danger`;
+        }
+
+        const interim = {
+            start: previous.end,
+            message,
+            end: item.start,
+            endEstimated: true,
+            startEstimated: true,
+            alertClass
+        };
+
+        return [...all, interim, item];
+    }
+
+    private createMomentItinerary(event: IEvent): IInteraryMoment {
+        const start = getStartMoment(event);
+        const message = getEventFilmName(event, this.selectedFilms);
+        const end = getEndMoment(event, this.trailerAllowance, this.selectedFilms);
+
+        if (start == null || end == null || message == null) {
+            throw Error(`Could not generate itinerary. start: ${start}, end: ${end} message: ${message}`);
+        }
+
+        return {
+            start,
+            message,
+            end,
+            endEstimated: true,
+            alertClass: 'alert-primary'
+        };
+    }
+
+    private generateEventLists() {
+        return this._allEvents.reduce(
+                (itineraries, event) => [...itineraries, ...this.pickNextEvent([event])],
+                new Array<IEvent[]>()
+            )
+            .filter(itinerary => itinerary.length > 1);
+    }
+
+    private pickNextEvent(events: IEvent[]): IEvent[][] {
+        const lastEvent = events[events.length - 1];
+        const lastEventEnd = getEndMoment(lastEvent, this.trailerAllowance, this.selectedFilms);
+
+        if (lastEventEnd == null ) {
+            throw Error(`Could not generate itinerary. `);
+        }
+
+        const subsequentEvents = this.allEvents
+            .filter(event => {
+                const eventStart = moment(event.eventDateTime);
+                return events.every(existingEvent => existingEvent.filmId !== event.filmId) &&
+                    eventStart.isAfter(lastEventEnd) &&
+                    eventStart.diff(lastEventEnd, 'minutes') < this.preferencesService.getMaxBreakLength();
+            });
+
+        if (subsequentEvents.length === 0) {
+            return [events];
+        }
+
+        return subsequentEvents.map(event => [...events, event]);
+    }
 }
+
 
 function sortEvents(one: IEvent, two: IEvent): number {
     const oneTime = moment(one.eventDateTime).toDate().getTime();
