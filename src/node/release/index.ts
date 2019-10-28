@@ -1,4 +1,4 @@
-import Client from 'ftp';
+import Client, { Options } from 'ftp';
 import { readdirSync } from 'fs';
 import { join } from 'path';
 import { from, bindNodeCallback } from 'rxjs';
@@ -59,8 +59,14 @@ client.on('error', (error: any) => {
     process.exit(1);
 });
 
-client.connect({
+const connectOptions: Options = {
     user: process.env.FTP_USER,
     host: process.env.FTP_HOST,
-    password: process.env.FTP_PASSWORD
-});
+    password: process.env.FTP_PASSWORD,
+    connTimeout: 60000,
+    pasvTimeout: 60000,
+};
+
+(connectOptions as any).debug = console.log;
+
+client.connect(connectOptions);
