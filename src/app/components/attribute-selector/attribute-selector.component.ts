@@ -39,6 +39,18 @@ export class AttributeSelectorComponent {
         this.preferencesService.setTrailerAllowance(value);
     }
 
+    public get maxBreakLength() {
+        return this.preferencesService.getMaxBreakLength();
+    }
+
+    public set maxBreakLength(value: number) {
+        if (isNaN(value)) {
+            value = 0;
+        }
+
+        this.preferencesService.setMaxBreakLength(value);
+    }
+
     private _expand = false;
 
     public get expand() {
