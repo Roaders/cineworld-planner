@@ -47,7 +47,11 @@ client.on('error', (error: any) => {
 
     console.log(`ERROR: ${code}`);
 
+    console.log(error);
+
     console.log(JSON.stringify(error, undefined, 4));
+
+    process.exit(1);
 });
 
 client.connect({
