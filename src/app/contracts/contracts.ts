@@ -5,6 +5,7 @@ export interface IInteraryBase {
     endEstimated?: boolean;
     alertClass: string;
     body: string | IEvent;
+    isEvent: boolean;
 }
 
 export interface IItineraryItem extends IInteraryBase {

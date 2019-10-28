@@ -1,4 +1,4 @@
-import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
 import { FilmAttribute, IEvent, IFilm, FilmAttributeValues } from 'src/contracts/contracts';
 import { displayAttribute } from 'src/app/helper/attribute-helper';
 import { defaultTrailerAllowance } from 'src/app/constants/constants';
@@ -12,16 +12,11 @@ export interface IFilter {attribute: FilmAttribute; mode: FilterMode; }
     selector: 'attribute-selector',
     templateUrl: './attribute-selector.component.html',
 })
-export class AttributeSelectorComponent {
+export class AttributeSelectorComponent implements OnInit {
 
     constructor(private preferencesService: PreferencesService) {
         this._filters = preferencesService.getAttributeFilters();
     }
-
-    private _trailerAllowance: number = defaultTrailerAllowance;
-
-    @Output()
-    public readonly trailerAllowanceChange = new EventEmitter<number>();
 
     @Input()
     public get trailerAllowance() {
@@ -51,18 +46,9 @@ export class AttributeSelectorComponent {
         this.preferencesService.setMaxBreakLength(value);
     }
 
-    private _expand = false;
-
     public get expand() {
         return this._expand;
     }
-
-    private _filters: IFilter[];
-
-    @Output()
-    public filters: EventEmitter<IFilter[]> = new EventEmitter<IFilter[]>();
-
-    private _events: IEvent[] = [];
 
     @Input()
     public get events(): IEvent[] {
@@ -72,8 +58,6 @@ export class AttributeSelectorComponent {
     public set events(value: IEvent[]) {
         this._events = value || [];
     }
-
-    private _selectedFilms: IFilm[] = [];
 
     @Input()
     public get selectedFilms(): IFilm[] {
@@ -98,6 +82,26 @@ export class AttributeSelectorComponent {
             .reduce((all, ids) => [...all, ...ids.filter(id => all.indexOf(id) < 0)], new Array<FilmAttribute>())
             .filter(attribute => displayAttribute(attribute) != null)
             .sort();
+    }
+
+    private _trailerAllowance: number = defaultTrailerAllowance;
+
+    @Output()
+    public readonly trailerAllowanceChange = new EventEmitter<number>();
+
+    private _expand = false;
+
+    private _filters: IFilter[];
+
+    @Output()
+    public filters: EventEmitter<IFilter[]> = new EventEmitter<IFilter[]>();
+
+    private _events: IEvent[] = [];
+
+    private _selectedFilms: IFilm[] = [];
+
+    public ngOnInit(): void {
+        this.filters.emit(this._filters);
     }
 
     public toggleExpand() {

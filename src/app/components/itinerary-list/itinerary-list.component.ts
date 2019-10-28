@@ -73,13 +73,14 @@ export class ItineraryListComponent {
             .sort(sortEvents)
             .map(event => this.createMomentItinerary(event))
             .reduce((all, item) => this.addNextEvent(all, item), new Array<IInteraryMoment>())
-            .map(({start, message, end, startEstimated, endEstimated, alertClass}) => ({
+            .map(({start, body, end, startEstimated, isEvent, endEstimated, alertClass}) => ({
                 start: formatTime(start),
                 end: formatTime(end),
-                message,
+                body,
                 endEstimated,
                 startEstimated,
                 alertClass,
+                isEvent
             }));
     }
 
@@ -105,11 +106,12 @@ export class ItineraryListComponent {
 
         const interim = {
             start: previous.end,
-            message,
+            body: message,
             end: item.start,
             endEstimated: true,
             startEstimated: true,
-            alertClass
+            alertClass,
+            isEvent: false
         };
 
         return [...all, interim, item];
@@ -126,10 +128,11 @@ export class ItineraryListComponent {
 
         return {
             start,
-            message,
+            body: event,
             end,
             endEstimated: true,
-            alertClass: 'alert-primary'
+            alertClass: 'alert-primary',
+            isEvent: true,
         };
     }
 

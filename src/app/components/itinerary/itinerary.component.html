@@ -1,11 +1,14 @@
 
-
 <div 
     class="w-100 d-flex alert" 
     *ngFor="let event of itinerary"
     [ngClass]="event.alertClass"
     >
     <div class="grid-time"><span>{{event.start}}</span><span *ngIf="event.startEstimated">*</span></div>
-    <div class="flex-grow-1"><span class="ml-1">{{event.message}}</span></div>
+
+    <div class="flex-grow-1" *ngIf="!event.isEvent"><span class="ml-1">{{getMessage(event.body)}}</span></div>
+
+    <a class="flex-grow-1" target="_blank" [href]="event.body.bookingLink" *ngIf="event.isEvent"><span class="ml-1">{{getMessage(event.body)}}</span></a>
+
     <div class="grid-time text-right"><span class="ml-1">{{event.end}}</span><span *ngIf="event.endEstimated">*</span></div>
 </div>

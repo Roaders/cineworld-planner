@@ -25,13 +25,22 @@
                         {{film.name}}
                     </button>
 
-                    <div class="mr-2 icon-link">
-                        <a href="{{film.videoLink}}" target="_blank">
+                    <div class="mr-2">
+                        <a 
+                            class="icon-link"
+                            *ngIf="film.videoLink != null && film.videoLink != ''" 
+                            href="{{film.videoLink}}" 
+                            target="_blank">
                             <i 
-                                class="fa fa-youtube-play" 
+                                class="fa fa-youtube-play fa-youtube-play-enabled"
                                 aria-hidden="true"
                                 ></i>
                         </a>
+                        <i 
+                            *ngIf="film.videoLink == null || film.videoLink == ''" 
+                            class="fa fa-youtube-play fa-youtube-play-disabled"
+                            aria-hidden="true"
+                            ></i>
                     </div>
 
                     <div class="icon-link">
