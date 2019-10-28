@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { EventListComponent } from './event-list.component';
-import { ItineraryComponent } from '../itinerary/itinerary.component';
+import { ItineraryComponent } from '../itinerary-list/itinerary-list.component';
 import { AttributeSelectorComponent } from '../attribute-selector/attribute-selector.component';
 import { PreferencesService } from 'src/app/services/preferences.service';
 import { FormsModule } from '@angular/forms';

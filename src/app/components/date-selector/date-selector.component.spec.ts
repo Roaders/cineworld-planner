@@ -6,7 +6,7 @@ import { CinemaListComponent } from '../cinema-list/cinema-list.component';
 import { CinemaComponent } from '../cinema/cinema.component';
 import { CinemaHeaderComponent } from '../cinema-header/cinema-header.component';
 import { EventListComponent } from '../event-list/event-list.component';
-import { ItineraryComponent } from '../itinerary/itinerary.component';
+import { ItineraryComponent } from '../itinerary-list/itinerary-list.component';
 import { AttributeSelectorComponent } from '../attribute-selector/attribute-selector.component';
 import { CineworldService } from 'src/app/services/cineworld.service';
 import { CinemaHelper } from 'src/app/helper/cinema-helper';
