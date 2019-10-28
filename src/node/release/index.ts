@@ -25,8 +25,29 @@ function pushFiles() {
     });
 }
 
+client.on('greeting', (message: string) => {
+    console.log(`GREETING: ${message}`);
+});
+
 client.on('ready', () => {
+    console.log(`READY`);
     pushFiles();
+});
+
+client.on('close', (error: boolean) => {
+    console.log(`CONNECTION CLOSED (had error: ${error})`);
+});
+
+client.on('end', () => {
+    console.log(`END`);
+});
+
+client.on('error', (error: any) => {
+    const code = error.code || 'NO_CODE';
+
+    console.log(`ERROR: ${code}`);
+
+    console.log(JSON.stringify(error, undefined, 4));
 });
 
 client.connect({
