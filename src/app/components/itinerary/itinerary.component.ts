@@ -172,7 +172,8 @@ export class ItineraryComponent {
             return [events];
         }
 
-        return subsequentEvents.map(event => [...events, event]);
+        return subsequentEvents.map(event => [...events, event])
+            .reduce((itineraries, itinerary) => [...itineraries, ...this.pickNextEvent(itinerary)], new Array<IEvent[]>());
     }
 }
 
