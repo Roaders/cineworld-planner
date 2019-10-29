@@ -101,4 +101,20 @@
 
     <div>{{formatMoment(testMoment)}}</div>
 
+  <div>
+    <select name="favoriteSnacks" [(ngModel)]="favoriteSnacks">
+        <option *ngFor="let snackOption of snacks" [ngValue]="snackOption">
+            {{ snackOption.name }}
+        </option>
+    </select>
+</div>
+
+<div>
+    <select name="favoriteSnacks" [(ngModel)]="favoriteSnacks" size="5">
+        <option *ngFor="let snackOption of snacks" [ngValue]="snackOption">
+            {{ snackOption.name }}
+        </option>
+    </select>
+</div>
+  
 </div>
