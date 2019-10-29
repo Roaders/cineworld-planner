@@ -10,6 +10,11 @@ export type FilterMode = 'exclude' | 'include';
 
 export interface IFilter {attribute: FilmAttribute; mode: FilterMode; }
 
+interface Snack {
+    id: string;
+    name: string;
+}
+
 @Component({
     selector: 'attribute-selector',
     templateUrl: './attribute-selector.component.html',
@@ -20,6 +25,15 @@ export class AttributeSelectorComponent implements OnInit  {
         this._filters = preferencesService.getAttributeFilters();
     }
 
+    public favoriteSnacks: Snack[];
+
+  public snacks: Snack[] = [
+      { id: "jrmints", name: "Junior Mints" },
+      { id: "pmm", name: "Peanut M&Ms" },
+      { id: "popcorn", name: "Popcorn" },
+      { id: "twizzlers", name: "Twizzlers" }
+  ];
+  
     @Input()
     public get trailerAllowance() {
         return this._trailerAllowance;
