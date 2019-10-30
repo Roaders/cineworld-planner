@@ -3,13 +3,10 @@ import { readdirSync } from 'fs';
 import { join } from 'path';
 import { from, bindNodeCallback } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
-import { networkInterfaces } from 'os';
 
 console.log(`RELEASE ${process.env.NODE_ENV} ${process.env.FTP_USER}@${process.env.FTP_HOST}`);
 
 console.log(`Network:`);
-
-console.log(JSON.stringify(networkInterfaces(), undefined, 4));
 
 const DIST_PATH = `dist/cineworld-planner`;
 const filesList = readdirSync(join(process.cwd(), DIST_PATH));
@@ -66,7 +63,5 @@ const connectOptions: Options = {
     connTimeout: 60000,
     pasvTimeout: 60000,
 };
-
-(connectOptions as any).debug = console.log;
 
 client.connect(connectOptions);
