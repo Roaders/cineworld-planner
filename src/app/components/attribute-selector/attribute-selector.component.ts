@@ -5,15 +5,11 @@ import { defaultTrailerAllowance } from 'src/app/constants/constants';
 import { PreferencesService } from 'src/app/services/preferences.service';
 import moment, { Moment } from 'moment';
 import { formatTime, getStartMoment, getEndMoment } from 'src/app/helper/event-helper';
+import { isEqual } from 'lodash';
 
 export type FilterMode = 'exclude' | 'include';
 
 export interface IFilter {attribute: FilmAttribute; mode: FilterMode; }
-
-interface Snack {
-    id: string;
-    name: string;
-}
 
 @Component({
     selector: 'attribute-selector',
@@ -25,21 +21,15 @@ export class AttributeSelectorComponent implements OnInit  {
         this._filters = preferencesService.getAttributeFilters();
     }
 
-    public favoriteSnacks: Snack[];
-
-  public snacks: Snack[] = [
-      { id: "jrmints", name: "Junior Mints" },
-      { id: "pmm", name: "Peanut M&Ms" },
-      { id: "popcorn", name: "Popcorn" },
-      { id: "twizzlers", name: "Twizzlers" }
-  ];
-  
     @Input()
     public get trailerAllowance() {
         return this._trailerAllowance;
     }
 
     public set trailerAllowance(value: number) {
+        if (value === this._trailerAllowance) {
+            return;
+        }
         if (isNaN(value)) {
             value = 0;
         }
@@ -48,6 +38,8 @@ export class AttributeSelectorComponent implements OnInit  {
 
         this.trailerAllowanceChange.emit(value);
         this.preferencesService.setTrailerAllowance(value);
+
+        this.resetHours();
     }
 
     public get expand() {
@@ -64,7 +56,12 @@ export class AttributeSelectorComponent implements OnInit  {
     }
 
     public set events(value: IEvent[]) {
+        if (isEqual(value, this._events)) {
+            return;
+        }
+
         this._events = value || [];
+        this.resetHours();
     }
 
     @Input()
@@ -73,20 +70,32 @@ export class AttributeSelectorComponent implements OnInit  {
     }
 
     public set selectedFilms(value: IFilm[]) {
+        if (isEqual(value, this._selectedFilms)) {
+            return;
+        }
+
         this._selectedFilms = value || [];
+        this.resetHours();
     }
 
+    private _hours: (Moment | undefined)[] | undefined;
+
     public get hours(): (Moment | undefined)[] {
-        const { spanStartMoment, spanEndMoment } = this.getOverallTimespan();
+        if (this._hours == null) {
 
-        const startHour = spanStartMoment.minute(0).toDate().getHours();
-        const endHour = spanEndMoment.toDate().getHours();
+            const { spanStartMoment, spanEndMoment } = this.getOverallTimespan();
 
-        const hours = Array.from({length: endHour + 1 - startHour})
-            .map((_, index) => index + startHour)
-            .map(hour => moment(spanStartMoment).hour(hour));
+            const startHour = spanStartMoment.minute(0).toDate().getHours();
+            const endHour = spanEndMoment.toDate().getHours();
 
-        return [undefined, ...hours];
+            const hours = Array.from({length: (endHour - startHour) + 2})
+                .map((_, index) => index + startHour)
+                .map(hour => moment(spanStartMoment).hour(hour));
+
+            this._hours = [undefined, ...hours];
+        }
+
+        return this._hours;
     }
 
     public get allAttributes(): FilmAttribute[] {
@@ -135,8 +144,6 @@ export class AttributeSelectorComponent implements OnInit  {
         this.finishBefore.emit(value);
     }
 
-    public testMoment: Moment | undefined;
-
     private _trailerAllowance: number = defaultTrailerAllowance;
 
     @Output()
@@ -154,10 +161,6 @@ export class AttributeSelectorComponent implements OnInit  {
     private _events: IEvent[] = [];
 
     private _selectedFilms: IFilm[] = [];
-
-    public updateTimeFilter(value: undefined | Moment) {
-        console.log(`update: ${value}`);
-    }
 
     public formatMoment(value?: Moment): string {
         return value ? formatTime(value) : 'Select...';
@@ -248,4 +251,9 @@ export class AttributeSelectorComponent implements OnInit  {
         return {spanStartMoment, spanEndMoment};
     }
 
+    private resetHours() {
+        this._finishBeforeMoment = undefined;
+        this._startAfterMoment = undefined;
+        this._hours = undefined;
+    }
 }

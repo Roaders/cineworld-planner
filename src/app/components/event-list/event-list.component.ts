@@ -49,7 +49,7 @@ export class EventListComponent {
     }
 
     public get events(): IEvent[] | undefined {
-        return this._events;
+        return this._events ? this._events.concat() : undefined;
     }
 
     private _selectedFilms: IFilm[] = [];

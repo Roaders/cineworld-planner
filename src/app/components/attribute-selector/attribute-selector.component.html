@@ -85,36 +85,16 @@
 
     <div class="form-group">
         <label for="startAfter">Start After</label>
-        <select 
-            class="form-control" 
-            id="startAfter" >
+        <select class="form-control" id="startAfter" [(ngModel)]="startAfterMoment">
             <option *ngFor="let hour of hours" [ngValue]="hour">{{formatMoment(hour)}}</option>
         </select>
     </div>
 
     <div class="form-group">
-        <label for="startAfter">Finish Before</label>
-        <select class="form-control" id="startAfter" [(ngModel)]="testMoment">
+        <label for="finishBefore">Finish Before</label>
+        <select class="form-control" id="finishBefore" [(ngModel)]="finishBeforeMoment">
             <option *ngFor="let hour of hours" [ngValue]="hour">{{formatMoment(hour)}}</option>
         </select>
     </div>
-
-    <div>{{formatMoment(testMoment)}}</div>
-
-  <div>
-    <select name="favoriteSnacks" [(ngModel)]="favoriteSnacks">
-        <option *ngFor="let snackOption of snacks" [ngValue]="snackOption">
-            {{ snackOption.name }}
-        </option>
-    </select>
-</div>
-
-<div>
-    <select name="favoriteSnacks" [(ngModel)]="favoriteSnacks" size="5">
-        <option *ngFor="let snackOption of snacks" [ngValue]="snackOption">
-            {{ snackOption.name }}
-        </option>
-    </select>
-</div>
   
 </div>

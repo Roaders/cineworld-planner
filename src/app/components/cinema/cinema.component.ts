@@ -24,7 +24,7 @@ export class CinemaComponent {
     }
 
     public get selectedFilms(): IFilm[] {
-        return this._selectedFilms;
+        return this._selectedFilms.concat();
     }
 
     public get filmList() {
