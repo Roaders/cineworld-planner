@@ -41,7 +41,6 @@
                 {{getStartTime(event)}} - {{getEndTime(event)}}* {{getEventFilmName(event)}}
             </div>
             
-            
             <div class="d-inline flex-grow-1 text-right">
                 <span 
                     class="ml-1" 
@@ -56,8 +55,8 @@
     <div class="text-muted small">* end time estimated</div>
 </div>
 
-<itinerary
-    [events]="selectedEvents"
-    [films]="selectedFilms"
-    [trailerAllowance]="trailerAllowance"  
-></itinerary>
+<itinerary-list
+    [selectedEvents]="selectedEvents"
+    [allEvents]="eventsList"
+    [selectedFilms]="selectedFilms"
+></itinerary-list>

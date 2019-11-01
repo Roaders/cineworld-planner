@@ -15,7 +15,7 @@ export interface IFilter {attribute: FilmAttribute; mode: FilterMode; }
     selector: 'attribute-selector',
     templateUrl: './attribute-selector.component.html',
 })
-export class AttributeSelectorComponent implements OnInit  {
+export class AttributeSelectorComponent implements OnInit {
 
     constructor(private preferencesService: PreferencesService) {
         this._filters = preferencesService.getAttributeFilters();
@@ -48,6 +48,18 @@ export class AttributeSelectorComponent implements OnInit  {
 
     public get showFilters() {
         return this._showFilters;
+    }
+
+    public get maxBreakLength() {
+        return this.preferencesService.getMaxBreakLength();
+    }
+
+    public set maxBreakLength(value: number) {
+        if (isNaN(value)) {
+            value = 0;
+        }
+
+        this.preferencesService.setMaxBreakLength(value);
     }
 
     @Input()

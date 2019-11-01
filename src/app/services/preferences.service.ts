@@ -4,6 +4,7 @@ import { IFilter } from '../components/attribute-selector/attribute-selector.com
 const FAVORITE_CINEMA_STORAGE_KEY = 'favoriteCinemaIds';
 const TRAILER_ALLOWANCE_STORAGE_KEY = 'trailerAllowance';
 const ATTRIBUTE_FILTER_STORAGE_KEY = 'attributeFilter';
+const MAX_BREAK_LENGTH_STORAGE_KEY = 'maxBreakLength';
 
 @Injectable()
 export class PreferencesService {
@@ -24,6 +25,15 @@ export class PreferencesService {
 
     public setTrailerAllowance(value: number) {
         localStorage.setItem(TRAILER_ALLOWANCE_STORAGE_KEY, JSON.stringify(value));
+    }
+
+    public getMaxBreakLength(): number {
+        const filtersString = localStorage.getItem(MAX_BREAK_LENGTH_STORAGE_KEY);
+        return filtersString ? JSON.parse(filtersString) : 30;
+    }
+
+    public setMaxBreakLength(value: number) {
+        localStorage.setItem(MAX_BREAK_LENGTH_STORAGE_KEY, JSON.stringify(value));
     }
 
     public removeFavoriteCinema(id: string) {

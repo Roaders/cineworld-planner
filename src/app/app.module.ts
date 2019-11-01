@@ -12,6 +12,7 @@ import { PreferencesService } from './services/preferences.service';
 import { CinemaHelper } from './helper/cinema-helper';
 import { CinemaHeaderComponent } from './components/cinema-header/cinema-header.component';
 import { EventListComponent } from './components/event-list/event-list.component';
+import { ItineraryListComponent } from './components/itinerary-list/itinerary-list.component';
 import { ItineraryComponent } from './components/itinerary/itinerary.component';
 import { AttributeSelectorComponent } from './components/attribute-selector/attribute-selector.component';
 
@@ -24,6 +25,7 @@ import { AttributeSelectorComponent } from './components/attribute-selector/attr
         CinemaHeaderComponent,
         EventListComponent,
         ItineraryComponent,
+        ItineraryListComponent,
         AttributeSelectorComponent
     ],
     imports: [

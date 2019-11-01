@@ -1,31 +1,25 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { EventListComponent } from './event-list.component';
-import { ItineraryListComponent } from '../itinerary-list/itinerary-list.component';
-import { AttributeSelectorComponent } from '../attribute-selector/attribute-selector.component';
+import { ItineraryListComponent } from './itinerary-list.component';
 import { PreferencesService } from 'src/app/services/preferences.service';
-import { FormsModule } from '@angular/forms';
 import { ItineraryComponent } from '../itinerary/itinerary.component';
 
-describe('EventListComponent', () => {
-    let component: EventListComponent;
-    let fixture: ComponentFixture<EventListComponent>;
+describe('ItineraryListComponent', () => {
+    let component: ItineraryListComponent;
+    let fixture: ComponentFixture<ItineraryListComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             providers: [PreferencesService],
             declarations: [
-                EventListComponent,
                 ItineraryListComponent,
-                ItineraryComponent,
-                AttributeSelectorComponent
-            ],
-            imports: [FormsModule]
+                ItineraryComponent
+            ]
         })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(EventListComponent);
+        fixture = TestBed.createComponent(ItineraryListComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

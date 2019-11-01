@@ -6,8 +6,13 @@
         border-color: $primary;
     }
     
-    .fa-youtube-play{
+    .fa-youtube-play-enabled{
         color: red;
+    }
+    
+    .fa-youtube-play-disabled{
+        font-size: 2rem;
+        color: $secondary;
     }
     
     .fa-film{

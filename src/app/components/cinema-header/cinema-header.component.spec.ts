@@ -11,8 +11,9 @@ import { PreferencesService } from 'src/app/services/preferences.service';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from 'src/app/app-routing.module';
 import { FormsModule } from '@angular/forms';
-import { ItineraryComponent } from '../itinerary/itinerary.component';
+import { ItineraryListComponent } from '../itinerary-list/itinerary-list.component';
 import { AttributeSelectorComponent } from '../attribute-selector/attribute-selector.component';
+import { ItineraryComponent } from '../itinerary/itinerary.component';
 
 describe('CinemaHeaderComponent', () => {
     let component: CinemaHeaderComponent;
@@ -24,6 +25,7 @@ describe('CinemaHeaderComponent', () => {
                 CinemaComponent,
                 DateSelectorComponent,
                 CinemaListComponent,
+                ItineraryListComponent,
                 ItineraryComponent,
                 CinemaHeaderComponent,
                 EventListComponent,
