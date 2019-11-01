@@ -23,23 +23,13 @@ export class EventListComponent {
         this.trailerAllowance = preferencesService.getTrailerAllowance();
     }
 
-    private _errors: string[] = [];
-
     public get errors() {
         return this._errors;
     }
 
-    private _filters: IFilter[] = [];
-
-    private _selectedEvents: IEvent[] = [];
-
     public get selectedEvents(): IEvent[] {
         return this._selectedEvents;
     }
-
-    public trailerAllowance: number;
-
-    private _events: IEvent[] | undefined;
 
     @Input()
     public set events(value: IEvent[] | undefined) {
@@ -51,8 +41,6 @@ export class EventListComponent {
     public get events(): IEvent[] | undefined {
         return this._events ? this._events.concat() : undefined;
     }
-
-    private _selectedFilms: IFilm[] = [];
 
     public get selectedFilms(): IFilm[] {
         return this._selectedFilms;
@@ -77,6 +65,22 @@ export class EventListComponent {
         return this.events
             .filter(event => this.filterEvents(event, filmsToDisplay));
     }
+
+    private _errors: string[] = [];
+
+    private _filters: IFilter[] = [];
+
+    private _selectedEvents: IEvent[] = [];
+
+    public trailerAllowance: number;
+
+    private _events: IEvent[] | undefined;
+
+    private _selectedFilms: IFilm[] = [];
+
+    private _startAfter: Moment | undefined;
+
+    private _finishBefore: Moment | undefined;
 
     public onAttributeFiltersChanged(filters: IFilter[]) {
         this._filters = filters || [];
@@ -188,6 +192,14 @@ export class EventListComponent {
         }
     }
 
+    public updateStartAfter(value: Moment | undefined) {
+        this._startAfter = value;
+    }
+
+    public updateFinishBefore(value: Moment | undefined) {
+        this._finishBefore = value;
+    }
+
     private filterEvents(event: IEvent, filmsToDisplay: IFilm[]): boolean {
         if (!this.eventMatchesSelectedAttributes(event)) {
             return false;
@@ -206,6 +218,15 @@ export class EventListComponent {
         const eventStart = getStartMoment(event);
         const trailersEnd = moment(eventStart).add(this.trailerAllowance, 'minutes');
         const earliestFilmEnd = moment(eventStart).add(eventFilm.length, 'minutes');
+        const latestFilmEnd = moment(earliestFilmEnd).add(this.trailerAllowance, 'minutes');
+
+        if (this._startAfter && eventStart.isBefore(this._startAfter)) {
+            return false;
+        }
+
+        if (this._finishBefore && latestFilmEnd.isAfter(this._finishBefore)) {
+            return false;
+        }
 
         return this._selectedEvents.every(selectedEvent => {
             const selectedEventFilm = this.getEventFilm(selectedEvent);

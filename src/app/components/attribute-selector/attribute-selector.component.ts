@@ -85,12 +85,11 @@ export class AttributeSelectorComponent implements OnInit  {
 
             const { spanStartMoment, spanEndMoment } = this.getOverallTimespan();
 
-            const startHour = spanStartMoment.minute(0).toDate().getHours();
-            const endHour = spanEndMoment.toDate().getHours();
+            const startHour = moment(spanStartMoment).minute(0);
+            const hourCount = moment(spanEndMoment).minute(0).diff(startHour, 'hour');
 
-            const hours = Array.from({length: (endHour - startHour) + 2})
-                .map((_, index) => index + startHour)
-                .map(hour => moment(spanStartMoment).hour(hour));
+            const hours = Array.from({length: hourCount + 2})
+                .map((_, index) => moment(startHour).add(index, 'hour'));
 
             this._hours = [undefined, ...hours];
         }
