@@ -30,6 +30,7 @@
     },
     "private": true,
     "dependencies": {
+        "@types/lodash": "^4.14.144",
         "axios": "^0.19.0",
         "axios-observable": "^1.1.2",
         "cors": "^2.8.5",
@@ -68,6 +69,7 @@
         "karma-coverage-istanbul-reporter": "~2.0.1",
         "karma-jasmine": "~2.0.1",
         "karma-jasmine-html-reporter": "^1.4.0",
+        "lodash": "^4.17.15",
         "moment": "^2.24.0",
         "nodemon": "^1.19.4",
         "protractor": "~5.4.0",

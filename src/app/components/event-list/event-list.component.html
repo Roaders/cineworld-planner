@@ -11,6 +11,8 @@
         (filters)="onAttributeFiltersChanged($event)"
         [trailerAllowance]="trailerAllowance"
         (trailerAllowanceChange)="trailerAllowance = $event"
+        (startAfter)="updateStartAfter($event)"
+        (finishBefore)="updateFinishBefore($event)"
         ></attribute-selector>
 
     <div id="listingsContainer">

@@ -3,6 +3,9 @@ import { FilmAttribute, IEvent, IFilm, FilmAttributeValues } from 'src/contracts
 import { displayAttribute } from 'src/app/helper/attribute-helper';
 import { defaultTrailerAllowance } from 'src/app/constants/constants';
 import { PreferencesService } from 'src/app/services/preferences.service';
+import moment, { Moment } from 'moment';
+import { formatTime, getStartMoment, getEndMoment } from 'src/app/helper/event-helper';
+import { isEqual } from 'lodash';
 
 export type FilterMode = 'exclude' | 'include';
 
@@ -24,6 +27,9 @@ export class AttributeSelectorComponent implements OnInit {
     }
 
     public set trailerAllowance(value: number) {
+        if (value === this._trailerAllowance) {
+            return;
+        }
         if (isNaN(value)) {
             value = 0;
         }
@@ -32,6 +38,16 @@ export class AttributeSelectorComponent implements OnInit {
 
         this.trailerAllowanceChange.emit(value);
         this.preferencesService.setTrailerAllowance(value);
+
+        this.resetHours();
+    }
+
+    public get expand() {
+        return this._expand;
+    }
+
+    public get showFilters() {
+        return this._showFilters;
     }
 
     public get maxBreakLength() {
@@ -46,17 +62,18 @@ export class AttributeSelectorComponent implements OnInit {
         this.preferencesService.setMaxBreakLength(value);
     }
 
-    public get expand() {
-        return this._expand;
-    }
-
     @Input()
     public get events(): IEvent[] {
         return this._events;
     }
 
     public set events(value: IEvent[]) {
+        if (isEqual(value, this._events)) {
+            return;
+        }
+
         this._events = value || [];
+        this.resetHours();
     }
 
     @Input()
@@ -65,7 +82,31 @@ export class AttributeSelectorComponent implements OnInit {
     }
 
     public set selectedFilms(value: IFilm[]) {
+        if (isEqual(value, this._selectedFilms)) {
+            return;
+        }
+
         this._selectedFilms = value || [];
+        this.resetHours();
+    }
+
+    private _hours: (Moment | undefined)[] | undefined;
+
+    public get hours(): (Moment | undefined)[] {
+        if (this._hours == null) {
+
+            const { spanStartMoment, spanEndMoment } = this.getOverallTimespan();
+
+            const startHour = moment(spanStartMoment).minute(0);
+            const hourCount = moment(spanEndMoment).minute(0).diff(startHour, 'hour');
+
+            const hours = Array.from({length: hourCount + 2})
+                .map((_, index) => moment(startHour).add(index, 'hour'));
+
+            this._hours = [undefined, ...hours];
+        }
+
+        return this._hours;
     }
 
     public get allAttributes(): FilmAttribute[] {
@@ -84,12 +125,44 @@ export class AttributeSelectorComponent implements OnInit {
             .sort();
     }
 
+    @Output()
+    public startAfter = new EventEmitter<undefined | Moment>();
+
+    @Output()
+    public finishBefore = new EventEmitter<undefined | Moment>();
+
+    private _startAfterMoment: Moment | undefined;
+
+    public get startAfterMoment(): Moment | undefined {
+        return this._startAfterMoment;
+    }
+
+    public set startAfterMoment(value: Moment | undefined) {
+        this._startAfterMoment = value;
+
+        this.startAfter.emit(value);
+    }
+
+    private _finishBeforeMoment: Moment | undefined;
+
+    public get finishBeforeMoment(): Moment | undefined {
+        return this._finishBeforeMoment;
+    }
+
+    public set finishBeforeMoment(value: Moment | undefined) {
+        this._finishBeforeMoment = value;
+
+        this.finishBefore.emit(value);
+    }
+
     private _trailerAllowance: number = defaultTrailerAllowance;
 
     @Output()
     public readonly trailerAllowanceChange = new EventEmitter<number>();
 
     private _expand = false;
+
+    private _showFilters = false;
 
     private _filters: IFilter[];
 
@@ -100,12 +173,20 @@ export class AttributeSelectorComponent implements OnInit {
 
     private _selectedFilms: IFilm[] = [];
 
+    public formatMoment(value?: Moment): string {
+        return value ? formatTime(value) : 'Select...';
+    }
+
     public ngOnInit(): void {
         this.filters.emit(this._filters);
     }
 
     public toggleExpand() {
         this._expand = !this._expand;
+    }
+
+    public toggleFilters() {
+        this._showFilters = !this._showFilters;
     }
 
     public getIcon(attribute: FilmAttribute): string | undefined {
@@ -159,4 +240,31 @@ export class AttributeSelectorComponent implements OnInit {
         this.filters.emit(this._filters);
     }
 
+    private getOverallTimespan() {
+
+        const spanStartMoment = getStartMoment(this.events[0]);
+
+        const spanEndMoment = this.events
+            .map(event => getEndMoment(event, this.trailerAllowance, this.selectedFilms))
+            .reduce((latest, current) => {
+                if (latest != null && current != null && current.isAfter(latest)) {
+                    return current;
+                }
+                return latest;
+            }, spanStartMoment);
+
+        if ( spanEndMoment == null) {
+            let errorMessage = `could not calculate timespan: `;
+            errorMessage = errorMessage + `spanEndMoment:${spanEndMoment ? 'defined' : 'notDefined'}`;
+            throw new Error(errorMessage);
+        }
+
+        return {spanStartMoment, spanEndMoment};
+    }
+
+    private resetHours() {
+        this._finishBeforeMoment = undefined;
+        this._startAfterMoment = undefined;
+        this._hours = undefined;
+    }
 }
