@@ -263,8 +263,12 @@ export class AttributeSelectorComponent implements OnInit {
     }
 
     private resetHours() {
-        this._finishBeforeMoment = undefined;
-        this._startAfterMoment = undefined;
         this._hours = undefined;
+
+        this._startAfterMoment = this.hours.filter(hour => hour != null && hour.isSame(this._startAfterMoment))[0];
+        this._finishBeforeMoment = this.hours.filter(hour => hour != null && hour.isSame(this._finishBeforeMoment))[0];
+
+        this.startAfter.emit(this._startAfterMoment);
+        this.finishBefore.emit(this._finishBeforeMoment);
     }
 }
