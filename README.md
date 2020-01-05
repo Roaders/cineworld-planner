@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Roaders/cineworld-planner.svg?branch=master)](https://travis-ci.org/Roaders/cineworld-planner)
+[![Build Status](https://travis-ci.org/Roaders/cineworld-planner.svg?branch=master)](https://travis-ci.org/Roaders/cineworld-planner) [![Greenkeeper badge](https://badges.greenkeeper.io/Roaders/cineworld-planner.svg)](https://greenkeeper.io/)
 
 # CineworldPlanner
 
