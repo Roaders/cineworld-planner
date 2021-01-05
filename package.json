@@ -31,7 +31,7 @@
     "private": true,
     "dependencies": {
         "@types/lodash": "^4.14.144",
-        "axios": "^0.19.0",
+        "axios": "^0.21.1",
         "axios-observable": "^1.1.2",
         "cors": "^2.8.5",
         "express": "^4.17.1",
