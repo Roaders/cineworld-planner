@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
 import { map, shareReplay } from 'rxjs/operators';
-import axios from 'axios-observable';
-import { AxiosError } from 'axios';
 import { ICinema } from '../../../contracts/contracts';
-import { defer, Observable } from 'rxjs';
+import { defer, from, Observable } from 'rxjs';
+import axios, { AxiosError } from 'axios';
 
 const CINEWORLD_HOMEPAGE_URL = `https://www.cineworld.co.uk`;
 
@@ -86,7 +85,7 @@ export class CinemaController {
         return defer(() => {
             console.log(`Loading cinema list from ${CINEWORLD_HOMEPAGE_URL}`);
 
-            return axios.get(CINEWORLD_HOMEPAGE_URL, {responseType: 'text'}).pipe(
+            return from(axios.get(CINEWORLD_HOMEPAGE_URL, {responseType: 'text'})).pipe(
                 map(result => processRawHtml(result.data))
             );
         });
