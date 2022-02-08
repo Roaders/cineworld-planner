@@ -25,7 +25,7 @@ export class CinemaListComponent {
         return this._errorMessage;
     }
 
-    private coordinates: Coordinates | undefined;
+    private coordinates: GeolocationCoordinates | undefined;
 
     public get alhpabeticalSearch() {
         return this._alhpabeticalSearch;
@@ -143,12 +143,12 @@ export class CinemaListComponent {
         return list.filter(cinema => cinema.name.toLowerCase().indexOf(compareString) >= 0);
     }
 
-    private onGeolocation(position: Position) {
+    private onGeolocation(position: GeolocationPosition) {
         this.coordinates = position.coords;
         this.clearSortAndFilter();
     }
 
-    private onGeolocationError(positionError: PositionError) {
+    private onGeolocationError(positionError: GeolocationPositionError) {
         console.log(`GEO LOCATION ERROR: ${positionError.message}`);
 
         this._errorMessage = `Could not get location: ${positionError.message}`;
@@ -185,7 +185,7 @@ export class CinemaListComponent {
     }
 }
 
-function getCoords(coords: Pick<Coordinates, 'longitude' | 'latitude'>) {
+function getCoords(coords: Pick<GeolocationCoordinates, 'longitude' | 'latitude'>) {
     const {longitude, latitude} = coords;
 
     return {longitude, latitude};
