@@ -20,7 +20,7 @@
         "noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
         "lib": [
             "es2018",
-            "dom"
+            "DOM"
         ]
     },
     "angularCompilerOptions": {
