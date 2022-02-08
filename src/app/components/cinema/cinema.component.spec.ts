@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { CinemaComponent } from './cinema.component';
 import { DateSelectorComponent } from '../date-selector/date-selector.component';
 import { CineworldService } from 'src/app/services/cineworld.service';
@@ -18,7 +18,7 @@ describe('CinemaComponent', () => {
     let component: CinemaComponent;
     let fixture: ComponentFixture<CinemaComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [
                 CinemaComponent,
