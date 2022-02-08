@@ -92,10 +92,11 @@ export class CinemaController {
     }
 
     private handleError(response: Response, error: any, message: string) {
-        console.log(message, {response, error});
 
         if (error.isAxiosError) {
             const axiosError = error as AxiosError;
+            console.log(message);
+            console.log(JSON.stringify(error.response))
 
             if (axiosError.response) {
                 response.status(axiosError.response.status);
@@ -103,6 +104,8 @@ export class CinemaController {
                 response.send();
                 return;
             }
+        } else {
+            console.log(message, {response, error});
         }
 
         response.status(500);
