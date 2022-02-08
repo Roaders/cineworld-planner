@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { version } from '../../../../package.json';
+import packageJson from '../../../../package.json';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +8,7 @@ import { version } from '../../../../package.json';
 export class AppComponent {
 
     constructor() {
-        document.title = `Cineworld Planner ${version}`;
+        document.title = `Cineworld Planner ${packageJson.version}`;
     }
 
 }

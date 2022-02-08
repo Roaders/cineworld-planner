@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { EventListComponent } from './event-list.component';
 import { ItineraryListComponent } from '../itinerary-list/itinerary-list.component';
 import { AttributeSelectorComponent } from '../attribute-selector/attribute-selector.component';
@@ -10,7 +10,7 @@ describe('EventListComponent', () => {
     let component: EventListComponent;
     let fixture: ComponentFixture<EventListComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             providers: [PreferencesService],
             declarations: [

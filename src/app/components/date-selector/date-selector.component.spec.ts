@@ -1,6 +1,6 @@
 import { DateSelectorComponent } from './date-selector.component';
 import * as momentImport from 'moment';
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { CinemaListComponent } from '../cinema-list/cinema-list.component';
 import { CinemaComponent } from '../cinema/cinema.component';
 import { CinemaHeaderComponent } from '../cinema-header/cinema-header.component';
@@ -19,7 +19,7 @@ describe('DateSelectorComponent', () => {
     let component: DateSelectorComponent;
     let fixture: ComponentFixture<DateSelectorComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [
                 CinemaListComponent,

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AttributeSelectorComponent } from './attribute-selector.component';
 import { PreferencesService } from 'src/app/services/preferences.service';
@@ -8,7 +8,7 @@ describe('AttributeSelectorComponent', () => {
     let component: AttributeSelectorComponent;
     let fixture: ComponentFixture<AttributeSelectorComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             providers: [PreferencesService],
             declarations: [AttributeSelectorComponent],
