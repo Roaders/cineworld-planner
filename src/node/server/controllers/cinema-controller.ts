@@ -96,7 +96,7 @@ export class CinemaController {
         if (error.isAxiosError) {
             const axiosError = error as AxiosError;
             console.log(message);
-            console.log(JSON.stringify(error.response))
+            console.log({response: error.response})
 
             if (axiosError.response) {
                 response.status(axiosError.response.status);
