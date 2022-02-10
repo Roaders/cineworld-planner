@@ -5,7 +5,8 @@
     "scripts": {
         "clean": "rimraf dist",
         "start-app": "ng serve --open",
-        "start-app-local": "ng serve --open --configuration=local",
+        "start-app-local": "ng serve --open",
+        "start-app-ring": "ng serve --open --configuration=ring",
         "start-app-production": "ng serve --open --configuration=production",
         "watch-build-node": "tsc -p src/node/tsconfig.json --watch",
         "start-ts-node": "ts-node --project src/node/tsconfig.json src/node/server/index.ts",

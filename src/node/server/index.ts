@@ -7,7 +7,6 @@ const app: Express = express();
 
 const allowedOrigins = [
     'https://www.cineworld-planner.co.uk',
-    'http://staging.cineworld-planner.co.uk',
     'http://localhost:4200',
 ];
 
