@@ -23,3 +23,17 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+## Deploying Server
+
+ * run `npm version patch`
+ * run `build-release`
+ * push docker image to hub
+ * update container with new image
+
+ To run locally:
+
+ ```
+ $ docker run --name cineworldplanner --rm -ti -p 3000:3000 roaders/cineworldplanner:latest
+ ```
+

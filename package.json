@@ -1,14 +1,13 @@
 {
     "name": "cineworld-planner",
     "description": "An Application to help plan multi-film visits to cineworld",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "scripts": {
-        "ng": "ng",
-        "clean": "rimraf dist",
+        "clean": "rimraf dist build",
         "start-app": "ng serve --open",
-        "start-app-local": "ng serve --open --configuration=local",
+        "start-app-local": "ng serve --open",
+        "start-app-ring": "ng serve --open --configuration=ring",
         "start-app-production": "ng serve --open --configuration=production",
-        "heroku-postbuild": "npm run build-release",
         "watch-build-node": "tsc -p src/node/tsconfig.json --watch",
         "start-ts-node": "ts-node --project src/node/tsconfig.json src/node/server/index.ts",
         "start-node": "node dist/node/server",
@@ -20,7 +19,8 @@
         "debug-node": "node --inspect dist/node/server",
         "build": "ng build",
         "build-prod": "ng build --configuration=production",
-        "build-release": "npm run clean && concurrently npm:build-node npm:build-prod",
+        "build-release": "npm run clean && npm run verify-release",
+        "postbuild-release": "docker build -f Dockerfile -t roaders/cineworldplanner:latest . && docker push roaders/cineworldplanner:latest",
         "watch-test": "ng test",
         "verify-release": "ngcc && concurrently npm:build-node npm:test npm:build-prod",
         "run-release": "node dist/node/release",
@@ -34,10 +34,7 @@
         "cors": "^2.8.5",
         "express": "^4.17.2",
         "ftp": "^0.3.10",
-        "jquery": "^1.12.4",
-        "popper.js": "^1.16.1",
-        "rxjs": "~6.6.7",
-        "tslib": "^2.0.0"
+        "rxjs": "~6.6.7"
     },
     "devDependencies": {
         "@angular-devkit/build-angular": "~13.2.2",
@@ -59,6 +56,7 @@
         "@types/jasminewd2": "^2.0.10",
         "@types/lodash": "^4.14.178",
         "@types/node": "^15.6.2",
+        "ajv": "^6.12.6",
         "bootstrap": "^4.6.1",
         "concurrently": "^5.3.0",
         "font-awesome": "^4.7.0",
@@ -75,10 +73,19 @@
         "nodemon": "^1.19.4",
         "rimraf": "^3.0.2",
         "ts-node": "~7.0.0",
+        "tslib": "^2.0.0",
         "tslint": "~6.1.0",
         "typescript": "~4.5.5",
-        "zone.js": "~0.11.4"
+        "zone.js": "~0.11.4",
+        "jquery": "^1.12.4",
+        "popper.js": "^1.16.1"
     },
+    "bundledDependencies": [
+        "express",
+        "cors",
+        "rxjs",
+        "axios"
+    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/Roaders/cineworld-planner.git"

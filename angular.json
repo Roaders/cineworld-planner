@@ -1,7 +1,7 @@
 {
     "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
     "cli": {
-      "analytics": "b29afc66-a6a4-449d-a476-4b6ed8214783"
+        "analytics": "b29afc66-a6a4-449d-a476-4b6ed8214783"
     },
     "version": 1,
     "newProjectRoot": "projects",
@@ -68,17 +68,11 @@
                                 }
                             ]
                         },
-                        "local": {
-              "budgets": [
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
-              ],
+                        "ring": {
                             "fileReplacements": [
                                 {
                                     "replace": "src/app/environments/environment.ts",
-                                    "with": "src/app/environments/environment.local.ts"
+                                    "with": "src/app/environments/environment.ring.ts"
                                 }
                             ]
                         }
@@ -94,8 +88,8 @@
                         "production": {
                             "browserTarget": "cineworld-planner:build:production"
                         },
-                        "local": {
-                            "browserTarget": "cineworld-planner:build:local"
+                        "ring": {
+                            "browserTarget": "cineworld-planner:build:ring"
                         }
                     }
                 },

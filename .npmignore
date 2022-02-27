@@ -1,0 +1,10 @@
+.angular/
+.github/
+src/
+temp/
+node_modules/
+angular.json
+karma.conf.js
+nodemon.json
+tsconfig.*
+tslint.json

@@ -2,14 +2,33 @@ import express from 'express';
 import { Express } from 'express';
 import { setupRoutes } from './routes';
 import cors from 'cors';
+import {join} from "path"
+import {readFileSync} from "fs"
+import http from "http"
+import https from "https"
 
 const app: Express = express();
 
 const allowedOrigins = [
     'https://www.cineworld-planner.co.uk',
-    'http://staging.cineworld-planner.co.uk',
+    'http://www.cineworld-planner.co.uk',
     'http://localhost:4200',
 ];
+
+const certificatePath = join(__dirname, "certificates", "cert.pem");
+const keyPath = join(__dirname, "certificates", "privkey.pem");
+
+let cert: Buffer | undefined;
+let key: Buffer | undefined;
+
+try {
+    console.log(`Loading certificate from '${certificatePath}'`);
+    cert = readFileSync(certificatePath);
+    console.log(`Loading privatekey from '${keyPath}'`);
+    key = readFileSync(keyPath);
+} catch(err){
+    console.log(`Could not load certificates.`);
+}
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -32,6 +51,13 @@ setupRoutes(app);
 
 const port = process.env.PORT || 3000;
 
-app.listen(port);
+if(cert != null && key != null){
+    https.createServer({key, cert}, app).listen(port);
+    
+    console.log('cineworld-planner https api server started on: ' + port);
+} else {
+    http.createServer(app).listen(port); 
+    
+    console.log('cineworld-planner http api server started on: ' + port);
+}
 
-console.log('cineworld-planner api server started on: ' + port);
