@@ -20,7 +20,7 @@
         "build": "ng build",
         "build-prod": "ng build --configuration=production",
         "build-release": "npm run clean && npm run verify-release",
-        "postbuild-release": "docker build -f Dockerfile -t roaders/cineworldplanner:latest .",
+        "postbuild-release": "docker build -f Dockerfile -t roaders/cineworldplanner:latest . && docker push roaders/cineworldplanner:latest",
         "watch-test": "ng test",
         "verify-release": "ngcc && concurrently npm:build-node npm:test npm:build-prod",
         "run-release": "node dist/node/release",
