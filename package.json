@@ -1,7 +1,7 @@
 {
     "name": "cineworld-planner",
     "description": "An Application to help plan multi-film visits to cineworld",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "scripts": {
         "clean": "rimraf dist build",
         "start-app": "ng serve --open",
