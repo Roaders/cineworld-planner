@@ -1,12 +1,15 @@
 
-FROM node:16
+# taken from https://snyk.io/blog/10-best-practices-to-containerize-nodejs-web-applications-with-docker/
 
-COPY  cineworld-planner-*.tgz ./
+FROM node:16-alpine
 
-RUN tar -xzf cineworld-planner-*.tgz
+RUN apk add dumb-init
 
-WORKDIR /package
+ENV NODE_ENV production
 
-EXPOSE 3000
+WORKDIR /usr/src/app
+COPY . /usr/src/app
 
-CMD [ "npm", "run",  "start-node" ]
+RUN npm ci --only=production
+
+CMD ["dumb-init", "node", "dist/node/server"]
