@@ -91,6 +91,6 @@
         "url": "https://github.com/Roaders/cineworld-planner.git"
     },
     "engines": {
-        "node": "16.x"
+        "node": "18.x"
     }
 }
