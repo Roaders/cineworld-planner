@@ -119,7 +119,7 @@ function getListingsUrl(externalCode: string, date: string) {
     return `https://www.cineworld.co.uk/uk/data-api-service/v1/quickbook/10108/film-events/in-cinema/${externalCode}/at-date/${date}`;
 }
 
-const apiSitesListRegExp = /apiSitesList *= *(\[[^]+\])/;
+const apiSitesListRegExp = /apiSitesList *= *(\[[^]+?\])/;
 
 function processRawHtml(rawHtml: string): ICinema[] {
     const regExpResult = apiSitesListRegExp.exec(rawHtml);
