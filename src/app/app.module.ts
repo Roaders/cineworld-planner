@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
@@ -16,8 +16,7 @@ import { ItineraryListComponent } from './components/itinerary-list/itinerary-li
 import { ItineraryComponent } from './components/itinerary/itinerary.component';
 import { AttributeSelectorComponent } from './components/attribute-selector/attribute-selector.component';
 
-@NgModule({
-    declarations: [
+@NgModule({ declarations: [
         AppComponent,
         CinemaListComponent,
         CinemaComponent,
@@ -28,17 +27,12 @@ import { AttributeSelectorComponent } from './components/attribute-selector/attr
         ItineraryListComponent,
         AttributeSelectorComponent
     ],
-    imports: [
-        BrowserModule,
+    bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,
-        HttpClientModule,
-        FormsModule,
-    ],
-    providers: [
+        FormsModule], providers: [
         CineworldService,
         PreferencesService,
         CinemaHelper,
-    ],
-    bootstrap: [AppComponent]
-})
+        provideHttpClient(withInterceptorsFromDi()),
+    ] })
 export class AppModule { }
