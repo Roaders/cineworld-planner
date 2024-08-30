@@ -76,7 +76,7 @@ export class CinemaComponent {
         const externalCode = this.activatedRoute.snapshot.params.externalCode;
 
         const observer: Observer<IListingsResponse> = {
-            error: error => this._errorMessage = error,
+            error: error => this._errorMessage = error.message ?? error,
             next: response => this.onListingLoaded(response),
             complete: () => null,
         };
