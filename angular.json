@@ -82,21 +82,21 @@
                 "serve": {
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "options": {
-                        "browserTarget": "cineworld-planner:build"
+                      "buildTarget": "cineworld-planner:build"
                     },
                     "configurations": {
                         "production": {
-                            "browserTarget": "cineworld-planner:build:production"
+                          "buildTarget": "cineworld-planner:build:production"
                         },
                         "ring": {
-                            "browserTarget": "cineworld-planner:build:ring"
+                          "buildTarget": "cineworld-planner:build:ring"
                         }
                     }
                 },
                 "extract-i18n": {
                     "builder": "@angular-devkit/build-angular:extract-i18n",
                     "options": {
-                        "browserTarget": "cineworld-planner:build"
+                      "buildTarget": "cineworld-planner:build"
                     }
                 },
                 "test": {
