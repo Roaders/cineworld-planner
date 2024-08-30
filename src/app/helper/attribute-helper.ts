@@ -25,15 +25,27 @@ export function displayAttribute(attribute: FilmAttribute): { icon: string, desc
         case 'movies-for-juniors':
             return { icon: 'J', description: 'Juniors' };
 
-        case 'qa':
-            return { icon: attribute.toUpperCase(), description: attribute.toUpperCase() };
+        case 'classicfilm':
+            return { icon: "Cl", description: "Classic Film" };
 
+
+        case 'action':
+        case 'horror':
+        case 'suspense':
+        case 'animation':
+        case 'adventure':
+        case 'comedy':
+        case 'drama':
+
+        case 'tbc':
+        case 'ch':        
+        case 'qa':
+        case '18':
         case '12a':
         case '15':
         case 'u':
         case 'pg':
-        case 'tbc':
-        case 'ch':
+        case 'reserved-selected':
             return undefined;
 
         default:

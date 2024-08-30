@@ -40,44 +40,36 @@ export interface IFilm {
     weight: number;
 }
 
-export type FilmAttribute =
-    '2d' |
-    'pg' |
-    'screenx' |
-    'u' |
-    '15' |
-    '4dx' |
-    '12a' |
-    'superscreen' |
-    '3d' |
-    'alternative-content' |
-    'audio-described' |
-    'subbed' |
-    'qa' | // Q&A
-    'ch' | // charity
-    'tbc' |
-    'movies-for-juniors';
+export const FilmAttributeValues = [    
+    '2d',
+    'pg',
+    'screenx',
+    'u',
+    '15',
+    '4dx',
+    '12a',
+    'superscreen',
+    '3d',
+    'alternative-content',
+    'audio-described',
+    'subbed',
+    'qa', // Q&A
+    'ch', // charity
+    'tbc',
+    'movies-for-juniors', 
+    '18', 
+    'action', 
+    'suspense', 
+    'animation', 
+    'adventure', 
+    'comedy', 
+    'drama', 
+    'classicfilm', 
+    'reserved-selected', 
+    'horror'
+] as const;
 
-const FilmAttributeObject: {[key in FilmAttribute ]: any; } = {
-    '2d' : null,
-    pg : null,
-    screenx : null,
-    u : null,
-    15 : null,
-    '4dx' : null,
-    '12a' : null,
-    superscreen : null,
-    '3d' : null,
-    'alternative-content' : null,
-    'audio-described' : null,
-    subbed: null,
-    qa: null,
-    ch: null,
-    tbc: null,
-    'movies-for-juniors': null,
-};
-
-export const FilmAttributeValues = Object.keys(FilmAttributeObject) as FilmAttribute[];
+export type FilmAttribute = typeof FilmAttributeValues[number];
 
 export interface IEvent {
     attributeIds: FilmAttribute[];
