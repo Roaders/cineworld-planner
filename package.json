@@ -81,15 +81,9 @@
     "typescript": "~5.4.5",
     "zone.js": "~0.14.10"
   },
-  "bundledDependencies": [
-    "express",
-    "cors",
-    "rxjs",
-    "axios"
-  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Roaders/cineworld-planner.git"
+    "url": "git+https://github.com/Roaders/cineworld-planner.git"
   },
   "engines": {
     "node": "18.x"
@@ -99,5 +93,10 @@
     "cors",
     "rxjs",
     "axios"
-  ]
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Roaders/cineworld-planner/issues"
+  },
+  "homepage": "https://github.com/Roaders/cineworld-planner#readme"
 }
