@@ -41,8 +41,7 @@ export function displayAttribute(attribute: FilmAttribute): { icon: string, desc
     }
 }
 
-function handleUnknownAttribute(attribute: never) {
-    console.warn(`Unknown Attribute: ${attribute}`);
+function handleUnknownAttribute(_attribute: never) {
     return undefined;
 }
 

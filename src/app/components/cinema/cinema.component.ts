@@ -3,12 +3,16 @@ import { CineworldService } from 'src/app/services/cineworld.service';
 import { ActivatedRoute } from '@angular/router';
 import { Observer } from 'rxjs';
 import { ICinema, IDay as IDate, IFilm, IListingsResponse, IEvent, FilmAttribute, FilmAttributeValues } from 'src/contracts/contracts';
+import { IFilter } from '../attribute-selector/attribute-selector.component';
+import { eventMatchesSelectedAttributes } from '../../helper/event-helper';
 
 @Component({
     selector: 'cinema',
     templateUrl: './cinema.component.html',
 })
 export class CinemaComponent {
+
+    private _filters: IFilter[] = [];
 
     constructor(
         private cineworldService: CineworldService,
@@ -49,6 +53,12 @@ export class CinemaComponent {
 
     private _cinema: ICinema | undefined;
 
+    private _filteredFilmList: IFilm[] | undefined
+
+    public get filteredFilmList(): IFilm[] | undefined {
+        return this._filteredFilmList;
+    }
+
     public selectDate(date: IDate) {
         if (this._selectedDate != null && this._selectedDate.date === date.date) {
             return;
@@ -70,6 +80,12 @@ export class CinemaComponent {
         }
     }
 
+    public onAttributeFiltersChanged(filters: IFilter[]) {
+        this._filters = filters;
+        
+        this._filteredFilmList = this.filterFilms();
+    }
+
     private loadCinemaTimes(date: IDate) {
         this._filmList = undefined;
         this._selectedFilms = [];
@@ -84,9 +100,17 @@ export class CinemaComponent {
         this.cineworldService.getCinemaListings(externalCode, date.date).subscribe(observer);
     }
 
+    private filterFilms(): IFilm[]{
+        const filteredEvents = this.events?.filter(event => eventMatchesSelectedAttributes(this._filters, event)) ?? [];
+
+        return this._filmList?.filter(film => filteredEvents.some(event => event.filmId === film.id)) ?? [];
+    }
+
     private onListingLoaded(response: IListingsResponse) {
         this._filmList = response.body.films;
         this._events = response.body.events;
+
+        this._filteredFilmList = this.filterFilms();
 
         const allAttributes = new Array<FilmAttribute>();
 

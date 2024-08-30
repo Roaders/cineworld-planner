@@ -35,14 +35,14 @@
             </div>
 
             <button
-                *ngIf="expand" 
+                *ngIf="expand && showTrailer" 
                 type="button" 
                 class="btn btn-secondary"
                 (click)="saveFilters()"
                 >Save Filters</button>
 
             <div
-                *ngIf="expand"
+                *ngIf="expand && showTrailer"
                 class="d-flex mt-2 mb-2 expanded-attribute"
                 >
 
@@ -59,7 +59,7 @@
             </div>
 
             <div
-                *ngIf="expand"
+                *ngIf="expand && showTrailer"
                 class="d-flex mb-2 expanded-attribute"
                 >
 
@@ -78,18 +78,19 @@
         </div>
 
         <div 
-            *ngIf="!expand"
+            *ngIf="!expand && showTrailer"
             class="flex-grow-1 text-right mr-2">{{trailerAllowance}}m</div>
     </div>
 
     <div>
         <i 
-            class="fa fa-cog icon-link text-secondary mr-2" 
+            class="fa fa-cog icon-link text-secondary" 
             aria-hidden="true"
             (click)="toggleExpand()"
             ></i>
         <i 
-            class="fa fa-filter icon-link text-secondary" 
+            *ngIf="showTrailer"
+            class="fa fa-filter icon-link text-secondary ml-2" 
             aria-hidden="true"
             (click)="toggleFilters()"
             ></i>

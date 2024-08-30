@@ -22,6 +22,9 @@ export class AttributeSelectorComponent implements OnInit {
     }
 
     @Input()
+    public showTrailer = true;
+
+    @Input()
     public get trailerAllowance() {
         return this._trailerAllowance;
     }
@@ -242,7 +245,13 @@ export class AttributeSelectorComponent implements OnInit {
 
     private getOverallTimespan() {
 
-        const spanStartMoment = getStartMoment(this.events[0]);
+        const startEvent: IEvent | undefined = this.events.length > 0 ? this.events[0] : undefined;
+
+        const spanStartMoment = startEvent != null ? getStartMoment(startEvent) : undefined;
+
+        if(spanStartMoment == null){
+            return {spanStartMoment: undefined, spanEndMoment: undefined};
+        }
 
         const spanEndMoment = this.events
             .map(event => getEndMoment(event, this.trailerAllowance, this.selectedFilms))
@@ -253,7 +262,7 @@ export class AttributeSelectorComponent implements OnInit {
                 return latest;
             }, spanStartMoment);
 
-        if ( spanEndMoment == null) {
+        if ( spanEndMoment == null || spanStartMoment == null) {
             let errorMessage = `could not calculate timespan: `;
             errorMessage = errorMessage + `spanEndMoment:${spanEndMoment ? 'defined' : 'notDefined'}`;
             throw new Error(errorMessage);

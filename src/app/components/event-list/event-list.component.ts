@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { IEvent, IFilm } from 'src/contracts/contracts';
-import { getStartMoment, formatTime, getEndMoment, getEventFilmName } from 'src/app/helper/event-helper';
+import { getStartMoment, formatTime, getEndMoment, getEventFilmName, eventMatchesSelectedAttributes } from 'src/app/helper/event-helper';
 import { displayAttribute } from 'src/app/helper/attribute-helper';
 import { IFilter } from '../attribute-selector/attribute-selector.component';
 import moment, { Moment } from 'moment';
@@ -85,7 +85,7 @@ export class EventListComponent {
     public onAttributeFiltersChanged(filters: IFilter[]) {
         this._filters = filters || [];
 
-        this._selectedEvents = this._selectedEvents.filter(event => this.eventMatchesSelectedAttributes(event));
+        this._selectedEvents = this._selectedEvents.filter(event => eventMatchesSelectedAttributes(this._filters, event));
     }
 
     public getEventFilmName(event: IEvent): string | undefined {
@@ -201,7 +201,7 @@ export class EventListComponent {
     }
 
     private filterEvents(event: IEvent, filmsToDisplay: IFilm[]): boolean {
-        if (!this.eventMatchesSelectedAttributes(event)) {
+        if (!eventMatchesSelectedAttributes(this._filters, event)) {
             return false;
         }
 
@@ -239,19 +239,7 @@ export class EventListComponent {
         });
     }
 
-    private eventMatchesSelectedAttributes(event: IEvent): boolean {
-        const excludeFilters = this._filters.filter(filter => {
-            return filter.mode === 'exclude' &&
-                event.attributeIds.some(id => filter.attribute === id);
-        });
 
-        if (excludeFilters.length > 0) {
-            return false;
-        }
-
-        return this._filters.filter(filter => filter.mode === 'include')
-            .every(filter => event.attributeIds.some(id => id === filter.attribute));
-    }
 
     private getOverallTimespan() {
         const displayedEvents = this.eventsList;

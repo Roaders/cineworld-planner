@@ -9,12 +9,19 @@
     <div class="mt-2">
         <h3>Films:</h3>
 
+        <attribute-selector
+        [events]="events"
+        [selectedFilms]="filmList"
+        [showTrailer]="false"
+        (filters)="onAttributeFiltersChanged($event)"
+        ></attribute-selector>
+
         <div 
-            *ngIf="filmList != null && filmList.length > 0"
+            *ngIf="filteredFilmList != null && filteredFilmList.length > 0"
             class="film-container pt-2"
             >
     
-            <div *ngFor="let film of filmList" class="mb-2 d-flex align-items-center" >
+            <div *ngFor="let film of filteredFilmList" class="mb-2 d-flex align-items-center" >
 
                     <button 
                         type="button"
