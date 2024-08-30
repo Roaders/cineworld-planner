@@ -1,27 +1,28 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
-        "strict": true,
-        "baseUrl": "./",
-        "outDir": "./dist/out-tsc",
-        "sourceMap": true,
-        "declaration": false,
-        "downlevelIteration": true,
-        "experimentalDecorators": true,
-        "module": "es2020",
-        "moduleResolution": "node",
-        "importHelpers": true,
-        "resolveJsonModule": true,
-        "target": "es2020",
-        "allowSyntheticDefaultImports": true,
-        "noUnusedLocals": true,                /* Report errors on unused locals. */
-        "noUnusedParameters": true,            /* Report errors on unused parameters. */
-        "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
-        "noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
-        "lib": [
-            "es2018",
-            "DOM"
-        ]
+      "strict": true,
+      "baseUrl": "./",
+      "outDir": "./dist/out-tsc",
+      "sourceMap": true,
+      "declaration": false,
+      "downlevelIteration": true,
+      "experimentalDecorators": true,
+      "module": "es2020",
+      "moduleResolution": "node",
+      "importHelpers": true,
+      "resolveJsonModule": true,
+      "target": "ES2022",
+      "allowSyntheticDefaultImports": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "noImplicitReturns": true,
+      "noFallthroughCasesInSwitch": true,
+      "lib": [
+        "es2018",
+        "DOM"
+      ],
+      "useDefineForClassFields": false
     },
     "angularCompilerOptions": {
         "fullTemplateTypeCheck": true,
