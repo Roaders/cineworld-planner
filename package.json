@@ -86,7 +86,7 @@
     "url": "git+https://github.com/Roaders/cineworld-planner.git"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "bundleDependencies": [
     "express",
