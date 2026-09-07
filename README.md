@@ -37,3 +37,14 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
  $ docker run --name cineworldplanner --rm -ti -p 3000:3000 roaders/cineworldplanner:latest
  ```
 
+ The API uses HTTP by default. To use HTTPS, set `HTTPS_CERTIFICATES_PATH` to a directory containing
+ `cert.pem` and `privkey.pem`. For example:
+
+ ```
+ $ docker run --name cineworldplanner --rm -ti -p 3000:3000 \
+     -e HTTPS_CERTIFICATES_PATH=/certificates \
+     -v /path/to/certificates:/certificates:ro \
+     roaders/cineworldplanner:latest
+ ```
+
+ If `HTTPS_CERTIFICATES_PATH` is set but either file cannot be loaded, the server will fail to start.

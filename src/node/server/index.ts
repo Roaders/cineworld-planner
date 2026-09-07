@@ -17,21 +17,6 @@ const allowedOrigins = [
     'http://localhost:4200',
 ];
 
-const certificatePath = join(__dirname, "certificates", "cert.pem");
-const keyPath = join(__dirname, "certificates", "privkey.pem");
-
-let cert: Buffer | undefined;
-let key: Buffer | undefined;
-
-try {
-    console.log(`Loading certificate from '${certificatePath}'`);
-    cert = readFileSync(certificatePath);
-    console.log(`Loading privatekey from '${keyPath}'`);
-    key = readFileSync(keyPath);
-} catch(err){
-    console.log(`Could not load certificates.`);
-}
-
 app.use(cors({
     origin: (origin, callback) => {
         // allow requests with no origin
@@ -52,14 +37,22 @@ app.use(cors({
 setupRoutes(app);
 
 const port = process.env.PORT || 3000;
+const certificatesPath = process.env.HTTPS_CERTIFICATES_PATH;
 
-if(cert != null && key != null){
+if (certificatesPath) {
+    const certificatePath = join(certificatesPath, "cert.pem");
+    const keyPath = join(certificatesPath, "privkey.pem");
+
+    console.log(`Loading certificate from '${certificatePath}'`);
+    const cert = readFileSync(certificatePath);
+    console.log(`Loading private key from '${keyPath}'`);
+    const key = readFileSync(keyPath);
+
     https.createServer({key, cert}, app).listen(port);
-    
+
     console.log('cineworld-planner https api server started on: ' + port);
 } else {
-    http.createServer(app).listen(port); 
-    
+    http.createServer(app).listen(port);
+
     console.log('cineworld-planner http api server started on: ' + port);
 }
-
