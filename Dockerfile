@@ -1,7 +1,7 @@
 
 # taken from https://snyk.io/blog/10-best-practices-to-containerize-nodejs-web-applications-with-docker/
 
-FROM node:16-alpine
+FROM node:20-alpine
 
 RUN apk add dumb-init
 
