@@ -5,6 +5,7 @@ import {
     mapListings,
     mapTheaters,
 } from '../node/server/controllers/cineworld-mapper';
+import { loadCinemaList } from '../node/server/controllers/cinema-controller';
 
 describe('Cineworld response mapper', () => {
     it('maps the new theater identifier, address, coordinates and page URL', () => {
@@ -43,6 +44,55 @@ describe('Cineworld response mapper', () => {
             name: 'Solihull',
             uri: '/cinemas/x06xl-cineworld-cinema-solihull/',
         }]);
+    });
+
+    it('discovers a replacement theater query when the known Gatsby hash stops working', async () => {
+        const requestedUrls: string[] = [];
+        const getJson = async (url: string) => {
+            requestedUrls.push(url);
+
+            if (url.endsWith('/2506275789.json')) {
+                throw new Error('Not found');
+            }
+            if (url.endsWith('/cinemas/page-data.json')) {
+                return {data: {staticQueryHashes: ['unrelated', 'replacement']}};
+            }
+            if (url.endsWith('/unrelated.json')) {
+                return {data: {data: {allTheater: {nodes: [{id: 'partial'}]}}}};
+            }
+
+            return {
+                data: {
+                    data: {
+                        allTheater: {
+                            nodes: [{
+                                id: 'X06XL',
+                                name: 'Solihull',
+                                path: '/theaters/x06xl-cineworld-cinema-solihull',
+                                practicalInfo: {
+                                    coordinates: {latitude: 52.4125, longitude: -1.7792},
+                                    location: {
+                                        address: '47 Upper Jubilee Walk',
+                                        city: 'Solihull',
+                                        zip: 'B91 3QW',
+                                    },
+                                },
+                            }],
+                        },
+                    },
+                },
+            };
+        };
+
+        const cinemas = await loadCinemaList(getJson);
+
+        expect(cinemas[0].externalCode).toBe('X06XL');
+        expect(requestedUrls.map(url => url.split('/').pop())).toEqual([
+            '2506275789.json',
+            'page-data.json',
+            'unrelated.json',
+            'replacement.json',
+        ]);
     });
 
     it('maps movie details and showtimes to the existing planner contract', () => {
