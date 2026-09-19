@@ -9,6 +9,7 @@ import packageJson from '../../../../package.json';
 })
 export class AppComponent {
 
+    /** Sets the browser title to include the current application version. */
     constructor() {
         document.title = `Cineworld Planner ${packageJson.version}`;
     }

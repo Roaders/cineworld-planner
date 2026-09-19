@@ -6,6 +6,7 @@ import { ICinema, IListingsResponse, IUrlLookup } from '../../contracts/contract
 import { environment } from '../environments/environment';
 import { urlLookup } from 'src/constants/constants';
 
+/** Parses query parameters from the current location hash. */
 function getUrlParams() {
     const hash = window.location.hash;
     const urlParams = hash.substr(hash.indexOf('?'));
@@ -13,6 +14,7 @@ function getUrlParams() {
     return new URLSearchParams(urlParams);
 }
 
+/** Resolves the API base URL from configuration and any environment override. */
 function getBaseUrl() {
     const environmentKey = environment.baseUrl;
 
@@ -25,10 +27,12 @@ function getBaseUrl() {
     return urlLookup[environmentKey];
 }
 
+/** Builds the cinemas API URL. */
 function getCinemasUrl() {
     return `${getBaseUrl()}/cinema`;
 }
 
+/** Builds the listings API URL for a cinema and date. */
 function getListingsUrl(externalCode: string, date: string) {
     return `${getBaseUrl()}/cinema/${externalCode}/listings/${date}`;
 }
@@ -36,11 +40,13 @@ function getListingsUrl(externalCode: string, date: string) {
 @Injectable()
 export class CineworldService {
 
+    /** Creates a service using the provided HTTP client. */
     constructor(private http: HttpClient) {
     }
 
     private _cinemaListStream: Observable<ICinema[]> | undefined;
 
+    /** Fetches and caches the list of cinemas. */
     public getCinemaListAsync(): Observable<ICinema[]> {
 
         if (this._cinemaListStream == null) {
@@ -52,6 +58,7 @@ export class CineworldService {
         return this._cinemaListStream;
     }
 
+    /** Finds a cinema by its external code. */
     public getCinemaAsync(externalCode: string): Observable<ICinema> {
         return this.getCinemaListAsync().pipe(
             map(cinemas => cinemas.filter(cinema => cinema.externalCode === externalCode)),
@@ -65,6 +72,7 @@ export class CineworldService {
         );
     }
 
+    /** Fetches listings for a cinema on a given date. */
     public getCinemaListings(externalCode: string, date: string): Observable<IListingsResponse> {
         return this.http.get<IListingsResponse>(getListingsUrl(externalCode, date));
     }

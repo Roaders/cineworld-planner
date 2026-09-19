@@ -18,6 +18,7 @@ export class ItineraryComponent {
     @Input()
     public itinerary: IItineraryItem[] = [];
 
+    /** Resolves an itinerary body to its display message. */
     public getMessage(body: IEvent | string): string {
         if (typeof body === 'string') {
             return body;
@@ -26,6 +27,7 @@ export class ItineraryComponent {
         return getEventFilmName(body, this.films) || '';
     }
 
+    /** Returns the booking link available for an event body. */
     public getBookingLink(body: IEvent | string): string {
         return typeof body === 'string' ? '' : body.bookingLink;
     }

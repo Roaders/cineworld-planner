@@ -50,6 +50,7 @@ export class CinemaController {
 
     private _cache = new Map<string, ITimeoutCache>();
 
+    /** Returns the available Cineworld cinemas. */
     public getCinemas(request: Request, response: Response ) {
         console.log(`Request: ${request.url}`);
 
@@ -63,6 +64,7 @@ export class CinemaController {
         );
     }
 
+    /** Returns a cinema's listings for the requested date. */
     public getListings(request: Request<{cinema: string; date: string}>, response: Response ) {
         console.log(`Request: ${request.url}`);
 
@@ -85,6 +87,7 @@ export class CinemaController {
             );
     }
 
+    /** Reuses a cached observable until its configured expiry. */
     private getCachedStream(cacheKey: string, maxAge: number, createStream: () => Observable<any>) {
         const now = Date.now();
         const cached = this._cache.get(cacheKey);
@@ -115,6 +118,7 @@ export class CinemaController {
         return stream;
     }
 
+    /** Creates an observable that loads and maps listings from Cineworld. */
     private getListingsObservable(cinema: string, date: string) {
         return defer(async () => {
             const scheduleUrl = getScheduleUrl(cinema, date);
@@ -146,6 +150,7 @@ export class CinemaController {
         });
     }
 
+    /** Creates an observable that loads the Cineworld cinema list. */
     private getCinemaListObservable() {
         return defer(async () => {
             console.log(`Loading cinema list from ${CINEMA_LIST_URL}`);
@@ -154,6 +159,7 @@ export class CinemaController {
         });
     }
 
+    /** Converts upstream and internal failures into HTTP error responses. */
     private handleError(response: Response, error: unknown, message: string) {
 
         if (axios.isAxiosError(error)) {
@@ -183,6 +189,7 @@ export class CinemaController {
     }
 }
 
+/** Builds the Cineworld schedule endpoint URL for a cinema and date. */
 function getScheduleUrl(cinemaId: string, date: string) {
     const nextDate = new Date(`${date}T00:00:00Z`);
     nextDate.setUTCDate(nextDate.getUTCDate() + 1);
@@ -196,6 +203,7 @@ function getScheduleUrl(cinemaId: string, date: string) {
     return `${CINEWORLD_URL}/api/gatsby-source-boxofficeapi/schedule?${params}`;
 }
 
+/** Builds the Cineworld movie endpoint URL for the requested movie IDs. */
 function getMoviesUrl(movieIds: string[]) {
     const params = new URLSearchParams({basic: 'false', castingLimit: '3'});
     movieIds.forEach(movieId => params.append('ids', movieId));
@@ -203,10 +211,12 @@ function getMoviesUrl(movieIds: string[]) {
     return `${CINEWORLD_URL}/api/gatsby-source-boxofficeapi/movies?${params}`;
 }
 
+/** Checks whether a value is a supported Cineworld cinema code. */
 export function isValidCinemaCode(value: string): boolean {
     return CINEMA_CODE_PATTERN.test(value);
 }
 
+/** Checks whether a value is a real calendar date in ISO format. */
 export function isValidIsoDate(value: string): boolean {
     if (!ISO_DATE_PATTERN.test(value)) {
         return false;
@@ -216,6 +226,7 @@ export function isValidIsoDate(value: string): boolean {
     return !Number.isNaN(date.getTime()) && date.toISOString().substring(0, 10) === value;
 }
 
+/** Loads the cinema list, discovering a current static query when necessary. */
 export async function loadCinemaList(getJson: GetJson): Promise<ICinema[]> {
     try {
         const result = await getJson(CINEMA_LIST_URL);
@@ -249,10 +260,12 @@ export async function loadCinemaList(getJson: GetJson): Promise<ICinema[]> {
     throw new InvalidCineworldResponseError('Could not discover a valid Cineworld theater query');
 }
 
+/** Builds the URL for a Cineworld Gatsby static query. */
 function getStaticQueryUrl(hash: string) {
     return `${CINEWORLD_URL}/page-data/sq/d/${hash}.json`;
 }
 
+/** Checks whether a value contains Cineworld cinema page metadata. */
 function isCinemasPageData(value: unknown): value is ICinemasPageData {
     const pageData = value as ICinemasPageData;
     return pageData != null
@@ -260,6 +273,7 @@ function isCinemasPageData(value: unknown): value is ICinemasPageData {
         && pageData.staticQueryHashes.every(hash => typeof hash === 'string' && hash.length > 0);
 }
 
+/** Checks whether a value is a populated Cineworld theater response. */
 function isTheaterResponse(value: unknown): value is ICineworldTheaterResponse {
     const response = value as ICineworldTheaterResponse;
     const theaters = response?.data?.allTheater?.nodes;

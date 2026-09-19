@@ -20,35 +20,42 @@ interface ITimespan {
 })
 export class EventListComponent {
 
+    /** Restores saved schedule preferences. */
     constructor(preferencesService: PreferencesService) {
         this.trailerAllowance = preferencesService.getTrailerAllowance();
         this.maxBreakLength = preferencesService.getMaxBreakLength();
     }
 
+    /** Provides accumulated schedule errors. */
     public get errors() {
         return this._errors;
     }
 
+    /** Provides the currently selected events. */
     public get selectedEvents(): IEvent[] {
         return this._selectedEvents;
     }
 
     @Input()
+    /** Replaces available events and clears their selection. */
     public set events(value: IEvent[] | undefined) {
         this._events = value || [];
 
         this._selectedEvents = [];
     }
 
+    /** Provides a copy of the available events. */
     public get events(): IEvent[] | undefined {
         return this._events ? this._events.concat() : undefined;
     }
 
+    /** Provides the currently selected films. */
     public get selectedFilms(): IFilm[] {
         return this._selectedFilms;
     }
 
     @Input()
+    /** Replaces selected films and removes incompatible event selections. */
     public set selectedFilms(value: IFilm[]) {
         this._selectedFilms = value;
 
@@ -56,6 +63,7 @@ export class EventListComponent {
             .filter(event => this._selectedFilms.some(film => film.id === event.filmId));
     }
 
+    /** Lists events eligible for the next selection. */
     public get eventsList(): IEvent[] {
         if (this.events == null) {
             return [];
@@ -86,16 +94,19 @@ export class EventListComponent {
 
     private _finishBefore: Date | undefined;
 
+    /** Applies attribute filters and removes incompatible selections. */
     public onAttributeFiltersChanged(filters: IFilter[]) {
         this._filters = filters || [];
 
         this._selectedEvents = this._selectedEvents.filter(event => eventMatchesSelectedAttributes(this._filters, event));
     }
 
+    /** Resolves the film name for an event. */
     public getEventFilmName(event: IEvent): string | undefined {
         return getEventFilmName(event, this.selectedFilms);
     }
 
+    /** Selects styling based on an event's film. */
     public getEventButtonClass(event: IEvent) {
 
         const styles = [
@@ -115,6 +126,7 @@ export class EventListComponent {
         return [`btn-outline-${style}`, `event-button-${style}`];
     }
 
+    /** Builds timeline spans for an event's trailers and film. */
     public getTimeSpans(event: IEvent): ITimespan[] {
 
         const eventFilm = this.getEventFilm(event);
@@ -131,6 +143,7 @@ export class EventListComponent {
         ];
     }
 
+    /** Resolves the selected film associated with an event. */
     private getEventFilm(event: IEvent) {
         const eventFilm = this.selectedFilms.filter(film => film.id === event.filmId)[0];
 
@@ -143,6 +156,7 @@ export class EventListComponent {
         return eventFilm;
     }
 
+    /** Positions a time span within the overall schedule. */
     private createTimeSpan(startDate: Date, endDate: Date, spanClass: string): ITimespan {
         const {spanStartTime, spanEndTime, spanElapsed} = this.getOverallTimespan();
 
@@ -166,28 +180,33 @@ export class EventListComponent {
         };
     }
 
+    /** Formats an event's start time. */
     public getStartTime(event: IEvent): string | undefined {
         const startDate = getStartDate(event);
 
         return startDate != null ? formatTime(startDate) : undefined;
     }
 
+    /** Formats an event's estimated end time. */
     public getEndTime(event: IEvent): string | undefined {
         const endDate = getEndDate(event, this.trailerAllowance, this.selectedFilms);
 
         return endDate != null ? formatTime(endDate) : undefined;
     }
 
+    /** Resolves display metadata for an event's attributes. */
     public eventAttributes(event: IEvent) {
         return event.attributeIds
             .map(attributeId => displayAttribute(attributeId))
             .filter(display => display != null);
     }
 
+    /** Determines whether an event is currently selected. */
     public isEventSelected(film: IEvent): boolean {
         return this._selectedEvents.some(selectedEvent => selectedEvent.id === film.id);
     }
 
+    /** Toggles an event's selection state. */
     public toggleEvent(event: IEvent) {
         if (this.isEventSelected(event)) {
             this._selectedEvents = this._selectedEvents.filter(selectedEvent => selectedEvent.id !== event.id);
@@ -196,14 +215,17 @@ export class EventListComponent {
         }
     }
 
+    /** Updates the earliest permitted event start. */
     public updateStartAfter(value: Date | undefined) {
         this._startAfter = value;
     }
 
+    /** Updates the latest permitted event finish. */
     public updateFinishBefore(value: Date | undefined) {
         this._finishBefore = value;
     }
 
+    /** Determines whether an event satisfies the active planning constraints. */
     private filterEvents(event: IEvent, filmsToDisplay: IFilm[]): boolean {
         if (!eventMatchesSelectedAttributes(this._filters, event)) {
             return false;
@@ -245,6 +267,7 @@ export class EventListComponent {
 
 
 
+    /** Calculates the overall span of displayed events. */
     private getOverallTimespan() {
         const displayedEvents = this.eventsList;
 
@@ -281,6 +304,7 @@ export class EventListComponent {
         return {spanStartTime, spanEndTime, spanElapsed};
     }
 
+    /** Records a schedule error once. */
     private showError(error: string) {
         if (this.errors.indexOf(error) < 0) {
             this.errors.push(error);

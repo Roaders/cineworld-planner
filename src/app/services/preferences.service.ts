@@ -9,33 +9,40 @@ const MAX_BREAK_LENGTH_STORAGE_KEY = 'maxBreakLength';
 @Injectable()
 export class PreferencesService {
 
+    /** Loads the saved attribute filters. */
     public getAttributeFilters(): IFilter[] {
         const filtersString = localStorage.getItem(ATTRIBUTE_FILTER_STORAGE_KEY);
         return filtersString ? JSON.parse(filtersString) : [];
     }
 
+    /** Saves the selected attribute filters. */
     public setAttributeFilters(value: IFilter[]) {
         localStorage.setItem(ATTRIBUTE_FILTER_STORAGE_KEY, JSON.stringify(value));
     }
 
+    /** Loads the saved trailer allowance or its default. */
     public getTrailerAllowance(): number {
         const filtersString = localStorage.getItem(TRAILER_ALLOWANCE_STORAGE_KEY);
         return filtersString ? JSON.parse(filtersString) : 30;
     }
 
+    /** Saves the trailer allowance. */
     public setTrailerAllowance(value: number) {
         localStorage.setItem(TRAILER_ALLOWANCE_STORAGE_KEY, JSON.stringify(value));
     }
 
+    /** Loads the saved maximum break length or its default. */
     public getMaxBreakLength(): number {
         const filtersString = localStorage.getItem(MAX_BREAK_LENGTH_STORAGE_KEY);
         return filtersString ? JSON.parse(filtersString) : 30;
     }
 
+    /** Saves the maximum break length. */
     public setMaxBreakLength(value: number) {
         localStorage.setItem(MAX_BREAK_LENGTH_STORAGE_KEY, JSON.stringify(value));
     }
 
+    /** Removes a cinema from the saved favorites. */
     public removeFavoriteCinema(id: string) {
         const currentFavorites = this.getFavoriteCinemaIds();
 
@@ -46,6 +53,7 @@ export class PreferencesService {
         }
     }
 
+    /** Adds a cinema to the saved favorites. */
     public addFavoriteCinema(id: string) {
         const currentFavorites = this.getFavoriteCinemaIds();
 
@@ -56,6 +64,7 @@ export class PreferencesService {
         }
     }
 
+    /** Loads the saved favorite cinema identifiers. */
     public getFavoriteCinemaIds(): string[] {
         const savedIds = localStorage.getItem(FAVORITE_CINEMA_STORAGE_KEY);
         return savedIds != null ? JSON.parse(savedIds) : new Array<string>();

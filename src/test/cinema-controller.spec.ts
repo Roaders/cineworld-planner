@@ -106,6 +106,7 @@ describe('CinemaController', () => {
     });
 });
 
+/** Requests listings with test response spies for the supplied cinema. */
 function requestListings(controller: CinemaController, cinema: string): void {
     const response = {
         json: vi.fn(),
@@ -120,6 +121,7 @@ function requestListings(controller: CinemaController, cinema: string): void {
     controller.getListings(request, response);
 }
 
+/** Resolves with the HTTP status returned for a URL. */
 function getStatus(url: string): Promise<number> {
     return new Promise((resolve, reject) => {
         const request = httpGet(url, response => {

@@ -51,6 +51,7 @@ interface ICineworldShowtime {
     };
 }
 
+/** Checks whether a value is a valid Cineworld schedule response. */
 export function isCineworldScheduleResponse(value: unknown): value is ICineworldScheduleResponse {
     if (!isRecord(value)) {
         return false;
@@ -61,6 +62,7 @@ export function isCineworldScheduleResponse(value: unknown): value is ICineworld
     );
 }
 
+/** Checks whether a value is a valid Cineworld movie collection. */
 export function isCineworldMovieResponse(value: unknown): value is ICineworldMovie[] {
     return Array.isArray(value) && value.every(isCineworldMovie);
 }
@@ -80,6 +82,7 @@ export interface ICineworldMovie {
     } | null;
 }
 
+/** Maps Cineworld theaters to the application's cinema model. */
 export function mapTheaters(response: ICineworldTheaterResponse): ICinema[] {
     return response.data.allTheater.nodes.map(theater => {
         const location = theater.practicalInfo.location;
@@ -102,6 +105,7 @@ export function mapTheaters(response: ICineworldTheaterResponse): ICinema[] {
     });
 }
 
+/** Maps a Cineworld schedule and its movies to a listings response. */
 export function mapListings(
     cinemaId: string,
     schedule: ICineworldSchedule,
@@ -125,6 +129,7 @@ export function mapListings(
     return {body: {events, films}};
 }
 
+/** Maps a Cineworld movie to the application's film model. */
 function mapMovie(movie: ICineworldMovie): IFilm {
     return {
         id: movie.id,
@@ -138,6 +143,7 @@ function mapMovie(movie: ICineworldMovie): IFilm {
     };
 }
 
+/** Maps a Cineworld showtime to the application's event model. */
 function mapShowtime(
     showtime: ICineworldShowtime,
     cinemaId: string,
@@ -160,6 +166,7 @@ function mapShowtime(
     };
 }
 
+/** Maps Cineworld showtime tags to recognized film attributes. */
 function mapTags(tags: string[]): FilmAttribute[] {
     return tags.map((tag): FilmAttribute | undefined => {
         const normalized = tag.toLowerCase();
@@ -178,6 +185,7 @@ function mapTags(tags: string[]): FilmAttribute[] {
     }).filter((attribute): attribute is FilmAttribute => attribute != null);
 }
 
+/** Extracts recognized certificate and genre attributes from a movie. */
 function getMovieAttributes(movie: ICineworldMovie): FilmAttribute[] {
     const values = [movie.certificate, ...(movie.genres || '').split(',')]
         .map(value => (value || '').trim().toLowerCase())
@@ -186,10 +194,12 @@ function getMovieAttributes(movie: ICineworldMovie): FilmAttribute[] {
     return uniqueAttributes(values);
 }
 
+/** Removes duplicate film attributes while preserving their order. */
 function uniqueAttributes(attributes: FilmAttribute[]): FilmAttribute[] {
     return attributes.filter((attribute, index) => attributes.indexOf(attribute) === index);
 }
 
+/** Checks whether a value is a valid Cineworld schedule. */
 function isCineworldSchedule(value: unknown): value is ICineworldSchedule {
     return isRecord(value) && Object.values(value).every(dateSchedule =>
         isRecord(dateSchedule)
@@ -199,6 +209,7 @@ function isCineworldSchedule(value: unknown): value is ICineworldSchedule {
     );
 }
 
+/** Checks whether a value is a valid Cineworld showtime. */
 function isCineworldShowtime(value: unknown): value is ICineworldShowtime {
     if (!isRecord(value) || !isRecord(value.data) || !Array.isArray(value.data.ticketing)) {
         return false;
@@ -218,6 +229,7 @@ function isCineworldShowtime(value: unknown): value is ICineworldShowtime {
         );
 }
 
+/** Checks whether a value is a valid Cineworld movie. */
 function isCineworldMovie(value: unknown): value is ICineworldMovie {
     if (!isRecord(value)) {
         return false;
@@ -240,18 +252,22 @@ function isCineworldMovie(value: unknown): value is ICineworldMovie {
         && trailerIsValid;
 }
 
+/** Checks whether a value is a non-array object. */
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value != null && !Array.isArray(value);
 }
 
+/** Checks whether a value is a non-empty string. */
 function isNonEmptyString(value: unknown): value is string {
     return typeof value === 'string' && value.length > 0;
 }
 
+/** Checks whether a value is nullish or a string. */
 function isNullableString(value: unknown): value is string | null | undefined {
     return value == null || typeof value === 'string';
 }
 
+/** Checks whether a value is nullish or a finite number. */
 function isNullableFiniteNumber(value: unknown): value is number | null | undefined {
     return value == null || (typeof value === 'number' && Number.isFinite(value));
 }

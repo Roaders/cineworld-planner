@@ -1,5 +1,6 @@
 import { FilmAttribute } from 'src/contracts/contracts';
 
+/** Maps a film attribute to its display icon and description. */
 export function displayAttribute(attribute: FilmAttribute): { icon: string, description: string } | undefined {
     switch (attribute) {
         case '4dx':
@@ -53,7 +54,7 @@ export function displayAttribute(attribute: FilmAttribute): { icon: string, desc
     }
 }
 
+/** Ensures unrecognized attributes are handled exhaustively. */
 function handleUnknownAttribute(_attribute: never) {
     return undefined;
 }
-

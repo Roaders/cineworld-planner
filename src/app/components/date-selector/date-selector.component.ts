@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class DateSelectorComponent implements OnInit {
 
+    /** Generates the selectable dates for the current route. */
     constructor(
         private activatedRoute: ActivatedRoute,
         private router: Router,
@@ -24,10 +25,12 @@ export class DateSelectorComponent implements OnInit {
 
     private _days: IDay[];
 
+    /** Provides the available screening days. */
     public get days(): IDay[] {
         return this._days;
     }
 
+    /** Selects, emits, and navigates to a screening day. */
     public selectDate(day: IDay) {
         this._selectedDate = day;
 
@@ -42,10 +45,12 @@ export class DateSelectorComponent implements OnInit {
         this.router.navigate(['/cinema/', cinema, day.date]);
     }
 
+    /** Determines whether a day is currently selected. */
     public isActive(day: IDay) {
         return this._selectedDate != null && day.date === this._selectedDate.date;
     }
 
+    /** Selects the routed date or defaults to the first available day. */
     public ngOnInit(): void {
         const dateFromRoute: string | undefined = this.activatedRoute.snapshot.params.selectedDate;
         let selectedDay = this.days.filter(day => day.date === dateFromRoute)[0];
@@ -57,6 +62,7 @@ export class DateSelectorComponent implements OnInit {
         this.selectDate(selectedDay);
     }
 
+    /** Generates the next seven selectable screening days. */
     private generateDates(): IDay[] {
         const now = new Date(Date.now());
         return Array.from({length: 7})
@@ -75,14 +81,17 @@ export class DateSelectorComponent implements OnInit {
 
 }
 
+/** Formats a date as an ISO-style calendar date. */
 function formatDate(date: Date): string {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+/** Formats a date as an abbreviated weekday. */
 function formatWeekday(date: Date): string {
     return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
 }
 
+/** Pads a numeric date component to two digits. */
 function pad(value: number): string {
     return value.toString().padStart(2, '0');
 }

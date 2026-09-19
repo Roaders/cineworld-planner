@@ -17,6 +17,7 @@ export interface IFilter {attribute: FilmAttribute; mode: FilterMode; }
 })
 export class AttributeSelectorComponent implements OnInit {
 
+    /** Restores the saved attribute filters. */
     constructor(private preferencesService: PreferencesService) {
         this._filters = preferencesService.getAttributeFilters();
     }
@@ -25,10 +26,12 @@ export class AttributeSelectorComponent implements OnInit {
     public showTrailer = true;
 
     @Input()
+    /** Provides the configured trailer allowance. */
     public get trailerAllowance() {
         return this._trailerAllowance;
     }
 
+    /** Updates and persists the trailer allowance. */
     public set trailerAllowance(value: number) {
         if (value === this._trailerAllowance) {
             return;
@@ -45,19 +48,23 @@ export class AttributeSelectorComponent implements OnInit {
         this.resetHours();
     }
 
+    /** Indicates whether the full attribute list is expanded. */
     public get expand() {
         return this._expand;
     }
 
+    /** Indicates whether filter controls are visible. */
     public get showFilters() {
         return this._showFilters;
     }
 
     @Input()
+    /** Provides the maximum permitted break length. */
     public get maxBreakLength(): number {
         return this._maxBreakLength;
     }
 
+    /** Updates and persists the maximum break length. */
     public set maxBreakLength(value: number) {
         if (isNaN(value)) {
             value = 0;
@@ -73,10 +80,12 @@ export class AttributeSelectorComponent implements OnInit {
     }
 
     @Input()
+    /** Provides the events used to derive available hours and attributes. */
     public get events(): IEvent[] {
         return this._events;
     }
 
+    /** Recalculates available hours when events change. */
     public set events(value: IEvent[]) {
         value = value || [];
         if (arraysEqual(value, this._events)) {
@@ -88,10 +97,12 @@ export class AttributeSelectorComponent implements OnInit {
     }
 
     @Input()
+    /** Provides the films currently selected for planning. */
     public get selectedFilms(): IFilm[] {
         return this._selectedFilms;
     }
 
+    /** Recalculates available hours when selected films change. */
     public set selectedFilms(value: IFilm[]) {
         value = value || [];
         if (arraysEqual(value, this._selectedFilms)) {
@@ -104,6 +115,7 @@ export class AttributeSelectorComponent implements OnInit {
 
     private _hours: (Date | undefined)[] | undefined;
 
+    /** Builds the selectable hourly boundaries for the current schedule. */
     public get hours(): (Date | undefined)[] {
         if (this._hours == null) {
 
@@ -124,6 +136,7 @@ export class AttributeSelectorComponent implements OnInit {
         return this._hours;
     }
 
+    /** Lists the film attributes available for filtering. */
     public get allAttributes(): FilmAttribute[] {
         if (this.expand) {
 
@@ -148,10 +161,12 @@ export class AttributeSelectorComponent implements OnInit {
 
     private _startAfterDate: Date | undefined;
 
+    /** Provides the selected lower time boundary. */
     public get startAfterDate(): Date | undefined {
         return this._startAfterDate;
     }
 
+    /** Updates and emits the selected lower time boundary. */
     public set startAfterDate(value: Date | undefined) {
         this._startAfterDate = value;
 
@@ -160,10 +175,12 @@ export class AttributeSelectorComponent implements OnInit {
 
     private _finishBeforeDate: Date | undefined;
 
+    /** Provides the selected upper time boundary. */
     public get finishBeforeDate(): Date | undefined {
         return this._finishBeforeDate;
     }
 
+    /** Updates and emits the selected upper time boundary. */
     public set finishBeforeDate(value: Date | undefined) {
         this._finishBeforeDate = value;
 
@@ -193,36 +210,44 @@ export class AttributeSelectorComponent implements OnInit {
 
     private _selectedFilms: IFilm[] = [];
 
+    /** Formats a time boundary for display. */
     public formatDate(value?: Date): string {
         return value ? formatTime(value) : 'Select...';
     }
 
+    /** Emits the restored filters after initialization. */
     public ngOnInit(): void {
         this.filters.emit(this._filters);
     }
 
+    /** Toggles whether all known attributes are displayed. */
     public toggleExpand() {
         this._expand = !this._expand;
     }
 
+    /** Toggles visibility of the filter controls. */
     public toggleFilters() {
         this._showFilters = !this._showFilters;
     }
 
+    /** Gets the icon associated with an attribute. */
     public getIcon(attribute: FilmAttribute): string | undefined {
         const attributeInfo = displayAttribute(attribute);
         return attributeInfo != null ? attributeInfo.icon : undefined;
     }
 
+    /** Gets the description associated with an attribute. */
     public getDescription(attribute: FilmAttribute): string | undefined {
         const attributeInfo = displayAttribute(attribute);
         return attributeInfo != null ? attributeInfo.description : undefined;
     }
 
+    /** Persists the current attribute filters. */
     public saveFilters() {
         this.preferencesService.setAttributeFilters(this._filters);
     }
 
+    /** Selects the icon class representing an attribute's filter mode. */
     public attributeFilterClass(attribute: FilmAttribute): string {
         const attributeFilter = this._filters.filter(filter => filter.attribute === attribute)[0];
         const existingMode = attributeFilter != null ? attributeFilter.mode : undefined;
@@ -239,6 +264,7 @@ export class AttributeSelectorComponent implements OnInit {
         }
     }
 
+    /** Advances an attribute through its available filter modes. */
     public toggleFilter(attribute: FilmAttribute) {
         const attributeFilter = this._filters.filter(filter => filter.attribute === attribute)[0];
         const existingMode = attributeFilter != null ? attributeFilter.mode : undefined;
@@ -260,6 +286,7 @@ export class AttributeSelectorComponent implements OnInit {
         this.filters.emit(this._filters);
     }
 
+    /** Calculates the earliest start and latest finish in the schedule. */
     private getOverallTimespan() {
 
         const startEvent: IEvent | undefined = this.events.length > 0 ? this.events[0] : undefined;
@@ -288,6 +315,7 @@ export class AttributeSelectorComponent implements OnInit {
         return {spanStartDate, spanEndDate};
     }
 
+    /** Invalidates and realigns the selectable hourly boundaries. */
     private resetHours() {
         this._hours = undefined;
 
@@ -299,10 +327,12 @@ export class AttributeSelectorComponent implements OnInit {
     }
 }
 
+/** Tests whether two arrays contain identical references in order. */
 function arraysEqual<T>(one: T[], two: T[]): boolean {
     return one.length === two.length && one.every((item, index) => item === two[index]);
 }
 
+/** Tests whether two defined dates represent the same instant. */
 function datesEqual(one: Date | undefined, two: Date | undefined): boolean {
     return one != null && two != null && one.getTime() === two.getTime();
 }

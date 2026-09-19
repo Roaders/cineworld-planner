@@ -3,6 +3,7 @@ import { Express } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { CinemaController } from './controllers/cinema-controller';
 
+/** Registers the cinema API routes and their rate limit. */
 export function setupRoutes(app: Express) {
 
     const cinemaController = new CinemaController();
