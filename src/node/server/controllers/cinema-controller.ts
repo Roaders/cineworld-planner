@@ -17,6 +17,8 @@ const CINEMAS_PAGE_DATA_URL = `${CINEWORLD_URL}/page-data/cinemas/page-data.json
 // Gatsby hashes the static GraphQL query text, not its cinema data. This remains stable across content rebuilds.
 const THEATER_STATIC_QUERY_HASH = '2506275789';
 const CINEMA_LIST_URL = getStaticQueryUrl(THEATER_STATIC_QUERY_HASH);
+const CINEMA_CODE_PATTERN = /^[A-Z0-9]{5}$/;
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 interface ICinemasPageData {
     staticQueryHashes: string[];
@@ -72,6 +74,11 @@ export class CinemaController {
 
         const cinema: string = request.params.cinema;
         const date: string = request.params.date;
+
+        if (!isValidCinemaCode(cinema) || !isValidIsoDate(date)) {
+            response.status(400).send();
+            return;
+        }
 
         const cacheKey = `listings_${cinema}_${date}`;
         const now = Date.now();
@@ -181,6 +188,19 @@ function getMoviesUrl(movieIds: string[]) {
     movieIds.forEach(movieId => params.append('ids', movieId));
 
     return `${CINEWORLD_URL}/api/gatsby-source-boxofficeapi/movies?${params}`;
+}
+
+export function isValidCinemaCode(value: string): boolean {
+    return CINEMA_CODE_PATTERN.test(value);
+}
+
+export function isValidIsoDate(value: string): boolean {
+    if (!ISO_DATE_PATTERN.test(value)) {
+        return false;
+    }
+
+    const date = new Date(`${value}T00:00:00Z`);
+    return !Number.isNaN(date.getTime()) && date.toISOString().substring(0, 10) === value;
 }
 
 export async function loadCinemaList(getJson: GetJson): Promise<ICinema[]> {
