@@ -1,12 +1,11 @@
 import { Component, Input, ChangeDetectionStrategy, DoCheck } from '@angular/core';
 import { IEvent, IFilm } from 'src/contracts/contracts';
-import moment, { Moment } from 'moment';
-import { getStartMoment, formatTime, getEndMoment, getEventFilmName } from 'src/app/helper/event-helper';
+import { differenceInMinutes, getStartDate, formatTime, getEndDate, getEventFilmName } from 'src/app/helper/event-helper';
 import { IInteraryBase, IItineraryItem } from 'src/app/contracts/contracts';
 
-interface IInteraryMoment extends IInteraryBase {
-    start: Moment;
-    end: Moment;
+interface IInteraryDate extends IInteraryBase {
+    start: Date;
+    end: Date;
 }
 
 @Component({
@@ -125,8 +124,8 @@ export class ItineraryListComponent implements DoCheck {
     private createItinerary(events: IEvent[]): IItineraryItem[] {
         return [...events]
             .sort(sortEvents)
-            .map(event => this.createMomentItinerary(event))
-            .reduce((all, item) => this.addNextEvent(all, item), new Array<IInteraryMoment>())
+            .map(event => this.createDateItinerary(event))
+            .reduce((all, item) => this.addNextEvent(all, item), new Array<IInteraryDate>())
             .map(({start, body, end, startEstimated, isEvent, endEstimated, alertClass}) => ({
                 start: formatTime(start),
                 end: formatTime(end),
@@ -144,14 +143,14 @@ export class ItineraryListComponent implements DoCheck {
             .map(eventList => this.createItinerary(eventList));
     }
 
-    private addNextEvent(all: IInteraryMoment[], item: IInteraryMoment): IInteraryMoment[] {
+    private addNextEvent(all: IInteraryDate[], item: IInteraryDate): IInteraryDate[] {
         if (all.length < 1) {
             return [item];
         }
 
         const previous = all[all.length - 1];
 
-        const interimTime = item.start.diff(previous.end, 'minutes');
+        const interimTime = differenceInMinutes(item.start, previous.end);
 
         let message: string;
         let alertClass: string;
@@ -177,10 +176,10 @@ export class ItineraryListComponent implements DoCheck {
         return [...all, interim, item];
     }
 
-    private createMomentItinerary(event: IEvent): IInteraryMoment {
-        const start = getStartMoment(event);
+    private createDateItinerary(event: IEvent): IInteraryDate {
+        const start = getStartDate(event);
         const message = getEventFilmName(event, this.selectedFilms);
-        const end = getEndMoment(event, this.trailerAllowance, this.selectedFilms);
+        const end = getEndDate(event, this.trailerAllowance, this.selectedFilms);
 
         if (start == null || end == null || message == null) {
             throw Error(`Could not generate itinerary. start: ${start}, end: ${end} message: ${message}`);
@@ -206,7 +205,7 @@ export class ItineraryListComponent implements DoCheck {
 
     private pickNextEvent(events: IEvent[]): IEvent[][] {
         const lastEvent = events[events.length - 1];
-        const lastEventEnd = getEndMoment(lastEvent, this.trailerAllowance, this.selectedFilms);
+        const lastEventEnd = getEndDate(lastEvent, this.trailerAllowance, this.selectedFilms);
 
         if (lastEventEnd == null ) {
             throw Error(`Could not generate itinerary. `);
@@ -214,10 +213,10 @@ export class ItineraryListComponent implements DoCheck {
 
         const subsequentEvents = this.allEvents
             .filter(event => {
-                const eventStart = moment(event.eventDateTime);
+                const eventStart = getStartDate(event);
                 return events.every(existingEvent => existingEvent.filmId !== event.filmId) &&
-                    eventStart.isAfter(lastEventEnd) &&
-                    eventStart.diff(lastEventEnd, 'minutes') < this._maxBreakLength;
+                    eventStart > lastEventEnd &&
+                    differenceInMinutes(eventStart, lastEventEnd) < this._maxBreakLength;
             });
 
         if (subsequentEvents.length === 0) {
@@ -231,8 +230,8 @@ export class ItineraryListComponent implements DoCheck {
 
 
 function sortEvents(one: IEvent, two: IEvent): number {
-    const oneTime = moment(one.eventDateTime).toDate().getTime();
-    const twoTime = moment(two.eventDateTime).toDate().getTime();
+    const oneTime = getStartDate(one).getTime();
+    const twoTime = getStartDate(two).getTime();
 
     return oneTime - twoTime;
 }

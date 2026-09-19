@@ -1,28 +1,32 @@
-import moment, { Moment } from 'moment';
 import { IEvent, IFilm } from 'src/contracts/contracts';
 import { IFilter } from '../components/attribute-selector/attribute-selector.component';
 
-export function formatTime(value: Moment): string {
-    return value.format('HH:mm');
+const MILLISECONDS_PER_MINUTE = 60 * 1000;
+
+export function formatTime(value: Date): string {
+    return `${pad(value.getHours())}:${pad(value.getMinutes())}`;
 }
 
-export function getEndMoment(event: IEvent, trailerAllowance: number, films: IFilm[]): Moment | undefined {
+export function getEndDate(event: IEvent, trailerAllowance: number, films: IFilm[]): Date | undefined {
     const eventFilm = films.filter(film => film.id === event.filmId)[0];
 
     if (eventFilm == null) {
         return undefined;
     }
 
-    const time = moment(event.eventDateTime);
-
-    time.add(trailerAllowance, 'minutes');
-    time.add(eventFilm.length, 'minutes');
-
-    return time;
+    return addMinutes(getStartDate(event), trailerAllowance + eventFilm.length);
 }
 
-export function getStartMoment(event: IEvent): Moment {
-    return moment(event.eventDateTime);
+export function getStartDate(event: IEvent): Date {
+    return new Date(event.eventDateTime);
+}
+
+export function addMinutes(value: Date, minutes: number): Date {
+    return new Date(value.getTime() + minutes * MILLISECONDS_PER_MINUTE);
+}
+
+export function differenceInMinutes(later: Date, earlier: Date): number {
+    return Math.trunc((later.getTime() - earlier.getTime()) / MILLISECONDS_PER_MINUTE);
 }
 
 export function getEventFilmName(event: IEvent, films: IFilm[]): string | undefined {
@@ -43,4 +47,8 @@ export function eventMatchesSelectedAttributes(filters: IFilter[], event: IEvent
 
     return filters.filter(filter => filter.mode === 'include')
         .every(filter => event.attributeIds.some(id => id === filter.attribute));
+}
+
+function pad(value: number): string {
+    return value.toString().padStart(2, '0');
 }

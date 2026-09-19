@@ -102,17 +102,17 @@
       <div style="max-width: 300px;">
         <div class="form-group">
           <label for="startAfter">Start After</label>
-          <select class="form-control" id="startAfter" [(ngModel)]="startAfterMoment">
+          <select class="form-control" id="startAfter" [(ngModel)]="startAfterDate">
             @for (hour of hours; track hour) {
-              <option [ngValue]="hour">{{formatMoment(hour)}}</option>
+              <option [ngValue]="hour">{{formatDate(hour)}}</option>
             }
           </select>
         </div>
         <div class="form-group">
           <label for="finishBefore">Finish Before</label>
-          <select class="form-control" id="finishBefore" [(ngModel)]="finishBeforeMoment">
+          <select class="form-control" id="finishBefore" [(ngModel)]="finishBeforeDate">
             @for (hour of hours; track hour) {
-              <option [ngValue]="hour">{{formatMoment(hour)}}</option>
+              <option [ngValue]="hour">{{formatDate(hour)}}</option>
             }
           </select>
         </div>

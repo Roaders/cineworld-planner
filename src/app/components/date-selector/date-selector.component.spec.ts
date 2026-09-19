@@ -1,5 +1,4 @@
 import { DateSelectorComponent } from './date-selector.component';
-import moment from 'moment';
 
 describe('DateSelectorComponent', () => {
 
@@ -12,7 +11,7 @@ describe('DateSelectorComponent', () => {
     }
 
     beforeAll(() => {
-        vi.spyOn(moment, 'now').mockImplementation(mockedNow);
+        vi.spyOn(Date, 'now').mockImplementation(mockedNow);
     });
 
     afterAll(() => {
