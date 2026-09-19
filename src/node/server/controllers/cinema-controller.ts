@@ -5,8 +5,9 @@ import axios, { AxiosError } from 'axios';
 import { ICinema } from '../../../contracts/contracts';
 import {
     ICineworldMovie,
-    ICineworldScheduleResponse,
     ICineworldTheaterResponse,
+    isCineworldMovieResponse,
+    isCineworldScheduleResponse,
     mapListings,
     mapTheaters,
 } from './cineworld-mapper';
@@ -30,6 +31,9 @@ type GetJson = (url: string) => Promise<IHttpResult>;
 interface ITimeoutCache {
     stream: Observable<any>;
     expiry: number;
+}
+
+class InvalidCineworldResponseError extends Error {
 }
 
 const MAX_CINEMA_LIST_CACHE_AGE = 1000 * 60 * 60; // Cache for 1 hour
@@ -96,12 +100,27 @@ export class CinemaController {
             const scheduleUrl = getScheduleUrl(cinema, date);
             console.log(`Loading list from ${scheduleUrl}`);
 
-            const scheduleResponse = await axios.get<ICineworldScheduleResponse>(scheduleUrl);
+            const scheduleResponse = await axios.get<unknown>(scheduleUrl);
+            if (!isCineworldScheduleResponse(scheduleResponse.data)) {
+                throw new InvalidCineworldResponseError('Cineworld returned an invalid schedule response');
+            }
+
             const schedule = scheduleResponse.data[cinema]?.schedule || {};
             const movieIds = Object.keys(schedule);
-            const movies = movieIds.length === 0
-                ? []
-                : (await axios.get<ICineworldMovie[]>(getMoviesUrl(movieIds))).data;
+            let movies: ICineworldMovie[] = [];
+
+            if (movieIds.length > 0) {
+                const moviesResponse = await axios.get<unknown>(getMoviesUrl(movieIds));
+                if (!isCineworldMovieResponse(moviesResponse.data)) {
+                    throw new InvalidCineworldResponseError('Cineworld returned an invalid movie response');
+                }
+
+                movies = moviesResponse.data;
+                const returnedMovieIds = new Set(movies.map(movie => movie.id));
+                if (movieIds.some(movieId => !returnedMovieIds.has(movieId))) {
+                    throw new InvalidCineworldResponseError('Cineworld omitted movies referenced by its schedule');
+                }
+            }
 
             return mapListings(cinema, schedule, movies);
         });
@@ -115,12 +134,12 @@ export class CinemaController {
         });
     }
 
-    private handleError(response: Response, error: any, message: string) {
+    private handleError(response: Response, error: unknown, message: string) {
 
-        if (error.isAxiosError) {
+        if (axios.isAxiosError(error)) {
             const axiosError = error as AxiosError;
             console.log(message);
-            console.log({response: error.response})
+            console.log({response: axiosError.response});
 
             if (axiosError.response) {
                 response.status(axiosError.response.status);
@@ -128,9 +147,15 @@ export class CinemaController {
                 response.send();
                 return;
             }
-        } else {
-            console.log(message, {response, error});
+        } else if (error instanceof InvalidCineworldResponseError) {
+            console.log(message, {error});
+            response.status(502);
+            response.statusMessage = error.message;
+            response.send();
+            return;
         }
+
+        console.log(message, {error});
 
         response.status(500);
         response.statusMessage = message;
@@ -170,7 +195,7 @@ export async function loadCinemaList(getJson: GetJson): Promise<ICinema[]> {
 
     const pageDataResult = await getJson(CINEMAS_PAGE_DATA_URL);
     if (!isCinemasPageData(pageDataResult.data)) {
-        throw new Error('Could not retrieve Cineworld cinema page data');
+        throw new InvalidCineworldResponseError('Could not retrieve valid Cineworld cinema page data');
     }
 
     for (const hash of pageDataResult.data.staticQueryHashes) {
@@ -188,7 +213,7 @@ export async function loadCinemaList(getJson: GetJson): Promise<ICinema[]> {
         }
     }
 
-    throw new Error('Could not discover Cineworld theater query');
+    throw new InvalidCineworldResponseError('Could not discover a valid Cineworld theater query');
 }
 
 function getStaticQueryUrl(hash: string) {
@@ -197,7 +222,9 @@ function getStaticQueryUrl(hash: string) {
 
 function isCinemasPageData(value: unknown): value is ICinemasPageData {
     const pageData = value as ICinemasPageData;
-    return pageData != null && Array.isArray(pageData.staticQueryHashes);
+    return pageData != null
+        && Array.isArray(pageData.staticQueryHashes)
+        && pageData.staticQueryHashes.every(hash => typeof hash === 'string' && hash.length > 0);
 }
 
 function isTheaterResponse(value: unknown): value is ICineworldTheaterResponse {
@@ -206,9 +233,17 @@ function isTheaterResponse(value: unknown): value is ICineworldTheaterResponse {
 
     return Array.isArray(theaters) && theaters.length > 0 && theaters.every(theater =>
         typeof theater.id === 'string'
+        && theater.id.length > 0
         && typeof theater.name === 'string'
+        && theater.name.length > 0
         && typeof theater.path === 'string'
-        && theater.practicalInfo?.coordinates != null
-        && theater.practicalInfo?.location != null
+        && theater.path.startsWith('/theaters/')
+        && Number.isFinite(theater.practicalInfo?.coordinates?.latitude)
+        && Number.isFinite(theater.practicalInfo?.coordinates?.longitude)
+        && typeof theater.practicalInfo?.location?.address === 'string'
+        && typeof theater.practicalInfo?.location?.city === 'string'
+        && typeof theater.practicalInfo?.location?.zip === 'string'
+        && (theater.practicalInfo.location.state == null
+            || typeof theater.practicalInfo.location.state === 'string')
     );
 }

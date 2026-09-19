@@ -51,18 +51,32 @@ interface ICineworldShowtime {
     };
 }
 
+export function isCineworldScheduleResponse(value: unknown): value is ICineworldScheduleResponse {
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    return Object.values(value).every(cinema =>
+        isRecord(cinema) && isCineworldSchedule(cinema.schedule)
+    );
+}
+
+export function isCineworldMovieResponse(value: unknown): value is ICineworldMovie[] {
+    return Array.isArray(value) && value.every(isCineworldMovie);
+}
+
 export interface ICineworldMovie {
     id: string;
     title: string;
-    runtime: number | null;
-    poster: string | null;
-    release: string | null;
-    certificate: string | null;
-    genres: string | null;
-    orderIndex: number | null;
-    trailer: {
-        HD: string | null;
-        SD: string | null;
+    runtime?: number | null;
+    poster?: string | null;
+    release?: string | null;
+    certificate?: string | null;
+    genres?: string | null;
+    orderIndex?: number | null;
+    trailer?: {
+        HD?: string | null;
+        SD?: string | null;
     } | null;
 }
 
@@ -174,4 +188,70 @@ function getMovieAttributes(movie: ICineworldMovie): FilmAttribute[] {
 
 function uniqueAttributes(attributes: FilmAttribute[]): FilmAttribute[] {
     return attributes.filter((attribute, index) => attributes.indexOf(attribute) === index);
+}
+
+function isCineworldSchedule(value: unknown): value is ICineworldSchedule {
+    return isRecord(value) && Object.values(value).every(dateSchedule =>
+        isRecord(dateSchedule)
+        && Object.values(dateSchedule).every(showtimes =>
+            Array.isArray(showtimes) && showtimes.every(isCineworldShowtime)
+        )
+    );
+}
+
+function isCineworldShowtime(value: unknown): value is ICineworldShowtime {
+    if (!isRecord(value) || !isRecord(value.data) || !Array.isArray(value.data.ticketing)) {
+        return false;
+    }
+
+    return isNonEmptyString(value.id)
+        && isNonEmptyString(value.startsAt)
+        && !Number.isNaN(Date.parse(value.startsAt))
+        && Array.isArray(value.tags)
+        && value.tags.every(tag => typeof tag === 'string')
+        && value.data.ticketing.every(ticketing =>
+            isRecord(ticketing)
+            && typeof ticketing.provider === 'string'
+            && typeof ticketing.type === 'string'
+            && Array.isArray(ticketing.urls)
+            && ticketing.urls.every(url => typeof url === 'string')
+        );
+}
+
+function isCineworldMovie(value: unknown): value is ICineworldMovie {
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    const trailerIsValid = value.trailer == null || (
+        isRecord(value.trailer)
+        && isNullableString(value.trailer.HD)
+        && isNullableString(value.trailer.SD)
+    );
+
+    return isNonEmptyString(value.id)
+        && isNonEmptyString(value.title)
+        && isNullableFiniteNumber(value.runtime)
+        && isNullableString(value.poster)
+        && isNullableString(value.release)
+        && isNullableString(value.certificate)
+        && isNullableString(value.genres)
+        && isNullableFiniteNumber(value.orderIndex)
+        && trailerIsValid;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value != null && !Array.isArray(value);
+}
+
+function isNonEmptyString(value: unknown): value is string {
+    return typeof value === 'string' && value.length > 0;
+}
+
+function isNullableString(value: unknown): value is string | null | undefined {
+    return value == null || typeof value === 'string';
+}
+
+function isNullableFiniteNumber(value: unknown): value is number | null | undefined {
+    return value == null || (typeof value === 'number' && Number.isFinite(value));
 }
