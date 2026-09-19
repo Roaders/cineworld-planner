@@ -189,7 +189,7 @@ export async function loadCinemaList(getJson: GetJson): Promise<ICinema[]> {
         if (isTheaterResponse(result.data)) {
             return mapTheaters(result.data);
         }
-    } catch (error) {
+    } catch {
         console.warn(`Could not load known Cineworld theater query; discovering current query hash.`);
     }
 
@@ -208,7 +208,7 @@ export async function loadCinemaList(getJson: GetJson): Promise<ICinema[]> {
             if (isTheaterResponse(result.data)) {
                 return mapTheaters(result.data);
             }
-        } catch (error) {
+        } catch {
             // An unrelated static query may be unavailable without preventing discovery.
         }
     }

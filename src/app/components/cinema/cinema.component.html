@@ -33,7 +33,7 @@
               {{film.name}}
             </button>
             <div class="me-2">
-              @if (film.videoLink != null && film.videoLink != '') {
+              @if (film.videoLink != null && film.videoLink !== '') {
                 <a
                   class="icon-link"
                   href="{{film.videoLink}}"
@@ -44,7 +44,7 @@
                   ></i>
                 </a>
               }
-              @if (film.videoLink == null || film.videoLink == '') {
+              @if (film.videoLink == null || film.videoLink === '') {
                 <i
                   class="fa fa-youtube-play fa-youtube-play-disabled"
                   aria-hidden="true"
