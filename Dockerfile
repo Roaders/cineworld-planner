@@ -1,15 +1,21 @@
 
-# taken from https://snyk.io/blog/10-best-practices-to-containerize-nodejs-web-applications-with-docker/
+FROM node:26-alpine
 
-FROM node:20-alpine
+RUN apk add --no-cache dumb-init
 
-RUN apk add dumb-init
-
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 WORKDIR /usr/src/app
-COPY . /usr/src/app
+COPY package.json package-lock.json ./
 
-RUN npm ci --only=production
+RUN npm ci --omit=dev && npm cache clean --force
 
-CMD ["dumb-init", "node", "dist/node/server"]
+COPY --chown=node:node dist/node ./dist/node
+COPY --chown=node:node dist/contracts ./dist/contracts
+
+USER node
+
+EXPOSE 3000
+
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "dist/node/server"]

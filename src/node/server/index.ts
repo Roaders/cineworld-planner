@@ -9,6 +9,9 @@ import https from "https"
 
 const app: Express = express();
 
+// Trust forwarded client addresses only when requests arrive through a private proxy such as Caddy.
+app.set('trust proxy', 'loopback, linklocal, uniquelocal');
+
 const allowedOrigins = [
     'https://www.cineworld-planner.co.uk',
     'http://www.cineworld-planner.co.uk',

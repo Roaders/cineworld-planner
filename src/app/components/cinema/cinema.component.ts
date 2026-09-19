@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CineworldService } from 'src/app/services/cineworld.service';
 import { ActivatedRoute } from '@angular/router';
 import { Observer } from 'rxjs';
@@ -9,6 +9,8 @@ import { eventMatchesSelectedAttributes } from '../../helper/event-helper';
 @Component({
     selector: 'cinema',
     templateUrl: './cinema.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class CinemaComponent {
 

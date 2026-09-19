@@ -1,11 +1,9 @@
-import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, Input, EventEmitter, Output, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FilmAttribute, IEvent, IFilm, FilmAttributeValues } from 'src/contracts/contracts';
 import { displayAttribute } from 'src/app/helper/attribute-helper';
 import { defaultTrailerAllowance } from 'src/app/constants/constants';
 import { PreferencesService } from 'src/app/services/preferences.service';
-import moment, { Moment } from 'moment';
-import { formatTime, getStartMoment, getEndMoment } from 'src/app/helper/event-helper';
-import { isEqual } from 'lodash';
+import { formatTime, getStartDate, getEndDate } from 'src/app/helper/event-helper';
 
 export type FilterMode = 'exclude' | 'include';
 
@@ -14,6 +12,8 @@ export interface IFilter {attribute: FilmAttribute; mode: FilterMode; }
 @Component({
     selector: 'attribute-selector',
     templateUrl: './attribute-selector.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AttributeSelectorComponent implements OnInit {
 
@@ -53,8 +53,9 @@ export class AttributeSelectorComponent implements OnInit {
         return this._showFilters;
     }
 
-    public get maxBreakLength() {
-        return this.preferencesService.getMaxBreakLength();
+    @Input()
+    public get maxBreakLength(): number {
+        return this._maxBreakLength;
     }
 
     public set maxBreakLength(value: number) {
@@ -62,6 +63,12 @@ export class AttributeSelectorComponent implements OnInit {
             value = 0;
         }
 
+        if (value === this._maxBreakLength) {
+            return;
+        }
+
+        this._maxBreakLength = value;
+        this.maxBreakLengthChange.emit(value);
         this.preferencesService.setMaxBreakLength(value);
     }
 
@@ -71,11 +78,12 @@ export class AttributeSelectorComponent implements OnInit {
     }
 
     public set events(value: IEvent[]) {
-        if (isEqual(value, this._events)) {
+        value = value || [];
+        if (arraysEqual(value, this._events)) {
             return;
         }
 
-        this._events = value || [];
+        this._events = value;
         this.resetHours();
     }
 
@@ -85,26 +93,30 @@ export class AttributeSelectorComponent implements OnInit {
     }
 
     public set selectedFilms(value: IFilm[]) {
-        if (isEqual(value, this._selectedFilms)) {
+        value = value || [];
+        if (arraysEqual(value, this._selectedFilms)) {
             return;
         }
 
-        this._selectedFilms = value || [];
+        this._selectedFilms = value;
         this.resetHours();
     }
 
-    private _hours: (Moment | undefined)[] | undefined;
+    private _hours: (Date | undefined)[] | undefined;
 
-    public get hours(): (Moment | undefined)[] {
+    public get hours(): (Date | undefined)[] {
         if (this._hours == null) {
 
-            const { spanStartMoment, spanEndMoment } = this.getOverallTimespan();
+            const { spanStartDate, spanEndDate } = this.getOverallTimespan();
 
-            const startHour = moment(spanStartMoment).minute(0);
-            const hourCount = moment(spanEndMoment).minute(0).diff(startHour, 'hour');
+            const startHour = new Date(spanStartDate?.getTime() ?? Date.now());
+            startHour.setMinutes(0);
+            const endHour = new Date(spanEndDate?.getTime() ?? Date.now());
+            endHour.setMinutes(0);
+            const hourCount = Math.trunc((endHour.getTime() - startHour.getTime()) / (60 * 60 * 1000));
 
             const hours = Array.from({length: hourCount + 2})
-                .map((_, index) => moment(startHour).add(index, 'hour'));
+                .map((_, index) => new Date(startHour.getTime() + index * 60 * 60 * 1000));
 
             this._hours = [undefined, ...hours];
         }
@@ -129,31 +141,31 @@ export class AttributeSelectorComponent implements OnInit {
     }
 
     @Output()
-    public startAfter = new EventEmitter<undefined | Moment>();
+    public startAfter = new EventEmitter<undefined | Date>();
 
     @Output()
-    public finishBefore = new EventEmitter<undefined | Moment>();
+    public finishBefore = new EventEmitter<undefined | Date>();
 
-    private _startAfterMoment: Moment | undefined;
+    private _startAfterDate: Date | undefined;
 
-    public get startAfterMoment(): Moment | undefined {
-        return this._startAfterMoment;
+    public get startAfterDate(): Date | undefined {
+        return this._startAfterDate;
     }
 
-    public set startAfterMoment(value: Moment | undefined) {
-        this._startAfterMoment = value;
+    public set startAfterDate(value: Date | undefined) {
+        this._startAfterDate = value;
 
         this.startAfter.emit(value);
     }
 
-    private _finishBeforeMoment: Moment | undefined;
+    private _finishBeforeDate: Date | undefined;
 
-    public get finishBeforeMoment(): Moment | undefined {
-        return this._finishBeforeMoment;
+    public get finishBeforeDate(): Date | undefined {
+        return this._finishBeforeDate;
     }
 
-    public set finishBeforeMoment(value: Moment | undefined) {
-        this._finishBeforeMoment = value;
+    public set finishBeforeDate(value: Date | undefined) {
+        this._finishBeforeDate = value;
 
         this.finishBefore.emit(value);
     }
@@ -162,6 +174,11 @@ export class AttributeSelectorComponent implements OnInit {
 
     @Output()
     public readonly trailerAllowanceChange = new EventEmitter<number>();
+
+    private _maxBreakLength = 0;
+
+    @Output()
+    public readonly maxBreakLengthChange = new EventEmitter<number>();
 
     private _expand = false;
 
@@ -176,7 +193,7 @@ export class AttributeSelectorComponent implements OnInit {
 
     private _selectedFilms: IFilm[] = [];
 
-    public formatMoment(value?: Moment): string {
+    public formatDate(value?: Date): string {
         return value ? formatTime(value) : 'Select...';
     }
 
@@ -247,37 +264,45 @@ export class AttributeSelectorComponent implements OnInit {
 
         const startEvent: IEvent | undefined = this.events.length > 0 ? this.events[0] : undefined;
 
-        const spanStartMoment = startEvent != null ? getStartMoment(startEvent) : undefined;
+        const spanStartDate = startEvent != null ? getStartDate(startEvent) : undefined;
 
-        if(spanStartMoment == null){
-            return {spanStartMoment: undefined, spanEndMoment: undefined};
+        if(spanStartDate == null){
+            return {spanStartDate: undefined, spanEndDate: undefined};
         }
 
-        const spanEndMoment = this.events
-            .map(event => getEndMoment(event, this.trailerAllowance, this.selectedFilms))
+        const spanEndDate = this.events
+            .map(event => getEndDate(event, this.trailerAllowance, this.selectedFilms))
             .reduce((latest, current) => {
-                if (latest != null && current != null && current.isAfter(latest)) {
+                if (latest != null && current != null && current > latest) {
                     return current;
                 }
                 return latest;
-            }, spanStartMoment);
+            }, spanStartDate);
 
-        if ( spanEndMoment == null || spanStartMoment == null) {
+        if ( spanEndDate == null || spanStartDate == null) {
             let errorMessage = `could not calculate timespan: `;
-            errorMessage = errorMessage + `spanEndMoment:${spanEndMoment ? 'defined' : 'notDefined'}`;
+            errorMessage = errorMessage + `spanEndDate:${spanEndDate ? 'defined' : 'notDefined'}`;
             throw new Error(errorMessage);
         }
 
-        return {spanStartMoment, spanEndMoment};
+        return {spanStartDate, spanEndDate};
     }
 
     private resetHours() {
         this._hours = undefined;
 
-        this._startAfterMoment = this.hours.filter(hour => hour != null && hour.isSame(this._startAfterMoment))[0];
-        this._finishBeforeMoment = this.hours.filter(hour => hour != null && hour.isSame(this._finishBeforeMoment))[0];
+        this._startAfterDate = this.hours.find(hour => datesEqual(hour, this._startAfterDate));
+        this._finishBeforeDate = this.hours.find(hour => datesEqual(hour, this._finishBeforeDate));
 
-        this.startAfter.emit(this._startAfterMoment);
-        this.finishBefore.emit(this._finishBeforeMoment);
+        this.startAfter.emit(this._startAfterDate);
+        this.finishBefore.emit(this._finishBeforeDate);
     }
+}
+
+function arraysEqual<T>(one: T[], two: T[]): boolean {
+    return one.length === two.length && one.every((item, index) => item === two[index]);
+}
+
+function datesEqual(one: Date | undefined, two: Date | undefined): boolean {
+    return one != null && two != null && one.getTime() === two.getTime();
 }

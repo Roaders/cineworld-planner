@@ -5,8 +5,9 @@ import axios, { AxiosError } from 'axios';
 import { ICinema } from '../../../contracts/contracts';
 import {
     ICineworldMovie,
-    ICineworldScheduleResponse,
     ICineworldTheaterResponse,
+    isCineworldMovieResponse,
+    isCineworldScheduleResponse,
     mapListings,
     mapTheaters,
 } from './cineworld-mapper';
@@ -16,6 +17,13 @@ const CINEMAS_PAGE_DATA_URL = `${CINEWORLD_URL}/page-data/cinemas/page-data.json
 // Gatsby hashes the static GraphQL query text, not its cinema data. This remains stable across content rebuilds.
 const THEATER_STATIC_QUERY_HASH = '2506275789';
 const CINEMA_LIST_URL = getStaticQueryUrl(THEATER_STATIC_QUERY_HASH);
+const CINEMA_CODE_PATTERN = /^[A-Z0-9]{5}$/;
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const MAX_CACHE_ENTRIES = 500;
+const CINEWORLD_REQUEST_CONFIG = {
+    timeout: 10 * 1000,
+    maxContentLength: 2 * 1024 * 1024,
+};
 
 interface ICinemasPageData {
     staticQueryHashes: string[];
@@ -32,63 +40,79 @@ interface ITimeoutCache {
     expiry: number;
 }
 
+class InvalidCineworldResponseError extends Error {
+}
+
 const MAX_CINEMA_LIST_CACHE_AGE = 1000 * 60 * 60; // Cache for 1 hour
 const MAX_LISTINGS_CACHE_AGE = 1000 * 60 * 10; // Cache for 10 minutes
 
 export class CinemaController {
 
-    private _cache: {[url: string]: ITimeoutCache | undefined} = {};
+    private _cache = new Map<string, ITimeoutCache>();
 
     public getCinemas(request: Request, response: Response ) {
         console.log(`Request: ${request.url}`);
 
-        const now = Date.now();
-        let cachedStream = this._cache[CINEMA_LIST_URL];
-
-        if (cachedStream == null || now > cachedStream.expiry) {
-
-            cachedStream = {
-                expiry: now + MAX_CINEMA_LIST_CACHE_AGE,
-                stream: this.getCinemaListObservable().pipe(
-                    shareReplay()
-                )
-            };
-
-            this._cache[CINEMA_LIST_URL] = cachedStream;
-        }
-
-        cachedStream.stream.subscribe(
+        this.getCachedStream(
+            CINEMA_LIST_URL,
+            MAX_CINEMA_LIST_CACHE_AGE,
+            () => this.getCinemaListObservable()
+        ).subscribe(
             cinemas =>  response.json(cinemas),
             error => this.handleError(response, error, `ERROR getting cinema list`)
         );
     }
 
-    public getListings(request: Request, response: Response ) {
+    public getListings(request: Request<{cinema: string; date: string}>, response: Response ) {
         console.log(`Request: ${request.url}`);
 
         const cinema: string = request.params.cinema;
         const date: string = request.params.date;
 
-        const cacheKey = `listings_${cinema}_${date}`;
-        const now = Date.now();
-        let cachedStream = this._cache[cacheKey];
-
-        if (cachedStream == null || now > cachedStream.expiry) {
-
-            cachedStream = {
-                expiry: now + MAX_LISTINGS_CACHE_AGE,
-                stream: this.getListingsObservable(cinema, date).pipe(
-                    shareReplay()
-                )
-            };
-
-            this._cache[cacheKey] = cachedStream;
+        if (!isValidCinemaCode(cinema) || !isValidIsoDate(date)) {
+            response.status(400).send();
+            return;
         }
 
-        cachedStream.stream.subscribe(
+        const cacheKey = `listings_${cinema}_${date}`;
+        this.getCachedStream(
+            cacheKey,
+            MAX_LISTINGS_CACHE_AGE,
+            () => this.getListingsObservable(cinema, date)
+        ).subscribe(
                 result => response.json(result),
                 error => this.handleError(response, error, `ERROR getting listing for cinema ${cinema} on date ${date}`)
             );
+    }
+
+    private getCachedStream(cacheKey: string, maxAge: number, createStream: () => Observable<any>) {
+        const now = Date.now();
+        const cached = this._cache.get(cacheKey);
+
+        if (cached != null && now <= cached.expiry) {
+            return cached.stream;
+        }
+
+        if (cached != null) {
+            this._cache.delete(cacheKey);
+        }
+
+        for (const [key, value] of this._cache) {
+            if (now > value.expiry) {
+                this._cache.delete(key);
+            }
+        }
+
+        while (this._cache.size >= MAX_CACHE_ENTRIES) {
+            const oldestKey = this._cache.keys().next().value;
+            if (oldestKey != null) {
+                this._cache.delete(oldestKey);
+            }
+        }
+
+        const stream = createStream().pipe(shareReplay());
+        this._cache.set(cacheKey, {stream, expiry: now + maxAge});
+        return stream;
     }
 
     private getListingsObservable(cinema: string, date: string) {
@@ -96,12 +120,27 @@ export class CinemaController {
             const scheduleUrl = getScheduleUrl(cinema, date);
             console.log(`Loading list from ${scheduleUrl}`);
 
-            const scheduleResponse = await axios.get<ICineworldScheduleResponse>(scheduleUrl);
+            const scheduleResponse = await axios.get<unknown>(scheduleUrl, CINEWORLD_REQUEST_CONFIG);
+            if (!isCineworldScheduleResponse(scheduleResponse.data)) {
+                throw new InvalidCineworldResponseError('Cineworld returned an invalid schedule response');
+            }
+
             const schedule = scheduleResponse.data[cinema]?.schedule || {};
             const movieIds = Object.keys(schedule);
-            const movies = movieIds.length === 0
-                ? []
-                : (await axios.get<ICineworldMovie[]>(getMoviesUrl(movieIds))).data;
+            let movies: ICineworldMovie[] = [];
+
+            if (movieIds.length > 0) {
+                const moviesResponse = await axios.get<unknown>(getMoviesUrl(movieIds), CINEWORLD_REQUEST_CONFIG);
+                if (!isCineworldMovieResponse(moviesResponse.data)) {
+                    throw new InvalidCineworldResponseError('Cineworld returned an invalid movie response');
+                }
+
+                movies = moviesResponse.data;
+                const returnedMovieIds = new Set(movies.map(movie => movie.id));
+                if (movieIds.some(movieId => !returnedMovieIds.has(movieId))) {
+                    throw new InvalidCineworldResponseError('Cineworld omitted movies referenced by its schedule');
+                }
+            }
 
             return mapListings(cinema, schedule, movies);
         });
@@ -111,16 +150,16 @@ export class CinemaController {
         return defer(async () => {
             console.log(`Loading cinema list from ${CINEMA_LIST_URL}`);
 
-            return loadCinemaList(url => axios.get(url));
+            return loadCinemaList(url => axios.get(url, CINEWORLD_REQUEST_CONFIG));
         });
     }
 
-    private handleError(response: Response, error: any, message: string) {
+    private handleError(response: Response, error: unknown, message: string) {
 
-        if (error.isAxiosError) {
+        if (axios.isAxiosError(error)) {
             const axiosError = error as AxiosError;
             console.log(message);
-            console.log({response: error.response})
+            console.log({response: axiosError.response});
 
             if (axiosError.response) {
                 response.status(axiosError.response.status);
@@ -128,9 +167,15 @@ export class CinemaController {
                 response.send();
                 return;
             }
-        } else {
-            console.log(message, {response, error});
+        } else if (error instanceof InvalidCineworldResponseError) {
+            console.log(message, {error});
+            response.status(502);
+            response.statusMessage = error.message;
+            response.send();
+            return;
         }
+
+        console.log(message, {error});
 
         response.status(500);
         response.statusMessage = message;
@@ -158,19 +203,32 @@ function getMoviesUrl(movieIds: string[]) {
     return `${CINEWORLD_URL}/api/gatsby-source-boxofficeapi/movies?${params}`;
 }
 
+export function isValidCinemaCode(value: string): boolean {
+    return CINEMA_CODE_PATTERN.test(value);
+}
+
+export function isValidIsoDate(value: string): boolean {
+    if (!ISO_DATE_PATTERN.test(value)) {
+        return false;
+    }
+
+    const date = new Date(`${value}T00:00:00Z`);
+    return !Number.isNaN(date.getTime()) && date.toISOString().substring(0, 10) === value;
+}
+
 export async function loadCinemaList(getJson: GetJson): Promise<ICinema[]> {
     try {
         const result = await getJson(CINEMA_LIST_URL);
         if (isTheaterResponse(result.data)) {
             return mapTheaters(result.data);
         }
-    } catch (error) {
+    } catch {
         console.warn(`Could not load known Cineworld theater query; discovering current query hash.`);
     }
 
     const pageDataResult = await getJson(CINEMAS_PAGE_DATA_URL);
     if (!isCinemasPageData(pageDataResult.data)) {
-        throw new Error('Could not retrieve Cineworld cinema page data');
+        throw new InvalidCineworldResponseError('Could not retrieve valid Cineworld cinema page data');
     }
 
     for (const hash of pageDataResult.data.staticQueryHashes) {
@@ -183,12 +241,12 @@ export async function loadCinemaList(getJson: GetJson): Promise<ICinema[]> {
             if (isTheaterResponse(result.data)) {
                 return mapTheaters(result.data);
             }
-        } catch (error) {
+        } catch {
             // An unrelated static query may be unavailable without preventing discovery.
         }
     }
 
-    throw new Error('Could not discover Cineworld theater query');
+    throw new InvalidCineworldResponseError('Could not discover a valid Cineworld theater query');
 }
 
 function getStaticQueryUrl(hash: string) {
@@ -197,7 +255,9 @@ function getStaticQueryUrl(hash: string) {
 
 function isCinemasPageData(value: unknown): value is ICinemasPageData {
     const pageData = value as ICinemasPageData;
-    return pageData != null && Array.isArray(pageData.staticQueryHashes);
+    return pageData != null
+        && Array.isArray(pageData.staticQueryHashes)
+        && pageData.staticQueryHashes.every(hash => typeof hash === 'string' && hash.length > 0);
 }
 
 function isTheaterResponse(value: unknown): value is ICineworldTheaterResponse {
@@ -206,9 +266,17 @@ function isTheaterResponse(value: unknown): value is ICineworldTheaterResponse {
 
     return Array.isArray(theaters) && theaters.length > 0 && theaters.every(theater =>
         typeof theater.id === 'string'
+        && theater.id.length > 0
         && typeof theater.name === 'string'
+        && theater.name.length > 0
         && typeof theater.path === 'string'
-        && theater.practicalInfo?.coordinates != null
-        && theater.practicalInfo?.location != null
+        && theater.path.startsWith('/theaters/')
+        && Number.isFinite(theater.practicalInfo?.coordinates?.latitude)
+        && Number.isFinite(theater.practicalInfo?.coordinates?.longitude)
+        && typeof theater.practicalInfo?.location?.address === 'string'
+        && typeof theater.practicalInfo?.location?.city === 'string'
+        && typeof theater.practicalInfo?.location?.zip === 'string'
+        && (theater.practicalInfo.location.state == null
+            || typeof theater.practicalInfo.location.state === 'string')
     );
 }

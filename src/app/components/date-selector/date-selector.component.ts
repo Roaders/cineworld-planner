@@ -1,11 +1,12 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
-import moment from 'moment';
+import { Component, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IDay } from 'src/contracts/contracts';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'date-selector',
-    templateUrl: './date-selector.component.html'
+    templateUrl: './date-selector.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class DateSelectorComponent implements OnInit {
 
@@ -57,26 +58,31 @@ export class DateSelectorComponent implements OnInit {
     }
 
     private generateDates(): IDay[] {
-        const now = new Date(moment.now());
+        const now = new Date(Date.now());
         return Array.from({length: 7})
             .map((_, index) => {
-                const date = moment(now).add(index, 'days');
+                const date = new Date(now);
+                date.setDate(now.getDate() + index);
 
-                let description: string;
-
-                switch (index) {
-                    case 0:
-                        description = 'Today';
-                        break;
-                    default:
-                        description = date.format('ddd');
-                }
+                const description = index === 0 ? 'Today' : formatWeekday(date);
 
                 return {
                     description,
-                    date: date.format('YYYY-MM-DD')
+                    date: formatDate(date)
                 };
             });
     }
 
+}
+
+function formatDate(date: Date): string {
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+function formatWeekday(date: Date): string {
+    return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
+}
+
+function pad(value: number): string {
+    return value.toString().padStart(2, '0');
 }

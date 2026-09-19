@@ -1,9 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { IEvent, IFilm } from 'src/contracts/contracts';
-import { getStartMoment, formatTime, getEndMoment, getEventFilmName, eventMatchesSelectedAttributes } from 'src/app/helper/event-helper';
+import { addMinutes, getStartDate, formatTime, getEndDate, getEventFilmName, eventMatchesSelectedAttributes } from 'src/app/helper/event-helper';
 import { displayAttribute } from 'src/app/helper/attribute-helper';
 import { IFilter } from '../attribute-selector/attribute-selector.component';
-import moment, { Moment } from 'moment';
 import { PreferencesService } from 'src/app/services/preferences.service';
 
 interface ITimespan {
@@ -15,12 +14,15 @@ interface ITimespan {
 
 @Component({
     selector: 'event-list',
-    templateUrl: './event-list.component.html'
+    templateUrl: './event-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class EventListComponent {
 
     constructor(preferencesService: PreferencesService) {
         this.trailerAllowance = preferencesService.getTrailerAllowance();
+        this.maxBreakLength = preferencesService.getMaxBreakLength();
     }
 
     public get errors() {
@@ -74,13 +76,15 @@ export class EventListComponent {
 
     public trailerAllowance: number;
 
+    public maxBreakLength: number;
+
     private _events: IEvent[] | undefined;
 
     private _selectedFilms: IFilm[] = [];
 
-    private _startAfter: Moment | undefined;
+    private _startAfter: Date | undefined;
 
-    private _finishBefore: Moment | undefined;
+    private _finishBefore: Date | undefined;
 
     public onAttributeFiltersChanged(filters: IFilter[]) {
         this._filters = filters || [];
@@ -115,10 +119,10 @@ export class EventListComponent {
 
         const eventFilm = this.getEventFilm(event);
 
-        const eventStart = getStartMoment(event);
-        const trailersEnd = moment(eventStart).add(this.trailerAllowance, 'minutes');
-        const earliestFilmEnd = moment(eventStart).add(eventFilm.length, 'minutes');
-        const latestFilmEnd = moment(trailersEnd).add(eventFilm.length, 'minutes');
+        const eventStart = getStartDate(event);
+        const trailersEnd = addMinutes(eventStart, this.trailerAllowance);
+        const earliestFilmEnd = addMinutes(eventStart, eventFilm.length);
+        const latestFilmEnd = addMinutes(trailersEnd, eventFilm.length);
 
         return [
             this.createTimeSpan(eventStart, trailersEnd, 'trailers-timespan'),
@@ -139,11 +143,11 @@ export class EventListComponent {
         return eventFilm;
     }
 
-    private createTimeSpan(startMoment: Moment, endMoment: Moment, spanClass: string): ITimespan {
+    private createTimeSpan(startDate: Date, endDate: Date, spanClass: string): ITimespan {
         const {spanStartTime, spanEndTime, spanElapsed} = this.getOverallTimespan();
 
-        const start = startMoment.toDate().getTime();
-        const end = endMoment.toDate().getTime();
+        const start = startDate.getTime();
+        const end = endDate.getTime();
 
         const startDuration = start - spanStartTime;
         const endDuration = spanEndTime - end;
@@ -163,15 +167,15 @@ export class EventListComponent {
     }
 
     public getStartTime(event: IEvent): string | undefined {
-        const startMoment = getStartMoment(event);
+        const startDate = getStartDate(event);
 
-        return startMoment != null ? formatTime(startMoment) : undefined;
+        return startDate != null ? formatTime(startDate) : undefined;
     }
 
     public getEndTime(event: IEvent): string | undefined {
-        const endMoment = getEndMoment(event, this.trailerAllowance, this.selectedFilms);
+        const endDate = getEndDate(event, this.trailerAllowance, this.selectedFilms);
 
-        return endMoment != null ? formatTime(endMoment) : undefined;
+        return endDate != null ? formatTime(endDate) : undefined;
     }
 
     public eventAttributes(event: IEvent) {
@@ -188,15 +192,15 @@ export class EventListComponent {
         if (this.isEventSelected(event)) {
             this._selectedEvents = this._selectedEvents.filter(selectedEvent => selectedEvent.id !== event.id);
         } else {
-            this._selectedEvents.push(event);
+            this._selectedEvents = [...this._selectedEvents, event];
         }
     }
 
-    public updateStartAfter(value: Moment | undefined) {
+    public updateStartAfter(value: Date | undefined) {
         this._startAfter = value;
     }
 
-    public updateFinishBefore(value: Moment | undefined) {
+    public updateFinishBefore(value: Date | undefined) {
         this._finishBefore = value;
     }
 
@@ -215,27 +219,27 @@ export class EventListComponent {
 
         const eventFilm = this.getEventFilm(event);
 
-        const eventStart = getStartMoment(event);
-        const trailersEnd = moment(eventStart).add(this.trailerAllowance, 'minutes');
-        const earliestFilmEnd = moment(eventStart).add(eventFilm.length, 'minutes');
-        const latestFilmEnd = moment(earliestFilmEnd).add(this.trailerAllowance, 'minutes');
+        const eventStart = getStartDate(event);
+        const trailersEnd = addMinutes(eventStart, this.trailerAllowance);
+        const earliestFilmEnd = addMinutes(eventStart, eventFilm.length);
+        const latestFilmEnd = addMinutes(earliestFilmEnd, this.trailerAllowance);
 
-        if (this._startAfter && eventStart.isBefore(this._startAfter)) {
+        if (this._startAfter && eventStart < this._startAfter) {
             return false;
         }
 
-        if (this._finishBefore && latestFilmEnd.isAfter(this._finishBefore)) {
+        if (this._finishBefore && latestFilmEnd > this._finishBefore) {
             return false;
         }
 
         return this._selectedEvents.every(selectedEvent => {
             const selectedEventFilm = this.getEventFilm(selectedEvent);
 
-            const selectedEventStart = getStartMoment(selectedEvent);
-            const selectedTrailersEnd = moment(selectedEventStart).add(this.trailerAllowance, 'minutes');
-            const selectedEarliestFilmEnd = moment(selectedEventStart).add(selectedEventFilm.length, 'minutes');
+            const selectedEventStart = getStartDate(selectedEvent);
+            const selectedTrailersEnd = addMinutes(selectedEventStart, this.trailerAllowance);
+            const selectedEarliestFilmEnd = addMinutes(selectedEventStart, selectedEventFilm.length);
 
-            return selectedTrailersEnd.isAfter(earliestFilmEnd) || selectedEarliestFilmEnd.isBefore(trailersEnd);
+            return selectedTrailersEnd > earliestFilmEnd || selectedEarliestFilmEnd < trailersEnd;
         });
     }
 
@@ -244,33 +248,33 @@ export class EventListComponent {
     private getOverallTimespan() {
         const displayedEvents = this.eventsList;
 
-        const spanStartMoment = getStartMoment(displayedEvents[0]);
+        const spanStartDate = getStartDate(displayedEvents[0]);
 
-        if (spanStartMoment == null) {
+        if (spanStartDate == null) {
             let errorMessage = `could not calculate timespan: `;
-            errorMessage = errorMessage + `spanStartMoment:${spanStartMoment ? 'defined' : 'notDefined'} `;
+            errorMessage = errorMessage + `spanStartDate:${spanStartDate ? 'defined' : 'notDefined'} `;
             this.showError(errorMessage);
             throw new Error(errorMessage);
         }
 
-        const spanEndMoment = displayedEvents
-            .map(event => getEndMoment(event, this.trailerAllowance, this.selectedFilms))
+        const spanEndDate = displayedEvents
+            .map(event => getEndDate(event, this.trailerAllowance, this.selectedFilms))
             .reduce((latest, current) => {
-                if (latest != null && current != null && current.isAfter(latest)) {
+                if (latest != null && current != null && current > latest) {
                     return current;
                 }
                 return latest;
-            }, spanStartMoment);
+            }, spanStartDate);
 
-        if ( spanEndMoment == null) {
+        if ( spanEndDate == null) {
             let errorMessage = `could not calculate timespan: `;
-            errorMessage = errorMessage + `spanEndMoment:${spanEndMoment ? 'defined' : 'notDefined'}`;
+            errorMessage = errorMessage + `spanEndDate:${spanEndDate ? 'defined' : 'notDefined'}`;
             this.showError(errorMessage);
             throw new Error(errorMessage);
         }
 
-        const spanStartTime = spanStartMoment.toDate().getTime();
-        const spanEndTime = spanEndMoment.toDate().getTime();
+        const spanStartTime = spanStartDate.getTime();
+        const spanEndTime = spanEndDate.getTime();
 
         const spanElapsed = spanEndTime - spanStartTime;
 

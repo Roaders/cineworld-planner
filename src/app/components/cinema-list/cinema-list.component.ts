@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CineworldService } from '../../services/cineworld.service';
 import { Router } from '@angular/router';
 import { ICinema } from 'src/contracts/contracts';
@@ -6,8 +6,10 @@ import { CinemaHelper } from 'src/app/helper/cinema-helper';
 import { getDistance, convertDistance, getRhumbLineBearing } from 'geolib';
 
 @Component({
-  selector: 'cinema-list',
-  templateUrl: './cinema-list.component.html',
+    selector: 'cinema-list',
+    templateUrl: './cinema-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class CinemaListComponent {
 
