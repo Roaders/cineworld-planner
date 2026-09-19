@@ -4,6 +4,7 @@ import packageJson from '../../../../package.json';
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
+    styleUrl: './app.component.scss',
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
