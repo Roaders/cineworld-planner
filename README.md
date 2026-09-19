@@ -90,13 +90,33 @@ Build the application before the image because the Dockerfile packages the compi
 ```sh
 npm run verify-release
 docker build -t roaders/cineworldplanner:latest .
-docker run --name cineworldplanner --rm -p 3000:3000 roaders/cineworldplanner:latest
+docker run --name cineworldplanner --rm \
+  --read-only \
+  --cap-drop=ALL \
+  --security-opt=no-new-privileges \
+  --pids-limit=100 \
+  --memory=256m \
+  --cpus=1 \
+  -p 127.0.0.1:3000:3000 \
+  roaders/cineworldplanner:latest
 ```
+
+The image runs as the unprivileged `node` user. Keep the filesystem read-only, do not use `--privileged`, and do not mount host paths unless the service needs them. The loopback port binding prevents direct network access; a reverse proxy on the host can reach it locally.
 
 To serve HTTPS, mount the certificate directory read-only and configure it:
 
 ```sh
-docker run --name cineworldplanner --rm -p 3000:3000 -e HTTPS_CERTIFICATES_PATH=/certificates -v /path/to/certificates:/certificates:ro roaders/cineworldplanner:latest
+docker run --name cineworldplanner --rm \
+  --read-only \
+  --cap-drop=ALL \
+  --security-opt=no-new-privileges \
+  --pids-limit=100 \
+  --memory=256m \
+  --cpus=1 \
+  -p 127.0.0.1:3000:3000 \
+  -e HTTPS_CERTIFICATES_PATH=/certificates \
+  -v /path/to/certificates:/certificates:ro \
+  roaders/cineworldplanner:latest
 ```
 
 `npm run build-release` has an external side effect: after verification it builds both `latest` and versioned image tags and pushes all tags to Docker Hub. Only run it when authenticated and intending to publish.
