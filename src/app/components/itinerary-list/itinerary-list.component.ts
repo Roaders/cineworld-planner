@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { IEvent, IFilm } from 'src/contracts/contracts';
 import moment, { Moment } from 'moment';
 import { getStartMoment, formatTime, getEndMoment, getEventFilmName } from 'src/app/helper/event-helper';
@@ -12,7 +12,9 @@ interface IInteraryMoment extends IInteraryBase {
 
 @Component({
     selector: 'itinerary-list',
-    templateUrl: './itinerary-list.component.html'
+    templateUrl: './itinerary-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ItineraryListComponent {
 

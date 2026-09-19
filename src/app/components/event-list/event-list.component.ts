@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { IEvent, IFilm } from 'src/contracts/contracts';
 import { getStartMoment, formatTime, getEndMoment, getEventFilmName, eventMatchesSelectedAttributes } from 'src/app/helper/event-helper';
 import { displayAttribute } from 'src/app/helper/attribute-helper';
@@ -15,7 +15,9 @@ interface ITimespan {
 
 @Component({
     selector: 'event-list',
-    templateUrl: './event-list.component.html'
+    templateUrl: './event-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class EventListComponent {
 

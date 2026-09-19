@@ -22,6 +22,11 @@ body{
 .icon-link{
     font-size: 2rem;
     cursor: pointer;
+    text-decoration: none;
+}
+
+.icon-link a {
+    text-decoration: none;
 }
 
 @media only screen and (max-width: 500px) {

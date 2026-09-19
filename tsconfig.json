@@ -2,14 +2,16 @@
     "compileOnSave": false,
     "compilerOptions": {
       "strict": true,
-      "baseUrl": "./",
+      "paths": {
+        "src/*": ["./src/*"]
+      },
       "outDir": "./dist/out-tsc",
       "sourceMap": true,
       "esModuleInterop": true,
       "declaration": false,
       "experimentalDecorators": true,
       "module": "es2020",
-      "moduleResolution": "node",
+      "moduleResolution": "bundler",
       "importHelpers": true,
       "resolveJsonModule": true,
       "target": "ES2022",
@@ -17,10 +19,6 @@
       "noUnusedParameters": true,
       "noImplicitReturns": true,
       "noFallthroughCasesInSwitch": true,
-      "lib": [
-        "es2018",
-        "DOM"
-      ],
       "useDefineForClassFields": false
     },
     "angularCompilerOptions": {

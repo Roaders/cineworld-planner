@@ -63,7 +63,7 @@ export class CinemaController {
         );
     }
 
-    public getListings(request: Request, response: Response ) {
+    public getListings(request: Request<{cinema: string; date: string}>, response: Response ) {
         console.log(`Request: ${request.url}`);
 
         const cinema: string = request.params.cinema;

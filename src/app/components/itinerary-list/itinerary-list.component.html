@@ -1,26 +1,25 @@
 
-<div class="mt-2 event-list d-inline" *ngIf="itinerary.length > 0">
-
+@if (itinerary.length > 0) {
+  <div class="mt-2 event-list d-inline">
     <h3>Itinerary</h3>
+    <itinerary
+      [itinerary]="itinerary"
+      [films]="selectedFilms"
+    ></itinerary>
+  </div>
+}
 
-    <itinerary 
-        [itinerary]="itinerary"
-        [films]="selectedFilms"
-        ></itinerary>
-</div>
-
-<div class="mt-2 event-list d-inline" *ngIf="itineraryList.length > 0">
-
+@if (itineraryList.length > 0) {
+  <div class="mt-2 event-list d-inline">
     <h3>Generated Itineraries</h3>
-
-        <div *ngFor="let itinerary of itineraryList">
-
-            <h4>{{getStartTime(itinerary)}}</h4>
-    
-            <itinerary 
-                [itinerary]="itinerary"
-                [films]="selectedFilms"
-                ></itinerary>
-    </div>
-
-</div>
+    @for (itinerary of itineraryList; track itinerary) {
+      <div>
+        <h4>{{getStartTime(itinerary)}}</h4>
+        <itinerary
+          [itinerary]="itinerary"
+          [films]="selectedFilms"
+        ></itinerary>
+      </div>
+    }
+  </div>
+}

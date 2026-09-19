@@ -1,4 +1,4 @@
-import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, Input, EventEmitter, Output, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FilmAttribute, IEvent, IFilm, FilmAttributeValues } from 'src/contracts/contracts';
 import { displayAttribute } from 'src/app/helper/attribute-helper';
 import { defaultTrailerAllowance } from 'src/app/constants/constants';
@@ -14,6 +14,8 @@ export interface IFilter {attribute: FilmAttribute; mode: FilterMode; }
 @Component({
     selector: 'attribute-selector',
     templateUrl: './attribute-selector.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AttributeSelectorComponent implements OnInit {
 

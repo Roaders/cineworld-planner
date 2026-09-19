@@ -1,10 +1,12 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { ICinema } from 'src/contracts/contracts';
 import { CinemaHelper } from 'src/app/helper/cinema-helper';
 
 @Component({
     selector: 'cinema-header',
     templateUrl: './cinema-header.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class CinemaHeaderComponent {
 

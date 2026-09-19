@@ -1,82 +1,85 @@
 
-<div class="cinema-list" class="m-auto container">
+<div class="cinema-list m-auto container">
 
-    <h1>Cineworld Planner</h1>
+  <h1>Cineworld Planner</h1>
 
-    <h2>Select Cinema</h2>
+  <h2>Select Cinema</h2>
 
-    <div *ngIf="errorMessage != null" class="alert alert-danger" role="alert">{{errorMessage}}</div>
+  @if (errorMessage != null) {
+    <div class="alert alert-danger" role="alert">{{errorMessage}}</div>
+  }
 
-    <div class="form-group">
-        <label for="cinemaSearchInput">Search</label>
-        <input 
-            type="text" 
-            class="form-control" 
-            id="cinemaSearchInput" 
-            placeholder="Cinema name..."
-            [(ngModel)]="searchString"
-            >
+  <div class="form-group">
+    <label for="cinemaSearchInput">Search</label>
+    <input
+      type="text"
+      class="form-control"
+      id="cinemaSearchInput"
+      placeholder="Cinema name..."
+      [(ngModel)]="searchString"
+      >
     </div>
-    
-    <div 
-        *ngIf="geolocationAvailable"
-        class="btn-group btn-group w-100 mb-2" 
-        role="group" 
+
+    @if (geolocationAvailable) {
+      <div
+        class="btn-group btn-group w-100 mb-2"
+        role="group"
         aria-label="Cinema List Sort"
         >
-
         <button
-            type="button" 
-            class="btn btn-primary"
-            [ngClass]="{active: alhpabeticalSearch}"
-            (click)="applySort(true)"
-            >Alphabetical</button>
-
+          type="button"
+          class="btn btn-primary"
+          [ngClass]="{active: alhpabeticalSearch}"
+          (click)="applySort(true)"
+        >Alphabetical</button>
         <button
-            type="button" 
-            class="btn btn-primary"
-            [ngClass]="{active: !alhpabeticalSearch}"
-            (click)="applySort(false)"
-            >Location</button>
-    </div>
+          type="button"
+          class="btn btn-primary"
+          [ngClass]="{active: !alhpabeticalSearch}"
+          (click)="applySort(false)"
+        >Location</button>
+      </div>
+    }
 
-    <div *ngIf="cinemaList != null">
-
-        <button 
-            *ngFor="let cinema of cinemaList" 
+    @if (cinemaList != null) {
+      <div>
+        @for (cinema of cinemaList; track cinema) {
+          <button
             type="button"
-            class="btn btn-primary btn-block position-relative"
+            class="btn btn-primary w-100 mb-2 position-relative"
             [ngClass]="{locationButton: !alhpabeticalSearch}"
             (click)="selectCinema(cinema)"
             >
             <div class="d-inline">
-                <span>{{cinema.name}}</span>
-                <i 
-                    *ngIf="isFavoriteCinema(cinema)"
-                    class="fa fa-heart pl-1 heart" 
-                    aria-hidden="true"></i>
+              <span>{{cinema.name}}</span>
+              @if (isFavoriteCinema(cinema)) {
+                <i
+                  class="fa fa-heart ps-1 heart"
+                aria-hidden="true"></i>
+              }
             </div>
-
-            <div 
+            @if (!alhpabeticalSearch) {
+              <div
                 class="button-right location-info"
-                *ngIf="!alhpabeticalSearch"
                 >
-                <span class="mr-1">{{displayDistance(cinema)}}</span>
-                <i 
-                    class="fa fa-arrow-circle-up"
-                    [ngStyle]="{'transform': getBearingStyle(cinema)}"
-                    aria-hidden="true">
+                <span class="me-1">{{displayDistance(cinema)}}</span>
+                <i
+                  class="fa fa-arrow-circle-up"
+                  [ngStyle]="{'transform': getBearingStyle(cinema)}"
+                  aria-hidden="true">
                 </i>
-            </div>
-        </button>
-    
-    </div>
+              </div>
+            }
+          </button>
+        }
+      </div>
+    }
 
-    <div 
-        *ngIf="cinemaList == null" 
+    @if (cinemaList == null) {
+      <div
         class="d-flex align-items-center pt-2">
-            <span class="spinner-border text-primary mr-2"></span>
-            <span>Loading...</span>
-    </div>
-</div>
-
+        <span class="spinner-border text-primary me-2"></span>
+        <span>Loading...</span>
+      </div>
+    }
+  </div>

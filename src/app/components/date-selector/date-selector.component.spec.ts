@@ -1,5 +1,5 @@
 import { DateSelectorComponent } from './date-selector.component';
-import * as momentImport from 'moment';
+import moment from 'moment';
 
 describe('DateSelectorComponent', () => {
 
@@ -7,18 +7,16 @@ describe('DateSelectorComponent', () => {
         return new DateSelectorComponent({snapshot: {params: {}}} as any, {} as any);
     }
 
-    const originalMoment = {...momentImport};
-
     function mockedNow() {
         return new Date(2019, 0, 27).getTime();
     }
 
     beforeAll(() => {
-        (momentImport as any).now = mockedNow;
+        vi.spyOn(moment, 'now').mockImplementation(mockedNow);
     });
 
     afterAll(() => {
-        (momentImport as any).now = originalMoment.now;
+        vi.restoreAllMocks();
     });
 
     it('should create', () => {

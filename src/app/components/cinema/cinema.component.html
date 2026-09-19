@@ -1,80 +1,85 @@
 <div class="cinema container">
-    
-    <cinema-header [cinema]="cinema"></cinema-header>
 
-    <div *ngIf="errorMessage != null" class="alert alert-danger" role="alert">{{errorMessage}}</div>
+  <cinema-header [cinema]="cinema"></cinema-header>
 
-    <date-selector (selectedDate)="selectDate($event)"></date-selector>
+  @if (errorMessage != null) {
+    <div class="alert alert-danger" role="alert">{{errorMessage}}</div>
+  }
 
-    <div class="mt-2">
-        <h3>Films:</h3>
+  <date-selector (selectedDate)="selectDate($event)"></date-selector>
 
-        <attribute-selector
-        [events]="events"
-        [selectedFilms]="filmList"
-        [showTrailer]="false"
-        (filters)="onAttributeFiltersChanged($event)"
-        ></attribute-selector>
+  <div class="mt-2">
+    <h3>Films:</h3>
 
-        <div 
-            *ngIf="filteredFilmList != null && filteredFilmList.length > 0"
-            class="film-container pt-2"
-            >
-    
-            <div *ngFor="let film of filteredFilmList" class="mb-2 d-flex align-items-center" >
+    <attribute-selector
+      [events]="events"
+      [selectedFilms]="filmList"
+      [showTrailer]="false"
+      (filters)="onAttributeFiltersChanged($event)"
+    ></attribute-selector>
 
-                    <button 
-                        type="button"
-                        class="btn btn-primary btn-block mr-2"
-                        (click)="toggleFilm(film)"
-                        [ngClass]="{'active': isFilmSelected(film)}"
-                        >
-                        {{film.name}}
-                    </button>
-
-                    <div class="mr-2">
-                        <a 
-                            class="icon-link"
-                            *ngIf="film.videoLink != null && film.videoLink != ''" 
-                            href="{{film.videoLink}}" 
-                            target="_blank">
-                            <i 
-                                class="fa fa-youtube-play fa-youtube-play-enabled"
-                                aria-hidden="true"
-                                ></i>
-                        </a>
-                        <i 
-                            *ngIf="film.videoLink == null || film.videoLink == ''" 
-                            class="fa fa-youtube-play fa-youtube-play-disabled"
-                            aria-hidden="true"
-                            ></i>
-                    </div>
-
-                    <div class="icon-link">
-                        <a href="{{film.link}}" target="_blank">
-                            <i 
-                                class="fa fa-film" 
-                                aria-hidden="true"
-                                ></i>
-                        </a>
-                    </div>
+    @if (filteredFilmList != null && filteredFilmList.length > 0) {
+      <div
+        class="film-container pt-2"
+        >
+        @for (film of filteredFilmList; track film) {
+          <div class="mb-2 d-flex align-items-center" >
+            <button
+              type="button"
+              class="btn btn-primary w-100 me-2"
+              (click)="toggleFilm(film)"
+              [ngClass]="{'active': isFilmSelected(film)}"
+              >
+              {{film.name}}
+            </button>
+            <div class="me-2">
+              @if (film.videoLink != null && film.videoLink != '') {
+                <a
+                  class="icon-link"
+                  href="{{film.videoLink}}"
+                  target="_blank">
+                  <i
+                    class="fa fa-youtube-play fa-youtube-play-enabled"
+                    aria-hidden="true"
+                  ></i>
+                </a>
+              }
+              @if (film.videoLink == null || film.videoLink == '') {
+                <i
+                  class="fa fa-youtube-play fa-youtube-play-disabled"
+                  aria-hidden="true"
+                ></i>
+              }
             </div>
-    
-        </div>
-    
-        <div *ngIf="filmList != null && filmList.length === 0">No Listings</div>
-    
-        <div 
-            *ngIf="filmList == null" 
-            class="d-flex align-items-center pt-2">
-                <span class="spinner-border text-primary mr-2"></span>
-                <span>Loading...</span>
-        </div>
-    </div>
+            <div class="icon-link">
+              <a href="{{film.link}}" target="_blank">
+                <i
+                  class="fa fa-film"
+                  aria-hidden="true"
+                ></i>
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+    }
 
-    <event-list
-        [events]="events"
-        [selectedFilms]="selectedFilms"
-        ></event-list>
+    @if (filmList != null && filmList.length === 0) {
+      <div>No Listings</div>
+    }
+
+    @if (filmList == null) {
+      <div
+        class="d-flex align-items-center pt-2">
+        <span class="spinner-border text-primary me-2"></span>
+        <span>Loading...</span>
+      </div>
+    }
+  </div>
+
+  <event-list
+    [events]="events"
+    [selectedFilms]="selectedFilms"
+  ></event-list>
 
 </div>

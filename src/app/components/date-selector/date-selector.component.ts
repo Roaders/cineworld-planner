@@ -1,11 +1,13 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import moment from 'moment';
 import { IDay } from 'src/contracts/contracts';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'date-selector',
-    templateUrl: './date-selector.component.html'
+    templateUrl: './date-selector.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class DateSelectorComponent implements OnInit {
 

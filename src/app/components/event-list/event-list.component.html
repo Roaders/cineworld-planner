@@ -1,62 +1,60 @@
 
-<div class="mt-2 event-list" *ngIf="selectedFilms.length > 0">
-
+@if (selectedFilms.length > 0) {
+  <div class="mt-2 event-list">
     <h3>Listings</h3>
-
-    <div *ngFor="let error of errors" class="alert alert-danger" role="alert">{{error}}</div>
-
+    @for (error of errors; track error) {
+      <div class="alert alert-danger" role="alert">{{error}}</div>
+    }
     <attribute-selector
-        [events]="events"
-        [selectedFilms]="selectedFilms"
-        (filters)="onAttributeFiltersChanged($event)"
-        [trailerAllowance]="trailerAllowance"
-        (trailerAllowanceChange)="trailerAllowance = $event"
-        (startAfter)="updateStartAfter($event)"
-        (finishBefore)="updateFinishBefore($event)"
-        ></attribute-selector>
-
+      [events]="events"
+      [selectedFilms]="selectedFilms"
+      (filters)="onAttributeFiltersChanged($event)"
+      [trailerAllowance]="trailerAllowance"
+      (trailerAllowanceChange)="trailerAllowance = $event"
+      (startAfter)="updateStartAfter($event)"
+      (finishBefore)="updateFinishBefore($event)"
+    ></attribute-selector>
     <div id="listingsContainer">
-        <button 
-            *ngFor="let event of eventsList"
-            type="button"
-            class="btn btn-sm event-button btn-block d-flex position-relative"
-            [ngClass]="getEventButtonClass(event)"
-            (click)="toggleEvent(event)"
-            >
-
+      @for (event of eventsList; track event) {
+        <button
+          type="button"
+          class="btn btn-sm event-button w-100 d-flex position-relative"
+          [ngClass]="getEventButtonClass(event)"
+          (click)="toggleEvent(event)"
+          >
+          @for (span of getTimeSpans(event); track span) {
             <div
-                *ngFor="let span of getTimeSpans(event)" 
-                class="position-absolute" 
-                [ngClass]="span.spanClass"
-                [ngStyle]="span.style">
+              class="position-absolute"
+              [ngClass]="span.spanClass"
+              [ngStyle]="span.style">
             </div>
-
-            <div class="d-inline">
-                <i 
-                    class="fa"
-                    [ngClass]="{'fa-check': isEventSelected(event), 'fa-square-o': !isEventSelected(event)}"
-                    aria-hidden="true"
-                    >
-                </i>
-                {{getStartTime(event)}} - {{getEndTime(event)}}* {{getEventFilmName(event)}}
-            </div>
-            
-            <div class="d-inline flex-grow-1 text-right">
-                <span 
-                    class="ml-1" 
-                    *ngFor="let attribute of eventAttributes(event)"
-                    title="{{attribute.description}}"
-                    >{{attribute.icon}}</span>
-            </div>
-    
+          }
+          <div class="d-inline">
+            <i
+              class="fa"
+              [ngClass]="{'fa-check': isEventSelected(event), 'fa-square-o': !isEventSelected(event)}"
+              aria-hidden="true"
+              >
+            </i>
+            {{getStartTime(event)}} - {{getEndTime(event)}}* {{getEventFilmName(event)}}
+          </div>
+          <div class="d-inline flex-grow-1 text-end">
+            @for (attribute of eventAttributes(event); track attribute) {
+              <span
+                class="ms-1"
+                title="{{attribute.description}}"
+              >{{attribute.icon}}</span>
+            }
+          </div>
         </button>
+      }
     </div>
-
     <div class="text-muted small">* end time estimated</div>
-</div>
+  </div>
+}
 
 <itinerary-list
-    [selectedEvents]="selectedEvents"
-    [allEvents]="eventsList"
-    [selectedFilms]="selectedFilms"
+  [selectedEvents]="selectedEvents"
+  [allEvents]="eventsList"
+  [selectedFilms]="selectedFilms"
 ></itinerary-list>
