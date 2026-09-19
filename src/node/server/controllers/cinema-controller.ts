@@ -1,10 +1,31 @@
 import { Request, Response } from 'express';
-import { map, shareReplay } from 'rxjs/operators';
-import { ICinema } from '../../../contracts/contracts';
-import { defer, from, Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
+import { defer, Observable } from 'rxjs';
 import axios, { AxiosError } from 'axios';
+import { ICinema } from '../../../contracts/contracts';
+import {
+    ICineworldMovie,
+    ICineworldScheduleResponse,
+    ICineworldTheaterResponse,
+    mapListings,
+    mapTheaters,
+} from './cineworld-mapper';
 
-const CINEWORLD_HOMEPAGE_URL = `https://www.cineworld.co.uk`;
+const CINEWORLD_URL = `https://www.cineworld.co.uk`;
+const CINEMAS_PAGE_DATA_URL = `${CINEWORLD_URL}/page-data/cinemas/page-data.json`;
+// Gatsby hashes the static GraphQL query text, not its cinema data. This remains stable across content rebuilds.
+const THEATER_STATIC_QUERY_HASH = '2506275789';
+const CINEMA_LIST_URL = getStaticQueryUrl(THEATER_STATIC_QUERY_HASH);
+
+interface ICinemasPageData {
+    staticQueryHashes: string[];
+}
+
+interface IHttpResult {
+    data: unknown;
+}
+
+type GetJson = (url: string) => Promise<IHttpResult>;
 
 interface ITimeoutCache {
     stream: Observable<any>;
@@ -22,7 +43,7 @@ export class CinemaController {
         console.log(`Request: ${request.url}`);
 
         const now = Date.now();
-        let cachedStream = this._cache[CINEWORLD_HOMEPAGE_URL];
+        let cachedStream = this._cache[CINEMA_LIST_URL];
 
         if (cachedStream == null || now > cachedStream.expiry) {
 
@@ -33,7 +54,7 @@ export class CinemaController {
                 )
             };
 
-            this._cache[CINEWORLD_HOMEPAGE_URL] = cachedStream;
+            this._cache[CINEMA_LIST_URL] = cachedStream;
         }
 
         cachedStream.stream.subscribe(
@@ -65,29 +86,32 @@ export class CinemaController {
         }
 
         cachedStream.stream.subscribe(
-                result => response.json(result.data),
+                result => response.json(result),
                 error => this.handleError(response, error, `ERROR getting listing for cinema ${cinema} on date ${date}`)
             );
     }
 
     private getListingsObservable(cinema: string, date: string) {
+        return defer(async () => {
+            const scheduleUrl = getScheduleUrl(cinema, date);
+            console.log(`Loading list from ${scheduleUrl}`);
 
-        return defer(() => {
-            const url = getListingsUrl(cinema, date);
-            console.log(`Loading list from ${url}`);
+            const scheduleResponse = await axios.get<ICineworldScheduleResponse>(scheduleUrl);
+            const schedule = scheduleResponse.data[cinema]?.schedule || {};
+            const movieIds = Object.keys(schedule);
+            const movies = movieIds.length === 0
+                ? []
+                : (await axios.get<ICineworldMovie[]>(getMoviesUrl(movieIds))).data;
 
-            return axios.get(url);
+            return mapListings(cinema, schedule, movies);
         });
     }
 
     private getCinemaListObservable() {
+        return defer(async () => {
+            console.log(`Loading cinema list from ${CINEMA_LIST_URL}`);
 
-        return defer(() => {
-            console.log(`Loading cinema list from ${CINEWORLD_HOMEPAGE_URL}`);
-
-            return from(axios.get(CINEWORLD_HOMEPAGE_URL, {responseType: 'text'})).pipe(
-                map(result => processRawHtml(result.data))
-            );
+            return loadCinemaList(url => axios.get(url));
         });
     }
 
@@ -114,20 +138,77 @@ export class CinemaController {
     }
 }
 
-function getListingsUrl(externalCode: string, date: string) {
-    // tslint:disable-next-line: max-line-length
-    return `https://www.cineworld.co.uk/uk/data-api-service/v1/quickbook/10108/film-events/in-cinema/${externalCode}/at-date/${date}`;
+function getScheduleUrl(cinemaId: string, date: string) {
+    const nextDate = new Date(`${date}T00:00:00Z`);
+    nextDate.setUTCDate(nextDate.getUTCDate() + 1);
+
+    const params = new URLSearchParams({
+        from: `${date}T03:00:00`,
+        theaters: JSON.stringify({id: cinemaId, timeZone: 'Europe/London'}),
+        to: `${nextDate.toISOString().substring(0, 10)}T03:00:00`,
+    });
+
+    return `${CINEWORLD_URL}/api/gatsby-source-boxofficeapi/schedule?${params}`;
 }
 
-const apiSitesListRegExp = /apiSitesList *= *(\[[^]+?\])/;
+function getMoviesUrl(movieIds: string[]) {
+    const params = new URLSearchParams({basic: 'false', castingLimit: '3'});
+    movieIds.forEach(movieId => params.append('ids', movieId));
 
-function processRawHtml(rawHtml: string): ICinema[] {
-    const regExpResult = apiSitesListRegExp.exec(rawHtml);
-    const sitesListString = regExpResult != null ? regExpResult[1] : undefined;
+    return `${CINEWORLD_URL}/api/gatsby-source-boxofficeapi/movies?${params}`;
+}
 
-    if (sitesListString) {
-        return JSON.parse(sitesListString);
+export async function loadCinemaList(getJson: GetJson): Promise<ICinema[]> {
+    try {
+        const result = await getJson(CINEMA_LIST_URL);
+        if (isTheaterResponse(result.data)) {
+            return mapTheaters(result.data);
+        }
+    } catch (error) {
+        console.warn(`Could not load known Cineworld theater query; discovering current query hash.`);
     }
 
-    throw new Error('Could not retrieve sites list from html');
+    const pageDataResult = await getJson(CINEMAS_PAGE_DATA_URL);
+    if (!isCinemasPageData(pageDataResult.data)) {
+        throw new Error('Could not retrieve Cineworld cinema page data');
+    }
+
+    for (const hash of pageDataResult.data.staticQueryHashes) {
+        if (hash === THEATER_STATIC_QUERY_HASH) {
+            continue;
+        }
+
+        try {
+            const result = await getJson(getStaticQueryUrl(hash));
+            if (isTheaterResponse(result.data)) {
+                return mapTheaters(result.data);
+            }
+        } catch (error) {
+            // An unrelated static query may be unavailable without preventing discovery.
+        }
+    }
+
+    throw new Error('Could not discover Cineworld theater query');
+}
+
+function getStaticQueryUrl(hash: string) {
+    return `${CINEWORLD_URL}/page-data/sq/d/${hash}.json`;
+}
+
+function isCinemasPageData(value: unknown): value is ICinemasPageData {
+    const pageData = value as ICinemasPageData;
+    return pageData != null && Array.isArray(pageData.staticQueryHashes);
+}
+
+function isTheaterResponse(value: unknown): value is ICineworldTheaterResponse {
+    const response = value as ICineworldTheaterResponse;
+    const theaters = response?.data?.allTheater?.nodes;
+
+    return Array.isArray(theaters) && theaters.length > 0 && theaters.every(theater =>
+        typeof theater.id === 'string'
+        && typeof theater.name === 'string'
+        && typeof theater.path === 'string'
+        && theater.practicalInfo?.coordinates != null
+        && theater.practicalInfo?.location != null
+    );
 }
