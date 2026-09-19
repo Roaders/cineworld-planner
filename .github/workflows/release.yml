@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - name: Use Node.js 26.x
+      uses: actions/setup-node@v7
+      with:
+        node-version: 26.x
+        cache: npm
+    - run: npm ci
+    - name: Validate version tag
+      id: version
+      shell: bash
+      run: |
+        PACKAGE_VERSION=$(node -p "require('./package.json').version")
+        if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/master; then
+          echo "Release tag must point to a commit on master" >&2
+          exit 1
+        fi
+        if [ "$GITHUB_REF_NAME" != "v$PACKAGE_VERSION" ]; then
+          echo "Tag $GITHUB_REF_NAME does not match package version $PACKAGE_VERSION" >&2
+          exit 1
+        fi
+        echo "value=$PACKAGE_VERSION" >> "$GITHUB_OUTPUT"
+    - run: npm run verify-release
+    - name: Upload website artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: dist/cineworld-planner/browser
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v4
+      with:
+        username: roaders
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v4
+    - name: Build and publish API image
+      uses: docker/build-push-action@v7
+      with:
+        context: .
+        push: true
+        tags: |
+          roaders/cineworldplanner:${{ steps.version.outputs.value }}
+          roaders/cineworldplanner:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  deploy-website:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - name: Deploy website to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v5

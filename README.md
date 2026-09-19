@@ -81,7 +81,15 @@ Useful individual commands:
 
 ## Deployment
 
-Pushes and pull requests to `master` run `npm run verify-release` with Node 26 in GitHub Actions.
+Pushes and pull requests to `master` run `npm run verify-release` with Node 26 in GitHub Actions. They do not deploy the website or publish a container.
+
+A version tag triggers the release workflow. It verifies the application, publishes the website to GitHub Pages, and pushes versioned and `latest` API images to Docker Hub. A separate GitHub Release page is not required.
+
+Before the first release:
+
+1. In the repository's **Settings → Pages**, set the source to **GitHub Actions**.
+2. Add a repository Actions secret named `DOCKERHUB_TOKEN` containing a Docker Hub access token with permission to write `roaders/cineworldplanner`.
+3. If the `github-pages` environment restricts deployment sources, allow tags matching `v*`.
 
 ### API container
 
@@ -119,14 +127,16 @@ docker run --name cineworldplanner --rm \
   roaders/cineworldplanner:latest
 ```
 
-`npm run build-release` has an external side effect: after verification it builds both `latest` and versioned image tags and pushes all tags to Docker Hub. Only run it when authenticated and intending to publish.
-
 ### Frontend
 
-Run `npm run build-prod`, then publish the contents of `dist/cineworld-planner/browser` to the static web host.
-
-A legacy FTP uploader remains available through `npm run run-release` and reads `FTP_HOST`, `FTP_USER`, and `FTP_PASSWORD`. It predates the current Angular output layout, so review its destination and paths before using it.
+The release workflow publishes `dist/cineworld-planner/browser` to GitHub Pages. Until a custom domain is configured, the site is available at `https://roaders.github.io/cineworld-planner/`.
 
 ### Versioning
 
-`npm run push` increments the patch version, creates the corresponding Git commit and tag, and pushes the branch and tags to `origin`. Run it only when the release is ready to publish.
+To publish a patch release from a clean `master` branch:
+
+```sh
+npm run release
+```
+
+This increments the patch version, creates the version commit and `vX.Y.Z` tag, and pushes them to `origin`. Pushing the tag starts the release workflow; normal branch pushes never deploy. The workflow rejects tags that are not on `master` or do not match the version in `package.json`.
