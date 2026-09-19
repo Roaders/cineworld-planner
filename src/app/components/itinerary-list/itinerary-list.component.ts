@@ -1,8 +1,7 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, DoCheck } from '@angular/core';
 import { IEvent, IFilm } from 'src/contracts/contracts';
 import moment, { Moment } from 'moment';
 import { getStartMoment, formatTime, getEndMoment, getEventFilmName } from 'src/app/helper/event-helper';
-import { PreferencesService } from 'src/app/services/preferences.service';
 import { IInteraryBase, IItineraryItem } from 'src/app/contracts/contracts';
 
 interface IInteraryMoment extends IInteraryBase {
@@ -16,10 +15,8 @@ interface IInteraryMoment extends IInteraryBase {
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
-export class ItineraryListComponent {
-
-    constructor(private preferencesService: PreferencesService) {
-    }
+export class ItineraryListComponent implements DoCheck {
+    private itinerariesDirty = false;
 
     private _allEvents: IEvent[] = [];
 
@@ -29,7 +26,13 @@ export class ItineraryListComponent {
     }
 
     public set allEvents(value: IEvent[]) {
-        this._allEvents = value || [];
+        value = value || [];
+        if (arraysEqual(value, this._allEvents)) {
+            return;
+        }
+
+        this._allEvents = value;
+        this.itinerariesDirty = true;
     }
 
     private _selectedFilms: IFilm[] = [];
@@ -40,11 +43,41 @@ export class ItineraryListComponent {
     }
 
     public set selectedFilms(value: IFilm[]) {
-        this._selectedFilms = value || [];
+        value = value || [];
+        if (arraysEqual(value, this._selectedFilms)) {
+            return;
+        }
+
+        this._selectedFilms = value;
+        this.itinerariesDirty = true;
     }
 
-    public get trailerAllowance() {
-        return this.preferencesService.getTrailerAllowance();
+    private _trailerAllowance = 0;
+
+    @Input()
+    public get trailerAllowance(): number {
+        return this._trailerAllowance;
+    }
+
+    public set trailerAllowance(value: number) {
+        if (value === this._trailerAllowance) {
+            return;
+        }
+
+        this._trailerAllowance = value;
+        this.itinerariesDirty = true;
+    }
+
+    private _maxBreakLength = 0;
+
+    @Input()
+    public set maxBreakLength(value: number) {
+        if (value === this._maxBreakLength) {
+            return;
+        }
+
+        this._maxBreakLength = value;
+        this.itinerariesDirty = true;
     }
 
     private _selectedEvents: IEvent[] = [];
@@ -55,15 +88,34 @@ export class ItineraryListComponent {
     }
 
     public set selectedEvents(value: IEvent[]) {
-        this._selectedEvents = value || [];
+        value = value || [];
+        if (arraysEqual(value, this._selectedEvents)) {
+            return;
+        }
+
+        this._selectedEvents = value;
+        this.itinerariesDirty = true;
     }
+
+    private _itineraryList: IItineraryItem[][] = [];
 
     public get itineraryList(): IItineraryItem[][] {
-        return this.generateEventLists().map(eventList => this.createItinerary(eventList));
+        return this._itineraryList;
     }
 
+    private _itinerary: IItineraryItem[] = [];
+
     public get itinerary(): IItineraryItem[] {
-        return this.createItinerary(this.selectedEvents);
+        return this._itinerary;
+    }
+
+    public ngDoCheck(): void {
+        if (!this.itinerariesDirty) {
+            return;
+        }
+
+        this.updateItineraries();
+        this.itinerariesDirty = false;
     }
 
     public getStartTime(itinerary: IItineraryItem[]): string {
@@ -71,7 +123,7 @@ export class ItineraryListComponent {
     }
 
     private createItinerary(events: IEvent[]): IItineraryItem[] {
-        return events
+        return [...events]
             .sort(sortEvents)
             .map(event => this.createMomentItinerary(event))
             .reduce((all, item) => this.addNextEvent(all, item), new Array<IInteraryMoment>())
@@ -84,6 +136,12 @@ export class ItineraryListComponent {
                 alertClass,
                 isEvent
             }));
+    }
+
+    private updateItineraries(): void {
+        this._itinerary = this.createItinerary(this.selectedEvents);
+        this._itineraryList = this.generateEventLists()
+            .map(eventList => this.createItinerary(eventList));
     }
 
     private addNextEvent(all: IInteraryMoment[], item: IInteraryMoment): IInteraryMoment[] {
@@ -159,7 +217,7 @@ export class ItineraryListComponent {
                 const eventStart = moment(event.eventDateTime);
                 return events.every(existingEvent => existingEvent.filmId !== event.filmId) &&
                     eventStart.isAfter(lastEventEnd) &&
-                    eventStart.diff(lastEventEnd, 'minutes') < this.preferencesService.getMaxBreakLength();
+                    eventStart.diff(lastEventEnd, 'minutes') < this._maxBreakLength;
             });
 
         if (subsequentEvents.length === 0) {
@@ -177,4 +235,8 @@ function sortEvents(one: IEvent, two: IEvent): number {
     const twoTime = moment(two.eventDateTime).toDate().getTime();
 
     return oneTime - twoTime;
+}
+
+function arraysEqual<T>(one: T[], two: T[]): boolean {
+    return one.length === two.length && one.every((item, index) => item === two[index]);
 }

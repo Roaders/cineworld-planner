@@ -23,6 +23,7 @@ export class EventListComponent {
 
     constructor(preferencesService: PreferencesService) {
         this.trailerAllowance = preferencesService.getTrailerAllowance();
+        this.maxBreakLength = preferencesService.getMaxBreakLength();
     }
 
     public get errors() {
@@ -75,6 +76,8 @@ export class EventListComponent {
     private _selectedEvents: IEvent[] = [];
 
     public trailerAllowance: number;
+
+    public maxBreakLength: number;
 
     private _events: IEvent[] | undefined;
 
@@ -190,7 +193,7 @@ export class EventListComponent {
         if (this.isEventSelected(event)) {
             this._selectedEvents = this._selectedEvents.filter(selectedEvent => selectedEvent.id !== event.id);
         } else {
-            this._selectedEvents.push(event);
+            this._selectedEvents = [...this._selectedEvents, event];
         }
     }
 

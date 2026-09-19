@@ -11,6 +11,8 @@
       (filters)="onAttributeFiltersChanged($event)"
       [trailerAllowance]="trailerAllowance"
       (trailerAllowanceChange)="trailerAllowance = $event"
+      [maxBreakLength]="maxBreakLength"
+      (maxBreakLengthChange)="maxBreakLength = $event"
       (startAfter)="updateStartAfter($event)"
       (finishBefore)="updateFinishBefore($event)"
     ></attribute-selector>
@@ -57,4 +59,6 @@
   [selectedEvents]="selectedEvents"
   [allEvents]="eventsList"
   [selectedFilms]="selectedFilms"
+  [trailerAllowance]="trailerAllowance"
+  [maxBreakLength]="maxBreakLength"
 ></itinerary-list>

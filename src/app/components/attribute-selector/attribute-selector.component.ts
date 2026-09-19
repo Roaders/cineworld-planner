@@ -55,8 +55,9 @@ export class AttributeSelectorComponent implements OnInit {
         return this._showFilters;
     }
 
-    public get maxBreakLength() {
-        return this.preferencesService.getMaxBreakLength();
+    @Input()
+    public get maxBreakLength(): number {
+        return this._maxBreakLength;
     }
 
     public set maxBreakLength(value: number) {
@@ -64,6 +65,12 @@ export class AttributeSelectorComponent implements OnInit {
             value = 0;
         }
 
+        if (value === this._maxBreakLength) {
+            return;
+        }
+
+        this._maxBreakLength = value;
+        this.maxBreakLengthChange.emit(value);
         this.preferencesService.setMaxBreakLength(value);
     }
 
@@ -164,6 +171,11 @@ export class AttributeSelectorComponent implements OnInit {
 
     @Output()
     public readonly trailerAllowanceChange = new EventEmitter<number>();
+
+    private _maxBreakLength = 0;
+
+    @Output()
+    public readonly maxBreakLengthChange = new EventEmitter<number>();
 
     private _expand = false;
 
