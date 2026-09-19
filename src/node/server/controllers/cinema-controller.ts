@@ -19,6 +19,11 @@ const THEATER_STATIC_QUERY_HASH = '2506275789';
 const CINEMA_LIST_URL = getStaticQueryUrl(THEATER_STATIC_QUERY_HASH);
 const CINEMA_CODE_PATTERN = /^[A-Z0-9]{5}$/;
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const MAX_CACHE_ENTRIES = 500;
+const CINEWORLD_REQUEST_CONFIG = {
+    timeout: 10 * 1000,
+    maxContentLength: 2 * 1024 * 1024,
+};
 
 interface ICinemasPageData {
     staticQueryHashes: string[];
@@ -43,27 +48,16 @@ const MAX_LISTINGS_CACHE_AGE = 1000 * 60 * 10; // Cache for 10 minutes
 
 export class CinemaController {
 
-    private _cache: {[url: string]: ITimeoutCache | undefined} = {};
+    private _cache = new Map<string, ITimeoutCache>();
 
     public getCinemas(request: Request, response: Response ) {
         console.log(`Request: ${request.url}`);
 
-        const now = Date.now();
-        let cachedStream = this._cache[CINEMA_LIST_URL];
-
-        if (cachedStream == null || now > cachedStream.expiry) {
-
-            cachedStream = {
-                expiry: now + MAX_CINEMA_LIST_CACHE_AGE,
-                stream: this.getCinemaListObservable().pipe(
-                    shareReplay()
-                )
-            };
-
-            this._cache[CINEMA_LIST_URL] = cachedStream;
-        }
-
-        cachedStream.stream.subscribe(
+        this.getCachedStream(
+            CINEMA_LIST_URL,
+            MAX_CINEMA_LIST_CACHE_AGE,
+            () => this.getCinemaListObservable()
+        ).subscribe(
             cinemas =>  response.json(cinemas),
             error => this.handleError(response, error, `ERROR getting cinema list`)
         );
@@ -81,25 +75,44 @@ export class CinemaController {
         }
 
         const cacheKey = `listings_${cinema}_${date}`;
-        const now = Date.now();
-        let cachedStream = this._cache[cacheKey];
-
-        if (cachedStream == null || now > cachedStream.expiry) {
-
-            cachedStream = {
-                expiry: now + MAX_LISTINGS_CACHE_AGE,
-                stream: this.getListingsObservable(cinema, date).pipe(
-                    shareReplay()
-                )
-            };
-
-            this._cache[cacheKey] = cachedStream;
-        }
-
-        cachedStream.stream.subscribe(
+        this.getCachedStream(
+            cacheKey,
+            MAX_LISTINGS_CACHE_AGE,
+            () => this.getListingsObservable(cinema, date)
+        ).subscribe(
                 result => response.json(result),
                 error => this.handleError(response, error, `ERROR getting listing for cinema ${cinema} on date ${date}`)
             );
+    }
+
+    private getCachedStream(cacheKey: string, maxAge: number, createStream: () => Observable<any>) {
+        const now = Date.now();
+        const cached = this._cache.get(cacheKey);
+
+        if (cached != null && now <= cached.expiry) {
+            return cached.stream;
+        }
+
+        if (cached != null) {
+            this._cache.delete(cacheKey);
+        }
+
+        for (const [key, value] of this._cache) {
+            if (now > value.expiry) {
+                this._cache.delete(key);
+            }
+        }
+
+        while (this._cache.size >= MAX_CACHE_ENTRIES) {
+            const oldestKey = this._cache.keys().next().value;
+            if (oldestKey != null) {
+                this._cache.delete(oldestKey);
+            }
+        }
+
+        const stream = createStream().pipe(shareReplay());
+        this._cache.set(cacheKey, {stream, expiry: now + maxAge});
+        return stream;
     }
 
     private getListingsObservable(cinema: string, date: string) {
@@ -107,7 +120,7 @@ export class CinemaController {
             const scheduleUrl = getScheduleUrl(cinema, date);
             console.log(`Loading list from ${scheduleUrl}`);
 
-            const scheduleResponse = await axios.get<unknown>(scheduleUrl);
+            const scheduleResponse = await axios.get<unknown>(scheduleUrl, CINEWORLD_REQUEST_CONFIG);
             if (!isCineworldScheduleResponse(scheduleResponse.data)) {
                 throw new InvalidCineworldResponseError('Cineworld returned an invalid schedule response');
             }
@@ -117,7 +130,7 @@ export class CinemaController {
             let movies: ICineworldMovie[] = [];
 
             if (movieIds.length > 0) {
-                const moviesResponse = await axios.get<unknown>(getMoviesUrl(movieIds));
+                const moviesResponse = await axios.get<unknown>(getMoviesUrl(movieIds), CINEWORLD_REQUEST_CONFIG);
                 if (!isCineworldMovieResponse(moviesResponse.data)) {
                     throw new InvalidCineworldResponseError('Cineworld returned an invalid movie response');
                 }
@@ -137,7 +150,7 @@ export class CinemaController {
         return defer(async () => {
             console.log(`Loading cinema list from ${CINEMA_LIST_URL}`);
 
-            return loadCinemaList(url => axios.get(url));
+            return loadCinemaList(url => axios.get(url, CINEWORLD_REQUEST_CONFIG));
         });
     }
 
