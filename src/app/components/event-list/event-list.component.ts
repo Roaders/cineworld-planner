@@ -271,7 +271,9 @@ export class EventListComponent {
     private getOverallTimespan() {
         const displayedEvents = this.eventsList;
 
-        const spanStartDate = getStartDate(displayedEvents[0]);
+        const spanStartDate = displayedEvents
+            .map(event => getStartDate(event))
+            .reduce((earliest, current) => current < earliest ? current : earliest);
 
         if (spanStartDate == null) {
             let errorMessage = `could not calculate timespan: `;

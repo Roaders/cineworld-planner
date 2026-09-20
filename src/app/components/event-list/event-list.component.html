@@ -24,7 +24,7 @@
           [ngClass]="getEventButtonClass(event)"
           (click)="toggleEvent(event)"
           >
-          @for (span of getTimeSpans(event); track span) {
+          @for (span of getTimeSpans(event); track span.spanClass) {
             <div
               class="position-absolute"
               [ngClass]="span.spanClass"
