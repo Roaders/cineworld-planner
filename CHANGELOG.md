@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Made preference service tests independent of the test runner's `localStorage` implementation.
+
 ## [1.6.6] - 2026-09-20
 
 ### Added

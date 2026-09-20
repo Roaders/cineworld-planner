@@ -2,8 +2,17 @@ import { PreferencesService } from './preferences.service';
 
 describe('PreferencesService', () => {
     const service = new PreferencesService();
+    let storedValues: Record<string, string>;
 
-    beforeEach(() => localStorage.clear());
+    beforeEach(() => {
+        storedValues = {};
+        vi.stubGlobal('localStorage', {
+            getItem: (key: string) => storedValues[key] ?? null,
+            setItem: (key: string, value: string) => storedValues[key] = value,
+        });
+    });
+
+    afterEach(() => vi.unstubAllGlobals());
 
     it('converts trailer allowances saved by the former text input to numbers', () => {
         localStorage.setItem('trailerAllowance', JSON.stringify('25'));
