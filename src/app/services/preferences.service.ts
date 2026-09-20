@@ -22,8 +22,7 @@ export class PreferencesService {
 
     /** Loads the saved trailer allowance or its default. */
     public getTrailerAllowance(): number {
-        const filtersString = localStorage.getItem(TRAILER_ALLOWANCE_STORAGE_KEY);
-        return filtersString ? JSON.parse(filtersString) : 30;
+        return this.getStoredNonNegativeNumber(TRAILER_ALLOWANCE_STORAGE_KEY, 30);
     }
 
     /** Saves the trailer allowance. */
@@ -33,8 +32,7 @@ export class PreferencesService {
 
     /** Loads the saved maximum break length or its default. */
     public getMaxBreakLength(): number {
-        const filtersString = localStorage.getItem(MAX_BREAK_LENGTH_STORAGE_KEY);
-        return filtersString ? JSON.parse(filtersString) : 30;
+        return this.getStoredNonNegativeNumber(MAX_BREAK_LENGTH_STORAGE_KEY, 30);
     }
 
     /** Saves the maximum break length. */
@@ -68,5 +66,13 @@ export class PreferencesService {
     public getFavoriteCinemaIds(): string[] {
         const savedIds = localStorage.getItem(FAVORITE_CINEMA_STORAGE_KEY);
         return savedIds != null ? JSON.parse(savedIds) : new Array<string>();
+    }
+
+    /** Loads a numeric preference, including values saved by the former text inputs. */
+    private getStoredNonNegativeNumber(key: string, fallback: number): number {
+        const storedValue = localStorage.getItem(key);
+        const value = storedValue == null ? fallback : Number(JSON.parse(storedValue));
+
+        return Number.isFinite(value) && value >= 0 ? value : fallback;
     }
 }

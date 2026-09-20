@@ -33,10 +33,11 @@ export class AttributeSelectorComponent implements OnInit {
 
     /** Updates and persists the trailer allowance. */
     public set trailerAllowance(value: number) {
+        value = Number(value);
         if (value === this._trailerAllowance) {
             return;
         }
-        if (isNaN(value)) {
+        if (!Number.isFinite(value) || value < 0) {
             value = 0;
         }
 
@@ -66,7 +67,8 @@ export class AttributeSelectorComponent implements OnInit {
 
     /** Updates and persists the maximum break length. */
     public set maxBreakLength(value: number) {
-        if (isNaN(value)) {
+        value = Number(value);
+        if (!Number.isFinite(value) || value < 0) {
             value = 0;
         }
 
