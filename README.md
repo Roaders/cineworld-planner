@@ -2,6 +2,31 @@
 
 An Angular application and Node/Express API for planning multi-film visits to Cineworld.
 
+## Features
+
+- **Find a cinema** — search Cineworld locations by name, mark favourites for quick access, or sort by your current location to see distance and direction.
+
+![Search and select a cinema](docs/screenshots/cinema-selection.png)
+
+- **Browse upcoming listings** — choose a day from the next week and view the films and screening times available at that cinema.
+- **Filter screening formats** — include or exclude formats and accessibility options such as 2D, 3D, 4DX, ScreenX, Superscreen, subtitled, and audio-described screenings.
+- **Open useful links** — jump to Cineworld cinema and film pages, trailers, maps, and booking pages from the planner.
+
+![Choose a date and select films](docs/screenshots/film-selection.png)
+
+- **Compare several films** — select the films you want to see and compare all of their screenings on a colour-coded timeline.
+- **Account for trailers and runtime estimates** — configure the trailer allowance used to estimate when each film finishes.
+- **Narrow the schedule** — restrict listings by earliest start, latest finish, and maximum break length.
+- **Build an itinerary manually** — select individual screenings and immediately see overlaps or breaks in your chosen schedule.
+
+![Compare screenings on the listings timeline](docs/screenshots/listings.png)
+
+- **Generate multi-film itineraries** — automatically find compatible combinations of screenings, including estimated break times between films.
+
+![Review generated multi-film itineraries](docs/screenshots/generated-itineraries.png)
+
+- **Remember preferences** — retain favourite cinemas, saved screening filters, trailer allowance, and maximum break length in the browser.
+
 ## Architecture
 
 - `src/app` contains the Angular frontend.
