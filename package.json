@@ -21,7 +21,7 @@
     "build-prod": "ng build --configuration=production",
     "watch-test": "ng test",
     "verify-release": "concurrently npm:lint npm:build-node npm:test npm:build-prod",
-    "release": "npm version patch && git push origin --follow-tags",
+    "release": "node -e \"const { execFileSync } = require('node:child_process'); const branch = execFileSync('git', ['branch', '--show-current'], { encoding: 'utf8' }).trim(); if (branch !== 'main') { console.error('Release must be run from main (current: ' + (branch || 'detached HEAD') + ').'); process.exit(1); }\" && npm version patch && git push origin --follow-tags",
     "test": "ng test --watch=false",
     "lint": "ng lint"
   },
