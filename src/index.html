@@ -1,13 +1,28 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <title>Cineworld Planner</title>
-  <base href="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <meta charset="utf-8">
+    <title>Cineworld Planner</title>
+    <base href="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+
 </head>
+
 <body>
-  <app-root></app-root>
+    <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+    <script>
+        kofiWidgetOverlay.draw('roaders', {
+            'type': 'floating-chat',
+            'floating-chat.donateButton.text': 'Tip Me',
+            'floating-chat.donateButton.background-color': '#0d6efd',
+            'floating-chat.donateButton.text-color': '#fff'
+        });
+    </script>
+    <app-root></app-root>
+
 </body>
+
 </html>
