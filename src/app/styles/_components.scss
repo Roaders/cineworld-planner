@@ -1,9 +1,9 @@
 
-@import '../components/cinema/cinema.component.scss';
-@import '../components/cinema-list/cinema-list.component.scss';
-@import '../components/cinema-header/cinema-header.component.scss';
-@import '../components/date-selector/date-selector.component.scss';
-@import '../components/event-list/event-list.component.scss';
-@import '../components/itinerary-list/itinerary-list.component.scss';
-@import '../components/itinerary/itinerary.component.scss';
-@import '../components/attribute-selector/attribute-selector.component.scss';
+@use '../components/cinema/cinema.component';
+@use '../components/cinema-list/cinema-list.component';
+@use '../components/cinema-header/cinema-header.component';
+@use '../components/date-selector/date-selector.component';
+@use '../components/event-list/event-list.component';
+@use '../components/itinerary-list/itinerary-list.component';
+@use '../components/itinerary/itinerary.component';
+@use '../components/attribute-selector/attribute-selector.component';

@@ -11,39 +11,43 @@
     $boundaryTwo: 50%;
     $boundaryThree: 90%;
 
-    @each $color, $value in $theme-colors {
+    @each $color in primary, secondary, success, danger, warning, info {
         .event-button-#{$color} {
-            color: $body-color;
-            background-color: rgba($value, 0.25);
-            text-align: left;
-
-            .film-end-timespan, .trailers-timespan {
-                background-image: linear-gradient(45deg, 
-                    $value $boundaryOne, 
-                    transparent $boundaryOne, 
-                    transparent $boundaryTwo, 
-                    $value $boundaryTwo, 
-                    $value $boundaryThree, 
-                    transparent $boundaryThree, 
-                    #fff);
-                background-size: 10px 10px;
-            }
-    
-            .film-timespan{
-                background-color: $value;
-            }
-
-            &:hover{
-                color: $white;
-                background-color: rgba($value, 0.75);
-            }
-
-            &.active{
-                color: $white;
-                background-color: rgba($value, 0.75);
-            }
-
+            --event-color: var(--bs-#{$color}-rgb);
         }
+    }
+
+    [class*='event-button-'] {
+        color: var(--bs-body-color);
+        background-color: rgb(var(--event-color) / 25%);
+        text-align: left;
+
+        .film-end-timespan, .trailers-timespan {
+            background-image: linear-gradient(45deg,
+                rgb(var(--event-color)) $boundaryOne,
+                transparent $boundaryOne,
+                transparent $boundaryTwo,
+                rgb(var(--event-color)) $boundaryTwo,
+                rgb(var(--event-color)) $boundaryThree,
+                transparent $boundaryThree,
+                #fff);
+            background-size: 10px 10px;
+        }
+
+        .film-timespan{
+            background-color: rgb(var(--event-color));
+        }
+
+        &:hover{
+            color: #fff;
+            background-color: rgb(var(--event-color) / 75%);
+        }
+
+        &.active{
+            color: #fff;
+            background-color: rgb(var(--event-color) / 75%);
+        }
+
     }
 
 }
