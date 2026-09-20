@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.6.8] - 2026-09-20
+
 ### Added
 
 - Added an architecture, privacy, deployment, and cost proposal for usage analytics and public statistics.
