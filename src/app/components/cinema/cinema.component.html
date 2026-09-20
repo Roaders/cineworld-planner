@@ -26,10 +26,14 @@
           <div class="mb-2 d-flex align-items-center" >
             <button
               type="button"
-              class="btn btn-primary w-100 me-2"
+              class="film-button btn btn-primary w-100 me-2"
               (click)="toggleFilm(film)"
               [ngClass]="{'active': isFilmSelected(film)}"
+              [attr.aria-pressed]="isFilmSelected(film)"
               >
+              @if (isFilmSelected(film)) {
+                <i class="film-selected-icon fa fa-check" aria-hidden="true"></i>
+              }
               {{film.name}}
             </button>
             <div class="me-2">

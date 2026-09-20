@@ -1,9 +1,29 @@
 
 .cinema{
 
+    .film-button{
+        position: relative;
+        padding-right: 2.5rem;
+        padding-left: 2.5rem;
+    }
+
+    .film-selected-icon{
+        position: absolute;
+        top: 50%;
+        left: 1rem;
+        transform: translateY(-50%);
+    }
+
     .btn-primary:hover{
         background-color: var(--bs-primary);
         border-color: var(--bs-primary);
+    }
+
+    .btn-primary.active,
+    .btn-primary.active:hover{
+        color: var(--bs-btn-active-color);
+        background-color: var(--bs-btn-active-bg);
+        border-color: var(--bs-btn-active-border-color);
     }
     
     .fa-youtube-play-enabled{
@@ -20,4 +40,3 @@
     }
 
 }
-
