@@ -73,7 +73,8 @@ export class EventListComponent {
             .filter(film => this._selectedEvents.every(event => event.filmId !== film.id));
 
         return this.events
-            .filter(event => this.filterEvents(event, filmsToDisplay));
+            .filter(event => this.filterEvents(event, filmsToDisplay))
+            .sort((one, two) => getStartDate(one).getTime() - getStartDate(two).getTime());
     }
 
     private _errors: string[] = [];

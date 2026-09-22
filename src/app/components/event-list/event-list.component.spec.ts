@@ -2,6 +2,25 @@ import { IEvent, IFilm } from 'src/contracts/contracts';
 import { EventListComponent } from './event-list.component';
 
 describe('EventListComponent', () => {
+    it('orders listings by start time rather than grouping them by film', () => {
+        const component = new EventListComponent({
+            getTrailerAllowance: () => 30,
+            getMaxBreakLength: () => 30,
+        } as any);
+        component.selectedFilms = [createFilm('film-one'), createFilm('film-two')];
+        component.events = [
+            createEvent('film-one', '2026-09-20T10:00:00'),
+            createEvent('film-one', '2026-09-20T14:00:00'),
+            createEvent('film-two', '2026-09-20T12:00:00'),
+        ];
+
+        expect(component.eventsList.map(event => event.eventDateTime)).toEqual([
+            '2026-09-20T10:00:00',
+            '2026-09-20T12:00:00',
+            '2026-09-20T14:00:00',
+        ]);
+    });
+
     it('positions spans from the earliest event when listings are not chronological', () => {
         const component = new EventListComponent({
             getTrailerAllowance: () => 30,
