@@ -31,7 +31,7 @@
               [ngStyle]="span.style">
             </div>
           }
-          <div class="d-inline">
+          <div class="d-inline event-label">
             <i
               class="fa"
               [ngClass]="{'fa-check': isEventSelected(event), 'fa-square-o': !isEventSelected(event)}"
@@ -43,7 +43,7 @@
           <div class="d-inline flex-grow-1 text-end">
             @for (attribute of eventAttributes(event); track attribute) {
               <span
-                class="ms-1"
+                class="ms-1 event-attribute"
                 title="{{attribute.description}}"
               >{{attribute.icon}}</span>
             }

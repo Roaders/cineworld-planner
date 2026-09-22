@@ -23,10 +23,19 @@
         background-color: rgba(var(--event-color), 0.25);
         isolation: isolate;
         text-align: left;
+        min-height: 2.75rem;
+        align-items: center;
 
         > .d-inline {
             position: relative;
             z-index: 1;
+        }
+
+        .event-label, .event-attribute:not(:empty) {
+            color: var(--bs-body-color);
+            background-color: rgba(var(--bs-body-bg-rgb), 0.9);
+            border-radius: var(--bs-border-radius-sm);
+            box-shadow: 0 0 0 2px rgba(var(--bs-body-bg-rgb), 0.9);
         }
 
         .film-end-timespan, .trailers-timespan {
