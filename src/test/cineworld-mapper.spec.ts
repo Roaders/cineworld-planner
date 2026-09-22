@@ -43,7 +43,13 @@ describe('Cineworld response mapper', () => {
             longitude: -1.7792,
             name: 'Solihull',
             uri: '/cinemas/x06xl-cineworld-cinema-solihull/',
+            websiteUrl: 'https://www.cineworld.co.uk/cinemas/x06xl-cineworld-cinema-solihull/',
         }]);
+
+        expect(mapTheaters(response, 'https://www.cineworld.ie', 'IE-', '/whats-on/')[0]).toMatchObject({
+            externalCode: 'IE-X06XL',
+            websiteUrl: 'https://www.cineworld.ie/whats-on/x06xl-cineworld-cinema-solihull/',
+        });
     });
 
     it('discovers a replacement theater query when the known Gatsby hash stops working', async () => {
@@ -152,5 +158,8 @@ describe('Cineworld response mapper', () => {
                 }],
             },
         });
+
+        expect(mapListings('IE-X06XL', schedule, movies, 'https://www.cineworld.ie', '/movies/')
+            .body.films[0].link).toBe('https://www.cineworld.ie/movies/movie-1');
     });
 });

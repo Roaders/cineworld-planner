@@ -15,12 +15,12 @@ describe('CinemaController', () => {
         vi.restoreAllMocks();
     });
 
-    it.each(['X079Z', 'G01HN', 'X0FR5'])(
+    it.each(['X079Z', 'G01HN', 'X0FR5', 'IE-X07A4'])(
         'accepts a current Cineworld cinema code: %s',
         cinema => expect(isValidCinemaCode(cinema)).toBe(true)
     );
 
-    it.each(['x079z', 'X079', 'X079ZZ', 'X07-Z'])(
+    it.each(['x079z', 'X079', 'X079ZZ', 'X07-Z', 'IE-X07A', 'ie-X07A4'])(
         'rejects a malformed cinema code: %s',
         cinema => expect(isValidCinemaCode(cinema)).toBe(false)
     );
@@ -66,6 +66,48 @@ describe('CinemaController', () => {
             expect.stringContaining('theaters='),
             {timeout: 10000, maxContentLength: 2 * 1024 * 1024}
         );
+    });
+
+    it('loads Irish listings from the Irish site with the upstream cinema code', () => {
+        const get = vi.spyOn(axios, 'get').mockReturnValue(
+            new Promise(() => undefined) as ReturnType<typeof axios.get>
+        );
+
+        requestListings(new CinemaController(), 'IE-X07A4');
+
+        const url = new URL(get.mock.calls[0][0] as string);
+        expect(url.origin).toBe('https://www.cineworld.ie');
+        expect(JSON.parse(url.searchParams.get('theaters') || '')).toEqual({
+            id: 'X07A4',
+            timeZone: 'Europe/Dublin',
+        });
+    });
+
+    it('combines UK and Irish cinema lists with source-aware codes and links', async () => {
+        vi.spyOn(console, 'log').mockImplementation(() => undefined);
+        vi.spyOn(axios, 'get').mockImplementation(async url => ({
+            data: createTheaterResponse(
+                url.startsWith('https://www.cineworld.ie') ? 'X07A4' : 'X079Z',
+                url.startsWith('https://www.cineworld.ie') ? 'Dublin' : 'Aberdeen',
+            ),
+        }) as any);
+        const json = vi.fn();
+        const response = {json} as unknown as Response;
+        const request = {url: '/cinema'} as Request;
+
+        new CinemaController().getCinemas(request, response);
+        await vi.waitFor(() => expect(json).toHaveBeenCalledOnce());
+
+        expect(json.mock.calls[0][0]).toEqual([
+            expect.objectContaining({
+                externalCode: 'X079Z',
+                websiteUrl: 'https://www.cineworld.co.uk/cinemas/x079z-cineworld-cinema-aberdeen/',
+            }),
+            expect.objectContaining({
+                externalCode: 'IE-X07A4',
+                websiteUrl: 'https://www.cineworld.ie/whats-on/x07a4-cineworld-cinema-dublin/',
+            }),
+        ]);
     });
 
     it('evicts the oldest entry when the cache reaches its limit', () => {
@@ -119,6 +161,29 @@ function requestListings(controller: CinemaController, cinema: string): void {
     } as Request<{cinema: string; date: string}>;
 
     controller.getListings(request, response);
+}
+
+/** Creates the minimum valid Cineworld theater response for controller tests. */
+function createTheaterResponse(id: string, name: string) {
+    return {
+        data: {
+            allTheater: {
+                nodes: [{
+                    id,
+                    name,
+                    path: `/theaters/${id.toLowerCase()}-cineworld-cinema-${name.toLowerCase()}`,
+                    practicalInfo: {
+                        coordinates: {latitude: 53, longitude: -6},
+                        location: {
+                            address: 'Test address',
+                            city: name,
+                            zip: 'Test postcode',
+                        },
+                    },
+                }],
+            },
+        },
+    };
 }
 
 /** Resolves with the HTTP status returned for a URL. */

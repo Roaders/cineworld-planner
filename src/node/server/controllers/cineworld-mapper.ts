@@ -83,10 +83,15 @@ export interface ICineworldMovie {
 }
 
 /** Maps Cineworld theaters to the application's cinema model. */
-export function mapTheaters(response: ICineworldTheaterResponse): ICinema[] {
+export function mapTheaters(
+    response: ICineworldTheaterResponse,
+    siteUrl = 'https://www.cineworld.co.uk',
+    cinemaCodePrefix = '',
+    cinemaPagePathPrefix = '/cinemas/',
+): ICinema[] {
     return response.data.allTheater.nodes.map(theater => {
         const location = theater.practicalInfo.location;
-        const path = theater.path.replace('/theaters/', '/cinemas/');
+        const path = theater.path.replace('/theaters/', cinemaPagePathPrefix);
 
         return {
             address: {
@@ -95,12 +100,13 @@ export function mapTheaters(response: ICineworldTheaterResponse): ICinema[] {
                 postalCode: location.zip,
                 state: location.state,
             },
-            externalCode: theater.id,
+            externalCode: `${cinemaCodePrefix}${theater.id}`,
             filename: path.split('/').pop() || '',
             latitude: theater.practicalInfo.coordinates.latitude,
             longitude: theater.practicalInfo.coordinates.longitude,
             name: theater.name,
             uri: `${path}/`,
+            websiteUrl: `${siteUrl}${path}/`,
         };
     });
 }
@@ -110,9 +116,11 @@ export function mapListings(
     cinemaId: string,
     schedule: ICineworldSchedule,
     movies: ICineworldMovie[],
+    siteUrl = 'https://www.cineworld.co.uk',
+    moviePagePathPrefix = '/films/',
 ): IListingsResponse {
     const moviesById = new Map(movies.map(movie => [movie.id, movie]));
-    const films = movies.map(mapMovie);
+    const films = movies.map(movie => mapMovie(movie, siteUrl, moviePagePathPrefix));
     const events = Object.keys(schedule).reduce((allEvents, movieId) => {
         const movie = moviesById.get(movieId);
         const movieAttributes = movie == null ? [] : getMovieAttributes(movie);
@@ -130,11 +138,11 @@ export function mapListings(
 }
 
 /** Maps a Cineworld movie to the application's film model. */
-function mapMovie(movie: ICineworldMovie): IFilm {
+function mapMovie(movie: ICineworldMovie, siteUrl: string, moviePagePathPrefix: string): IFilm {
     return {
         id: movie.id,
         length: movie.runtime == null ? 0 : movie.runtime / 60,
-        link: `https://www.cineworld.co.uk/films/${movie.id}`,
+        link: `${siteUrl}${moviePagePathPrefix}${movie.id}`,
         name: movie.title,
         posterLink: movie.poster || '',
         releaseYear: movie.release == null ? '' : movie.release.substring(0, 4),

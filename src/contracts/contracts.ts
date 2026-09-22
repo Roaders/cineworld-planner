@@ -27,6 +27,7 @@ export interface ICinema {
     longitude: number;
     name: string;
     uri: string;
+    websiteUrl: string;
 }
 
 export interface IFilm {
