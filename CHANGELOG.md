@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Moved the Ko-fi support link into the page footer so it no longer obscures content on mobile devices.
+
 ## [1.6.10] - 2026-09-22
 
 ### Added
